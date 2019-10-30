@@ -21,10 +21,7 @@ def get_user_settings():
             user_config_settings['model_version'] = option
             return render_template('pkpd/index.html', settings=user_config_settings)
 
-    if request.method == 'POST':
-
         if 'file' in request.files:
-
             file = request.files['file']
 
             filename = secure_filename(file.filename)
@@ -32,8 +29,15 @@ def get_user_settings():
             #return redirect(url_for('uploaded_file', filename=filename))
 
             user_config_settings['data_file'] = filename
-            print(user_config_settings)
 
             return render_template('pkpd/index.html', settings=user_config_settings)
+
+        if 'go' in request.form:
+            print('Running Python analysis here')
+            print('My settings are:')
+            print(user_config_settings)
+            print('My data is located at:')
+            print(os.path.join(current_app.config['UPLOAD_FOLDER'], user_config_settings['data_file']))
+
 
     return render_template('pkpd/index.html', settings=user_config_settings)
