@@ -1,25 +1,36 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}TITLE GOES HERE{% endblock %}</h1>
+  <h1>{% block title %}PKPD Parameter Fitting{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 
-  {% if submit %}
-
-  <h1>upload file 1</h1>
+  {% if not 'data_file' in settings %}
+  <div>Upload CSV data</div>
   <form method=post enctype="multipart/form-data">
     <input type=file name=file>
     <input type=submit value=Upload>
   </form>
-
   {% endif %}
 
-  {% if not submit %}
+  {% if 'data_file' in settings %}
+  <div> Data {{ settings['data_file'] }} uploaded successfully</div>
+  {% endif %}
 
-  <h1> File uploaded successfully, ready for Python analysis </h1>
+  <br><br>
 
+  {% if not 'model_version' in settings %}
+  <div>Choose model</div>
+  <form method=post enctype="multipart/form-data">
+    <input type="radio" name="options" value=one id=one>1-compartment<br>
+    <input type="radio" name="options" value=two id=two>2-compartment
+    <input type=submit value="Choose model">
+  </form>
+  {% endif %}
+
+  {% if 'model_version' in settings %}
+  <div> Model {{ settings['model_version'] }} selected successfully</div>
   {% endif %}
 
 
