@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}TITLE GOES HERE{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+  {% if submit %}
+
+  <h1>upload file 1</h1>
+  <form method=post enctype="multipart/form-data">
+    <input type=file name=file>
+    <input type=submit value=Upload>
+  </form>
+
+  {% endif %}
+
+  {% if not submit %}
+
+  <h1> File uploaded successfully, ready for Python analysis </h1>
+
+  {% endif %}
+
+
+
+{% endblock %}

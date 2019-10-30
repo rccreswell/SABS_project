@@ -1,4 +1,6 @@
 # SABS_project
 
 To test the web app, run 
-$ python test.py
+
+$ pip install -e .
+$ flask run
