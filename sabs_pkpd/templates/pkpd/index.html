@@ -8,9 +8,10 @@
 
   {% if not 'data_file' in settings %}
   <div>Upload CSV data</div>
-  <form method=post enctype="multipart/form-data">
-    <input type=file name=file>
-    <input type=submit value=Upload>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="data_form">
+    <input type="file" name="filename" value="filename" id="filename">
+    <input type="submit" value="Upload">
   </form>
   {% endif %}
 
@@ -22,10 +23,10 @@
 
   {% if not 'model_version' in settings %}
   <div>Choose model</div>
-  <form method=post enctype="multipart/form-data">
-    <input type="radio" name="options" value=one id=one>1-compartment<br>
-    <input type="radio" name="options" value=two id=two>2-compartment
-    <input type=submit value="Choose model">
+  <form method="post" enctype="multipart/form-data">
+    <input type="radio" name="options" value="one" id="one">1-compartment<br>
+    <input type="radio" name="options" value="two" id="two">2-compartment
+    <input type="submit" value="Choose model">
   </form>
   {% endif %}
 
@@ -37,8 +38,12 @@
 
   <div> Run analysis</div>
   <form method=post>
-    <input type=submit name="go" value="Go">
+    <input type="submit" name="go" value="Go">
   </form>
+
+  {% if 'ready' in settings %}
+  <div> Running analysis here...</div>
+  {% endif %}
 
 
 
