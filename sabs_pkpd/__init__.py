@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 import pints
-#import myokit
+import myokit
 import matplotlib.pyplot as plt
 import numpy as np
 
