@@ -1,5 +1,6 @@
 import numpy as np
 from operator import itemgetter
+import myokit
 
 class Data_exp():
 
