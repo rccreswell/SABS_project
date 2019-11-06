@@ -40,5 +40,3 @@ def create_app(test_config=None):
     app.register_blueprint(pkpd.bp)
 
     return app
-
-def
