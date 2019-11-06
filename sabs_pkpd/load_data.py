@@ -1,12 +1,28 @@
 import numpy as np
 
-class Data():
+class Data_exp():
 
-    def __init__ (self, times, data):
+    def __init__ (self, times, values, experiment_number, experiment_condition):
         self.times = []
-        self.data = []
+        self.values = []
+        self.experiment_number = []
+        self.experiment_condition = []
 
-def load_data_file(filename, headers: bool = True):
+
+    def add_times(self, data_in):
+        self.values = data_in
+
+    def add_values(self, data_in):
+        self.values = data_in
+
+    def add_exp_nums(self, data_in):
+        self.values = data_in
+
+    def add_exp_conds(self, data_in):
+        self.values = data_in
+
+
+def load_data_file(Data_class: Data_exp, filename, headers: bool = True):
 
     # Data should be provided in 4 columns : time, data, experiment number, experiment condition,
     data = np.loadtxt(filename, delimiter = ',', skiprows = int(headers))
@@ -16,5 +32,7 @@ def load_data_file(filename, headers: bool = True):
     if len(data[0])>4:
         print('The provided CSV file has more than 4 columns. Proceeding anyway...')
 
-    data_times = [list(np.array(data)[0:5,0]), list(np.array(data)[5:10,0])]
-    values = [list(np.array(data)[0:5,1]), list(np.array(data)[5:10,1])]
+    Data_class.add_times(data[:, 0])
+    Data_class.add_values(data[:, 1])
+    Data_class.add_exp_nums(data[:, 2])
+    Data_class.add_exp_conds(data[:, 3])
