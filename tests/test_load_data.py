@@ -2,6 +2,7 @@ import sabs_pkpd
 
 import io
 import pytest
+import numpy as np
 
 def test_load_data_file():
     """ Test the CSV file is correctly loaded    """
