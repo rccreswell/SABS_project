@@ -3,11 +3,11 @@ from operator import itemgetter
 
 class Data_exp():
 
-    def __init__ (self):
-        self.times = []
-        self.values = []
-        self.experiment_number = []
-        self.experiment_conditions = []
+    def __init__ (self,times, values, exp_nums, exp_conds):
+        self.times = times
+        self.values = values
+        self.experiment_number = exp_nums
+        self.experiment_conditions = exp_conds
 
 
     def add_times(self, times_in):
@@ -24,7 +24,7 @@ class Data_exp():
 
 
 
-def load_data_file(Data_class: Data_exp, filename, headers: bool = True):
+def load_data_file(filename, headers: bool = True):
 
     # Data should be provided in 4 columns : time, data, experiment number, experiment condition,
     data = np.loadtxt(filename, delimiter = ',', skiprows = int(headers))
@@ -40,7 +40,4 @@ def load_data_file(Data_class: Data_exp, filename, headers: bool = True):
     data = np.concatenate([i for i in data])
     data = data.reshape(len(data)//4, 4)
 
-    Data_class.add_times(data[:, 0])
-    Data_class.add_values(data[:, 1])
-    Data_class.add_exp_nums(data[:, 2])
-    Data_class.add_exp_conds(data[:, 3])
+    return Data_exp(data[:, 0], data[:, 1], data[:, 2], data[:, 3])
