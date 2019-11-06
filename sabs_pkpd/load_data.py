@@ -7,8 +7,8 @@ class Data_exp():
     def __init__ (self,times, values, exp_nums, exp_conds):
         self.times = times
         self.values = values
-        self.experiment_number = exp_nums
-        self.experiment_conditions = exp_conds
+        self.exp_nums = exp_nums
+        self.exp_conds = exp_conds
 
 
     def add_times(self, times_in):
@@ -18,10 +18,10 @@ class Data_exp():
         self.values = data_in
 
     def add_exp_nums(self, exps_in):
-        self.experiment_number = exps_in
+        self.exp_nums= exps_in
 
     def add_exp_conds(self, conds_in):
-        self.experiment_conditions = conds_in
+        self.exp_conds = conds_in
 
 
 
