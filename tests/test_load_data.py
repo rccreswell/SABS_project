@@ -11,3 +11,4 @@ def test_load_data_file():
 
     test = ( a.values == np.transpose([0, 0.126, 0.333, 0.612, 0.802, 0.933, 0, 0.221, 0.528, 0.826, 0.950]))
     assert test.all() == True
+
