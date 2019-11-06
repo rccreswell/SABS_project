@@ -3,7 +3,12 @@ language: python
 python:
 
   - 3.7
-  
+
+before_script:
+  - wget https://github.com/pints-team/pints.git/archive/pints-master.zip -O /tmp/pints-master.zip
+  - tar -xvf /tmp/pints-master.zip
+  - export PATH=$PATH:$PWD/pints-master/
+
 install:
   - pip install -r requirements.txt
   - pip install -e .
