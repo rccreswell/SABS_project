@@ -42,3 +42,4 @@ def load_data_file(filename, headers: bool = True):
     data = data.reshape(len(data)//4, 4)
 
     return Data_exp(data[:, 0], data[:, 1], data[:, 2], data[:, 3])
+
