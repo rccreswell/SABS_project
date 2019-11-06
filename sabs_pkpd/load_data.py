@@ -2,7 +2,7 @@ import numpy as np
 
 class Data():
 
-    __init__ (self, times, data):
+    def __init__ (self, times, data):
         self.times = []
         self.data = []
 
