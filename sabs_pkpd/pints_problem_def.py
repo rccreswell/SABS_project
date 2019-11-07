@@ -10,5 +10,6 @@ class MyModel(pints.ForwardModel):
         return n
 
     def simulate(self, parameters, times):
-        sabs_pkpd.run_model.simulate_data(fitted_params, parameters, exp_cond_annot, s, read_out, data, pre_run = 0)
-
+        out = sabs_pkpd.run_model.simulate_data(fitted_params, parameters, exp_cond_annot, s, read_out, data, pre_run = 0)
+        out = np.concatenate([i for i in out])
+        return out
