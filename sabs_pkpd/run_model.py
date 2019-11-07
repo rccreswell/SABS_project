@@ -65,7 +65,7 @@ def quick_simulate(s, time_max, read_out: str,  varying_param_name = None, varyi
             # set the right experimental conditions
             s.set_constant(varying_param_name, varying_param_values[k])
 
-            # reset timer
+            # reset time
             s.set_time(0)
 
             # Eventually run a pre-run to reach steady-state
