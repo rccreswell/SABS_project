@@ -17,7 +17,7 @@ def simulate_data(fitted_params, params_values, exp_param, s, read_out: str, dat
     output = []
 
     # Run the model solving for all experiment conditions
-    for k in range(0, len(set(data.exp_nums))):
+    for k in range(0, len(set(data.exp_conds))):
         s.reset()
         # reset timer
         s.set_time(0)
