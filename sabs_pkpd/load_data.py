@@ -35,9 +35,9 @@ def load_data_file(filename, headers: bool = True):
     if len(data[0]) > 4:
         raise ValueError('The CSV file is not in the standard format. Please refer to the documentation. (Too many columns)')
 
-    # Sorting the list in increasing times and experiment number
+    # Sorting the list in increasing times and experiment condition
 
-    data = sorted(data, key=itemgetter(2, 0))
+    data = sorted(data, key=itemgetter(3, 0))
     data = np.concatenate([i for i in data])
     data = data.reshape(len(data)//4, 4)
     exp_nums_list = list(set(data[:,2]))
