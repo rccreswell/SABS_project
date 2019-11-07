@@ -5,7 +5,7 @@ import pytest
 import numpy as np
 
 def test_simulate_data():
-    s = sabs_pkpd.run_model.set_myokit_simulation('./test resources/pints_problem_def_test.mmt')
+    s = sabs_pkpd.run_model.set_myokit_simulation('./tests/test resources/pints_problem_def_test.mmt')
 
     data = sabs_pkpd.load_data.load_data_file('./test resources/load_data_test.csv')
 
