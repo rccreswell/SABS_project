@@ -7,7 +7,7 @@ def set_myokit_simulation(model_filename):
     return myokit.Simulation(model, prot)
 
 
-def simulate_data(fitted_params, params_values, exp_param, s, read_out: str, data, pre_run = 0):
+def simulate_data(fitted_params_annot, fitted_params_values, exp_cond_annot, s, read_out: str, data, pre_run = 0):
 
     # This function is meant for comparison of simulation conditions to data, or to be called by the PINTS optimisation tool
 
@@ -21,11 +21,11 @@ def simulate_data(fitted_params, params_values, exp_param, s, read_out: str, dat
         s.set_time(0)
 
         # Set parameters for simulation
-        for i in range(0, len(fitted_params)):
-            s.set_constant(fitted_params[i], params_values[i])
+        for i in range(0, len(fitted_params_annot)):
+            s.set_constant(fitted_params_annot[i], fitted_params_values[i])
 
         # set the right experimental conditions
-        s.set_constant(exp_param, list(set(data.exp_conds))[k])
+        s.set_constant(exp_cond_annot, list(set(data.exp_conds))[k])
 
         # Eventually run a pre-run to reach steady-state
         s.pre(pre_run)
@@ -37,15 +37,16 @@ def simulate_data(fitted_params, params_values, exp_param, s, read_out: str, dat
     return output
 
 
-def quick_simulate(s, time_max, read_out: str,  varying_param_name = None, varying_param_values = [], fixed_params_names = [], fixed_params_values = [], pre_run = 0, time_samples = []):
+def quick_simulate(s, time_max, read_out: str,  varying_param_annot = None, varying_param_values = [], fixed_params_annot = [], fixed_params_values = [], pre_run = 0, time_samples = []):
 
     '''This function is for quick simulation of user selected conditions
     '''
 
-    if time_samples[-1] >= time_max and time_samples != []:
-        raise ValueError('The time samples have to be within the range (0 , time_max)')
+    if time_samples != []:
+        if time_samples[-1] >= time_max :
+            raise ValueError('The time samples have to be within the range (0 , time_max)')
 
-    if len(fixed_params_names) != len(fixed_params_values):
+    if len(fixed_params_annot) != len(fixed_params_values):
         raise ValueError('The parameters clamped for the simulation must have the same length for names and values')
 
     if len(time_samples) == 0:
@@ -61,12 +62,12 @@ def quick_simulate(s, time_max, read_out: str,  varying_param_name = None, varyi
             s.reset()
 
             # Set parameters for simulation
-            if len(fixed_params_names) > 0:
-                for i in range(0, len(fixed_params_names)):
-                    s.set_constant(fixed_params_names[i], fixed_params_values[i])
+            if len(fixed_params_annot) > 0:
+                for i in range(0, len(fixed_params_annot)):
+                    s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
             # set the right experimental conditions
-            s.set_constant(varying_param_name, varying_param_values[k])
+            s.set_constant(varying_param_annot, varying_param_values[k])
 
             # reset time
             s.set_time(0)
@@ -84,9 +85,9 @@ def quick_simulate(s, time_max, read_out: str,  varying_param_name = None, varyi
         s.reset()
 
         # Set parameters for simulation
-        if len(fixed_params_names) > 0:
-            for i in range(0, len(fixed_params_names)):
-                s.set_constant(fixed_params_names[i], fixed_params_values[i])
+        if len(fixed_params_annot) > 0:
+            for i in range(0, len(fixed_params_annot)):
+                s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
         # reset timer
         s.set_time(0)
