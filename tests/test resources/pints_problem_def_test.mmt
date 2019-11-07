@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 21 10:58:43 2019
+
+@author: yanral
+"""
+[[model]]   
+comp1.y = 0
+
+
+[engine]
+time = 0 bind time 
+pace = 0 bind pace
+step = 0 bind time_step
+
+[constants]
+unknown_cst = 5
+T = 37
+
+[comp1] 
+use constants.unknown_cst as u_c
+use constants.T as T
+dot(y) = 1 - y * T * u_c
+
+
+
+[[protocol]]
+# Level Start   Length  Period  Multiplier
+1       0       1000    0       0
+
+    
+[[script]]

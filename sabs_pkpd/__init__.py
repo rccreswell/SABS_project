@@ -1,5 +1,9 @@
 import os
 from flask import Flask
+import pints
+import myokit
+import matplotlib.pyplot as plt
+import numpy as np
 
 def create_app(test_config=None):
     """Factory for creating and configuring the web app.
@@ -36,3 +40,6 @@ def create_app(test_config=None):
     app.register_blueprint(pkpd.bp)
 
     return app
+
+from . import load_data
+
