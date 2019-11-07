@@ -6,6 +6,7 @@ Created on Mon Oct 21 10:58:43 2019
 """
 [[model]]   
 comp1.y = 0
+comp1.x = 1
 
 
 [engine]
@@ -15,12 +16,14 @@ step = 0 bind time_step
 
 [constants]
 unknown_cst = 5
+unknown_cst2 = 3
 T = 37
 
 [comp1] 
 use constants.unknown_cst as u_c
 use constants.T as T
-dot(y) = 1 - y * T * u_c
+dot(y) = 1 - y * T * u_c + x
+dot(x) = 1 - x*T * u_c2 +y
 
 
 
