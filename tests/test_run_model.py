@@ -23,7 +23,7 @@ def test_simulate_data():
 
 def test_quick_simulate():
     s = sabs_pkpd.run_model.set_myokit_simulation('./tests/test resources/pints_problem_def_test.mmt')
-    time_max = 1
+    time_max = 6
     changed_params_names = ['constants.unknown_cst', 'constants.unknown_cst2']
     changed_params_values = [0.1, 0.1]
     time_samples = [0, 0.01, 0.05, 0.1, 0.3, 0.5, 1, 5]

@@ -42,6 +42,9 @@ def quick_simulate(s, time_max, read_out: str,  varying_param_name = None, varyi
     '''This function is for quick simulation of user selected conditions
     '''
 
+    if time_samples[-1] >= time_max and time_samples != []:
+        raise ValueError('The time samples have to be within the range (0 , time_max)')
+
     if len(fixed_params_names) != len(fixed_params_values):
         raise ValueError('The parameters clamped for the simulation must have the same length for names and values')
 
