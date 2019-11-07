@@ -1,7 +1,6 @@
 import pints
 import myokit
 import numpy as np
-import load_data
 
 def set_myokit_simulation(model_filename):
     model, prot, script = myokit.load(model_filename)
