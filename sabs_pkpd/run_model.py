@@ -7,7 +7,7 @@ def set_myokit_simulation(model_filename):
     return myokit.Simulation(model, prot)
 
 
-def simulate_data(fitted_params, params_values, read_out: str, data):
+def simulate_data(fitted_params, params_values, exp_param, s, read_out: str, data):
 
     # Set parameters for simulation
     for i in range(0, len(fitted_params)):
