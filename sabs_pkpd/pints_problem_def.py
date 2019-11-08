@@ -7,8 +7,8 @@ import sabs_pkpd
 class MyModel(pints.ForwardModel):
     def n_parameters(self):
         # Define the amount of fitted parameters
-        ''' I have no idea how to make the user change that (for now) '''
-        n = len(data_exp.fitting_instructions.fitted_params_annot)
+        ''' I have no idea how to make the user change n (for now) '''
+        n = 2
         return n
 
     def simulate(self, parameters, times):

@@ -1,6 +1,8 @@
 import pints
 import myokit
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 def set_myokit_simulation(model_filename):
     model, prot, script = myokit.load(model_filename)
@@ -105,3 +107,12 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
         output.append(list(a[read_out]))
 
     return output
+
+
+def plot_model_vs_data(plotting_parameters_values, data_exp, s):
+    number_of_plots = len(data_exp.exp_conds)
+    number_of_rows = number_of_plots//2 + number_of_plots%(number_of_plots//2)
+    fig1 = plt.fig()
+    for i in range(number_of_plots):
+        plt.subplot(number_of_rows, 2, 0)
+
