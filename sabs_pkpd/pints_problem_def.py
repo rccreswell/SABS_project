@@ -8,7 +8,8 @@ class MyModel(pints.ForwardModel):
     def n_parameters(self):
         # Define the amount of fitted parameters
         ''' I have no idea how to make the user change that (for now) '''
-        return len(data_exp.fitting_instructions.fitted_params_annot)
+        n = len(data_exp.fitting_instructions.fitted_params_annot)
+        return n
 
     def simulate(self, parameters, times):
 
