@@ -29,7 +29,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
             s.set_constant(data_exp.fitting_instructions.fitted_params_annot[i], fitted_params_values[i])
 
         # set the right experimental conditions
-        s.set_constant(data_exp.fitting_instructions.exp_cond_annot, list(set(data_exp.exp_conds))[k])
+        s.set_constant(data_exp.fitting_instructions.exp_cond_param_annot, list(set(data_exp.exp_conds))[k])
 
         # Eventually run a pre-run to reach steady-state
         s.pre(pre_run)
