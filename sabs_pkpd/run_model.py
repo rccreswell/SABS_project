@@ -7,37 +7,41 @@ def set_myokit_simulation(model_filename):
     return myokit.Simulation(model, prot)
 
 
-def simulate_data(fitted_params_annot, fitted_params_values, exp_cond_annot, s, read_out: str, data, pre_run = 0):
+def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
     # This function is meant for comparison of simulation conditions to data, or to be called by the PINTS optimisation tool
 
     # Allocate memory for the output
     output = []
 
+    # Verify that the parameters for fitting and their values have the same length
+    if len(fitted_params_values) != len(data_exp.fitting_instructions.fitted_params_annot):
+        raise ValueError('Fitted parameters annotations and values should have the same length')
+
     # Run the model solving for all experiment conditions
-    for k in range(0, len(set(data.exp_conds))):
+    for k in range(0, len(set(data_exp.exp_conds))):
         s.reset()
         # reset timer
         s.set_time(0)
 
         # Set parameters for simulation
-        for i in range(0, len(fitted_params_annot)):
-            s.set_constant(fitted_params_annot[i], fitted_params_values[i])
+        for i in range(0, len(data_exp.fitting_instructions.fitted_params_annot)):
+            s.set_constant(data_exp.fitting_instructions.fitted_params_annot[i], fitted_params_values[i])
 
         # set the right experimental conditions
-        s.set_constant(exp_cond_annot, list(set(data.exp_conds))[k])
+        s.set_constant(data_exp.fitting_instructions.exp_cond_annot, list(set(data_exp.exp_conds))[k])
 
         # Eventually run a pre-run to reach steady-state
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(data.times[k][-1]+0.01, log_times=data.times[k])
+        a = s.run(data_exp.times[k][-1]+0.01, log_times=data_exp.times[k])
         # Convert output in concentration
-        output.append( list(a[read_out]))
+        output.append( list(a[data_exp.fitting_instructions.sim_output_param_annot]))
     return output
 
 
-def quick_simulate(s, time_max, read_out: str,  varying_param_annot = None, varying_param_values = [], fixed_params_annot = [], fixed_params_values = [], pre_run = 0, time_samples = []):
+def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp_cond_param_values = [], fixed_params_annot = [], fixed_params_values = [], pre_run = 0, time_samples = []):
 
     '''This function is for quick simulation of user selected conditions
     '''
@@ -57,8 +61,8 @@ def quick_simulate(s, time_max, read_out: str,  varying_param_annot = None, vary
 
     # Run the model solving for all experiment conditions
     # In case the user wants some parameter to vary between simulations
-    if len(varying_param_values) > 0:
-        for k in range(0, len(varying_param_values)):
+    if len(exp_cond_param_values) > 0:
+        for k in range(0, len(exp_cond_param_values)):
             s.reset()
 
             # Set parameters for simulation
@@ -67,7 +71,7 @@ def quick_simulate(s, time_max, read_out: str,  varying_param_annot = None, vary
                     s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
             # set the right experimental conditions
-            s.set_constant(varying_param_annot, varying_param_values[k])
+            s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
 
             # reset time
             s.set_time(0)
