@@ -2,7 +2,6 @@ import pints
 import myokit
 import numpy as np
 import sabs_pkpd
-import matplotlib.pyplot as plt
 
 
 class MyModel(pints.ForwardModel):
