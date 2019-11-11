@@ -1,3 +1,7 @@
+# About data.csv files
+
+The data file should be loaded as a .csv file.
+
 # This is an example of how to use the simulation and inference tools included in this package.
 
 ##  Importing the necessary libraries:
@@ -29,7 +33,7 @@ sabs_pkpd.constants.data_exp.Add_fitting_instructions(fit_param_annot, exp_cond_
   - <strong>times</strong> is a list of all loaded experiments, with all time points for each ;
   - <strong>values</strong> is a list with the same shape, containing the data measured at those time points ;
   - <strong>exp_nums</strong> is a list of the labels of the experiments, as floats.
-  - 
+  - <strong>exp_conds</strong> is a list of the values taken by the experimental condition for each experiment. It is of length the number of experiments.
 
 ## Parameter inference instructions
 ```python
