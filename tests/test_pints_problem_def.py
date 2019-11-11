@@ -21,4 +21,5 @@ def test_infer_params():
     np.random.seed(19580)
 
     inferred_params = sabs_pkpd.pints_problem_def.infer_params(initial_point, sabs_pkpd.constants.data_exp, boundaries_low, boundaries_high)
-    assert np.array_equal(inferred_params, np.array([0.0998266, 0.10037735]))
+    diff = inferred_params - np.array([0.1, 0.1])
+    assert np.linalg.norm(diff) < 0.01
