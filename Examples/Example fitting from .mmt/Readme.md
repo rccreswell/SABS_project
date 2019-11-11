@@ -46,7 +46,7 @@ sabs_pkpd.constants.s = sabs_pkpd.run_model.set_myokit_simulation('./tests/test 
 ```
 Set up the constants n and s:
   - <strong>n</strong> is the number of parameters fitted
-  - <strong>s</strong> is the myokit model loaded for myokit.simulation 
+  - <strong>s</strong> is the myokit model loaded for myokit.simulation. Please make sure when entering the filename that the subdirectory key is '/' not '\'
 
 For a better comprehension of the example, please refer to the .mmt model in the /tests/test resources/ directory.
 
