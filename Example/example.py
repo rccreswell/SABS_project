@@ -20,4 +20,4 @@ sabs_pkpd.constants.data_exp.Add_fitting_instructions(['constants.unknown_cst', 
 inferred_params = sabs_pkpd.pints_problem_def.infer_params(initial_point, sabs_pkpd.constants.data_exp, boundaries_low, boundaries_high)
 
 # Plot of the results against the data
-sabs_pkpd.run_model.plot_model_vs_data(['constants.unknown_cst', 'constants.unknown_cst2'],inferred_params, sabs_pkpd.constants.data_exp, sabs_pkpd.constants.s)
+sabs_pkpd.run_model.plot_model_vs_data(['constants.unknown_cst', 'constants.unknown_cst2'], inferred_params, sabs_pkpd.constants.data_exp, sabs_pkpd.constants.s)

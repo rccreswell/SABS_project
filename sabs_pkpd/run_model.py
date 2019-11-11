@@ -63,35 +63,55 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
 
     # Run the model solving for all experiment conditions
     # In case the user wants some parameter to vary between simulations
-    if len(exp_cond_param_values) > 0:
-        for k in range(0, len(exp_cond_param_values)):
-            s.reset()
+    if type(exp_cond_param_values) != float and type(exp_cond_param_values) != int:
+        if len(exp_cond_param_values) > 0:
+            for k in range(0, len(exp_cond_param_values)):
 
-            # Set parameters for simulation
-            if len(fixed_params_annot) > 0:
-                for i in range(0, len(fixed_params_annot)):
-                    s.set_constant(fixed_params_annot[i], fixed_params_values[i])
+                s.reset()
 
-            # set the right experimental conditions
-            s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
+                # Set parameters for simulation
+                if len(fixed_params_annot) > 0:
+                    for i in range(0, len(fixed_params_annot)):
+                        s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
-            # reset time
-            s.set_time(0)
+                # set the right experimental conditions
+                s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
 
-            # Eventually run a pre-run to reach steady-state
-            s.pre(pre_run)
+                # reset time
+                s.set_time(0)
 
-            # Run the simulation with starting parameters
-            a = s.run(time_max*1.001, log_times=time_samples)
-            # Convert output in concentration
-            output.append( list(a[read_out]))
+                # Eventually run a pre-run to reach steady-state
+                s.pre(pre_run)
+
+                # Run the simulation with starting parameters
+                a = s.run(time_max*1.001, log_times=time_samples)
+                # Convert output in concentration
+                output.append( list(a[read_out]))
+        else:
+                s.reset()
+
+                # Set parameters for simulation
+                if len(list(fixed_params_annot)) > 0:
+                    for i in range(0, len(fixed_params_annot)):
+                        s.set_constant(fixed_params_annot[i], fixed_params_values[i])
+
+                # reset timer
+                s.set_time(0)
+
+                # Eventually run a pre-run to reach steady-state
+                s.pre(pre_run)
+
+                # Run the simulation with starting parameters
+                a = s.run(time_max * 1.001, log_times=time_samples)
+                # Convert output in concentration
+                output.append(list(a[read_out]))
 
     # In case there is no looping over a v varying parameter
     else:
         s.reset()
 
         # Set parameters for simulation
-        if len(fixed_params_annot) > 0:
+        if len(list(fixed_params_annot)) > 0:
             for i in range(0, len(fixed_params_annot)):
                 s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
@@ -102,7 +122,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(time_max*1.001, log_times=time_samples)
+        a = s.run(time_max * 1.001, log_times=time_samples)
         # Convert output in concentration
         output.append(list(a[read_out]))
 
@@ -120,19 +140,23 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
     number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
     fig1 = plt.figure()
 
-    for i in range(1, number_of_plots+1):
-        plt.subplot(number_of_rows, 2, i)
+    for i in range(0, number_of_plots):
+        plt.subplot(number_of_rows, 2, i+1)
 
         time_max = data_exp.times[i][-1]
-        exp_cond_param_values = list(data_exp.exp_conds[i])
-        fixed_params_values = list(plotting_parameters_values)
-        fixed_params_values.append(exp_cond_param_values)
         time_samples = data_exp.times[i]
+
+        fixed_params_values = list(plotting_parameters_values)
+        exp_cond_param_values = float(data_exp.exp_conds[i])
+        fixed_params_values.append(exp_cond_param_values)
 
         sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples = time_samples)
 
-        plt.plot(time_samples, sim_data)
-        plt.plot(time_samples, data_exp.values[i])
-        plt.suptitle('Experimental conditions : ' + exp_cond_param_annot + ' = ' + str(exp_cond_param_values))
+        plt.plot(time_samples, sim_data[0], label='Simulated values')
+        plt.plot(time_samples, data_exp.values[i], label='Experimental data')
+        plt.title('Experimental conditions : ' + exp_cond_param_annot + ' = ' + str(exp_cond_param_values))
         plt.xlabel('Time')
         plt.ylabel(data_exp.fitting_instructions.sim_output_param_annot)
+        plt.legend()
+
+    return 0
