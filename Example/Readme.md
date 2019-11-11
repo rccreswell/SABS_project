@@ -13,10 +13,23 @@ The file should be organised following the template:
 | 0.3 | 0.253 | 2019110601 | 37 |
 | 0.7 | 0.865 | 2019110601 | 37 |
 
-Note : the rows do not need to be sorted. While loading the data table, the table
+Note : the rows do not need to be sorted. While loading the data table, the table will be sorted with increasing experimental conditions (in a first time), and with increasing times (in a second time), thus resulting in a data structure similar to the one above.
 
+# Architecture of the loaded data
+
+The data is loaded as a data_exp structure. <strong>data_exp</strong> is a structure with entries:
+  - <strong>times</strong> is a list of all loaded experiments, with all time points for each ;
+  - <strong>values</strong> is a list with the same shape, containing the data measured at those time points ;
+  - <strong>exp_nums</strong> is a list of the labels of the experiments, as floats.
+  - <strong>exp_conds</strong> is a list of the values taken by the experimental condition for each experiment. It is of length the number of experiments.
+  - <strong>.fitting_instructions</strong> after call of the function <strong>Add_fitting_instructions</strong>. This subclass has entries:
+    - <strong>fitted_params_annot</strong> is a list of strings for the parameters fitted for the model. It is presented as ['compartment.parameter_fitted1', 'compartment.parameter_fitted2', ...]. It should match the annotations of the .mmt model used for simulations/fitting.
+    - <strong>exp_cond_param_annot</strong> is a string. It should match the annotation of the .mmt model for the varying experimental condition used to generate the data.
+    - <strong>sim_output_param_annot</strong> is a string. It should match the annotation of the .mmt model output.
 
 # Use of the simulation and inference tools included in this package.
+
+Check the example.py file for the example code. If you want to run it, please change the directories to the directories of the 
 
 ##  Importing the necessary libraries:
 
@@ -43,11 +56,7 @@ model_output_annot = 'comp1.y'
 sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file('./tests/test resources/load_data_test.csv')
 sabs_pkpd.constants.data_exp.Add_fitting_instructions(fit_param_annot, exp_cond_annot, model_output_annot)
 ```
-<strong>data_exp</strong> is a structure with entries:
-  - <strong>times</strong> is a list of all loaded experiments, with all time points for each ;
-  - <strong>values</strong> is a list with the same shape, containing the data measured at those time points ;
-  - <strong>exp_nums</strong> is a list of the labels of the experiments, as floats.
-  - <strong>exp_conds</strong> is a list of the values taken by the experimental condition for each experiment. It is of length the number of experiments.
+Here is an example of how to load 
 
 ## Parameter inference instructions
 ```python
