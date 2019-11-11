@@ -37,8 +37,6 @@ Check the example.py file for the example code. If you want to run it, please ch
 import sabs_pkpd
 ```
 
-Note : numpy, matplotlib.pyplot are imported in the __init__.py file
-
 ## Setting up the parameters for simulation and fitting
 ```python
 sabs_pkpd.constants.n = 2
