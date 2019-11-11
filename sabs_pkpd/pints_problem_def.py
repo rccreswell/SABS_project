@@ -7,13 +7,11 @@ import sabs_pkpd
 class MyModel(pints.ForwardModel):
     def n_parameters(self):
         # Define the amount of fitted parameters
-        ''' I have no idea how to make the user change n (for now) '''
-        n = 2
-        return n
+        return sabs_pkpd.constants.n
 
     def simulate(self, parameters, times):
 
-        out = sabs_pkpd.run_model.simulate_data(parameters, s, data_exp, pre_run = 0)
+        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = 0)
         out = np.concatenate([i for i in out])
         return out
 
