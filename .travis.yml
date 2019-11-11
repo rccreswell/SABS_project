@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get -y install python3-pip python3-dev
   - sudo apt-get -y install python3-scipy python3-sympy
   - sudo apt-get -y install python3-pyqt5 python3-matplotlib
-  - sudo apt-get -y install libsundials-serial-dev
+
 
 install:
   - pip install -r requirements.txt
@@ -20,5 +20,6 @@ install:
   - wget https://github.com/MichaelClerx/myokit/archive/master.zip -O /tmp/myokit-master.zip
   - unzip -q /tmp/myokit-master.zip -d /home/travis/myokit-master/
   - pip install /home/travis/myokit-master/myokit-master/
+
 script:
     - pytest
