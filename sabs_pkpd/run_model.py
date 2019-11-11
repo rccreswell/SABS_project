@@ -37,7 +37,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(data_exp.times[k][-1]+0.01, log_times=data_exp.times[k])
+        a = s.run(data_exp.times[k][-1]*1.001, log_times=data_exp.times[k])
         # Convert output in concentration
         output.append( list(a[data_exp.fitting_instructions.sim_output_param_annot]))
     return output
@@ -49,7 +49,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     '''
 
     if time_samples != []:
-        if time_samples[-1] >= time_max :
+        if time_samples[-1] > time_max :
             raise ValueError('The time samples have to be within the range (0 , time_max)')
 
     if len(fixed_params_annot) != len(fixed_params_values):
@@ -82,7 +82,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
             s.pre(pre_run)
 
             # Run the simulation with starting parameters
-            a = s.run(time_max, log_times=time_samples)
+            a = s.run(time_max*1.001, log_times=time_samples)
             # Convert output in concentration
             output.append( list(a[read_out]))
 
@@ -102,17 +102,37 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(time_max, log_times=time_samples)
+        a = s.run(time_max*1.001, log_times=time_samples)
         # Convert output in concentration
         output.append(list(a[read_out]))
 
     return output
 
 
-def plot_model_vs_data(plotting_parameters_values, data_exp, s):
-    number_of_plots = len(data_exp.exp_conds)
-    number_of_rows = number_of_plots//2 + number_of_plots%(number_of_plots//2)
-    fig1 = plt.fig()
-    for i in range(number_of_plots):
-        plt.subplot(number_of_rows, 2, 0)
+def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s):
 
+    read_out = data_exp.fitting_instructions.sim_output_param_annot
+    exp_cond_param_annot = data_exp.fitting_instructions.exp_cond_param_annot
+    fixed_params_annot = list(plotting_parameters_annot)
+    fixed_params_annot.append(exp_cond_param_annot)
+
+    number_of_plots = len(data_exp.exp_conds)
+    number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
+    fig1 = plt.figure()
+
+    for i in range(1, number_of_plots+1):
+        plt.subplot(number_of_rows, 2, i)
+
+        time_max = data_exp.times[i][-1]
+        exp_cond_param_values = list(data_exp.exp_conds[i])
+        fixed_params_values = list(plotting_parameters_values)
+        fixed_params_values.append(exp_cond_param_values)
+        time_samples = data_exp.times[i]
+
+        sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples = time_samples)
+
+        plt.plot(time_samples, sim_data)
+        plt.plot(time_samples, data_exp.values[i])
+        plt.suptitle('Experimental conditions : ' + exp_cond_param_annot + ' = ' + str(exp_cond_param_values))
+        plt.xlabel('Time')
+        plt.ylabel(data_exp.fitting_instructions.sim_output_param_annot)
