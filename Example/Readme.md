@@ -82,3 +82,4 @@ This returns ```inferred_params``` as a ```numpy.array``` of the optimised param
 sabs_pkpd.run_model.plot_model_vs_data(['constants.unknown_cst', 'constants.unknown_cst2'], inferred_params, sabs_pkpd.constants.data_exp, sabs_pkpd.constants.s)
 ```
 The output is presented in the figure below:
+![Sim_vs_exp](./Example_plot_exp_vs_sim.png)
