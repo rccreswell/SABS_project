@@ -48,6 +48,8 @@ Set up the constants n and s:
   - <strong>n</strong> is the number of parameters fitted
   - <strong>s</strong> is the myokit model loaded for myokit.simulation 
 
+For a better comprehension of the example, please refer to the .mmt model in the /tests/test resources/ directory.
+
 ## Loading experimental data and setting up the instructions for fitting
 ```python
 fit_param_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
@@ -56,7 +58,9 @@ model_output_annot = 'comp1.y'
 sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file('./tests/test resources/load_data_test.csv')
 sabs_pkpd.constants.data_exp.Add_fitting_instructions(fit_param_annot, exp_cond_annot, model_output_annot)
 ```
-Here is an example of how to load 
+Here is an example of how to load a data. Refer to the section above for the structure of the .csv file loaded. Here, we decide to fit the parameters 'constants.unknown_cst' and 'constants.unknown_cst2' of the .mmt model previously loaded. 
+In this toy example, we consider the case where two measurements were done at 'constants.T' = 20 and 37.
+We consider also that the data measured in the csv file is modelled as 'comp1.y'.
 
 ## Parameter inference instructions
 ```python
@@ -64,4 +68,3 @@ initial_point = [0.5, 0.5]
 boundaries_low = [0, 0]
 boundaries_high = [1, 1]
 ```
-
