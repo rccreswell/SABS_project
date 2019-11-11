@@ -1,8 +1,22 @@
 # About data.csv files
 
-The data file should be loaded as a .csv file.
+The data file should be loaded as a .csv file, with <strong>coma as separator</strong>.
 
-# This is an example of how to use the simulation and inference tools included in this package.
+The file should be organised following the template:
+
+| Time | Values | Experiment number | Experimental condition |
+| ---- | ------ | ----------------- | ---------------------- | 
+| 0 | 0.094 | 2019110601 | 20 |
+| 0.3 | 0.654 | 2019110601 | 20 |
+| 0.6 | 0.844 | 2019110601 | 20 |
+| 0 | 0.094 | 2019110601 | 37 |
+| 0.3 | 0.253 | 2019110601 | 37 |
+| 0.7 | 0.865 | 2019110601 | 37 |
+
+Note : the rows do not need to be sorted. While loading the data table, the table
+
+
+# Use of the simulation and inference tools included in this package.
 
 ##  Importing the necessary libraries:
 
