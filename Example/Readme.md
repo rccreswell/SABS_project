@@ -64,7 +64,21 @@ We consider also that the data measured in the csv file is modelled as 'comp1.y'
 
 ## Parameter inference instructions
 ```python
-initial_point = [0.5, 0.5]
+initial_point = [0.5, 0.3]
 boundaries_low = [0, 0]
 boundaries_high = [1, 1]
 ```
+Here, the initial point is set as ``` 'constants.unknown_cst' = 0.5``` and ```'constants.unknown_cst2' = 0.3``` . 
+The parameters are allowed to vary here from 0 to 1.
+
+## Call of the inference function
+```python
+inferred_params = sabs_pkpd.pints_problem_def.infer_params(initial_point, sabs_pkpd.constants.data_exp, boundaries_low, boundaries_high)
+```
+This returns ```inferred_params``` as a ```numpy.array``` of the optimised parameters. In this toy problem, the data was generated with parameters ``` 'constants.unknown_cst' = 0.1``` and ```'constants.unknown_cst2' = 0.1``` . 
+
+## Plot the model with optimised parameters against experimental data
+```python
+sabs_pkpd.run_model.plot_model_vs_data(['constants.unknown_cst', 'constants.unknown_cst2'], inferred_params, sabs_pkpd.constants.data_exp, sabs_pkpd.constants.s)
+```
+The output is presented in the figure below:
