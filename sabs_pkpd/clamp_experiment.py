@@ -10,18 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import myokit
 
-def def_clamp_protocol(protocol_filename, )
-    """
-    The clamped variable has to be defined with a fixed value in the model, not with a literal expression nor an ODE.
-    
-    :return: 
-    """
-
-
-
-
-
-
 modelname = 'C:/Users/yanral/Documents/Software Development/tests/test resources/clamp_exp_test.mmt'
 # In[]
 m, p, script = myokit.load(modelname)
@@ -40,16 +28,16 @@ plt.title('Clamped value ' + exp_clamped_parameter_annot)
 
 p = myokit.Protocol()
 
-for i in range(len(time_samples)-1):
-    p.schedule(exp_clamped_parameter_values[i], time_samples[i], time_samples[i+1]-time_samples[i])
-    
+for i in range(len(time_samples) - 1):
+    p.schedule(exp_clamped_parameter_values[i], time_samples[i], time_samples[i + 1] - time_samples[i])
+
 myokit.save(modelname, model=m, protocol=p)
 
 s.reset()
 # reset timer
 s.set_time(0)
 
-a = s.run(time_max, log_times = time_samples)
+a = s.run(time_max, log_times=time_samples)
 output = a[read_out]
 
 

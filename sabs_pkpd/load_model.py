@@ -59,6 +59,8 @@ def convert_protocol(model):
             variable.set_rhs(0.5)
         elif variable.name() == 'Istim':
             variable.set_rhs('level * IstimAmplitude')
+        elif variable.name() == 'i_stim':
+            variable.set_rhs(0.5)
         elif variable.name() == 'level':
             pass
         else:
