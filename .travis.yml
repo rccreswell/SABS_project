@@ -20,5 +20,6 @@ install:
   - wget https://github.com/MichaelClerx/myokit/archive/master.zip -O /tmp/myokit-master.zip
   - unzip -q /tmp/myokit-master.zip -d /home/travis/myokit-master/
   - pip install /home/travis/myokit-master/myokit-master/
+
 script:
     - pytest
