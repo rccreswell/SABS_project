@@ -4,11 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def set_myokit_simulation(model_filename):
-    model, prot, script = myokit.load(model_filename)
-    return myokit.Simulation(model, prot)
-
-
 def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
     # This function is meant for comparison of simulation conditions to data, or to be called by the PINTS optimisation tool
