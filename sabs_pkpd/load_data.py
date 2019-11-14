@@ -2,8 +2,20 @@ import numpy as np
 from operator import itemgetter
 import myokit
 
-class FittingInstructions():
 
+class FittingInstructions():
+    """
+    This class stores the fitting instructions for parameter inference.
+    
+    Attributes
+    ----------
+    fitted_params_annot : list of strings
+        mmt model annotations of the fitted parameters. Ex ['constants.unknown_cst']
+    exp_cond_param_annot : str
+        mmt model annotation of the variable specifying the experimental conditions. It should correspond to the annotation of the experimental condition varying when generating the data.
+    sim_output_param_annot : str
+        mmt model annotation of the simulation output of interest.
+    """
     def __init__(self, fitted_params_annot, exp_cond_param_annot, sim_output_param_annot):
         self.fitted_params_annot = fitted_params_annot
         self.exp_cond_param_annot = exp_cond_param_annot
@@ -17,7 +29,7 @@ class Data_exp():
         self.values = values
         self.exp_nums = exp_nums
         self.exp_conds = exp_conds
-        self.fitting_instructions = []
+        self.fitting_instructions = None
 
     def Add_fitting_instructions(self, fitted_params_annot, exp_cond_param_annot, sim_output_param_annot):
         self.fitting_instructions = FittingInstructions(fitted_params_annot, exp_cond_param_annot, sim_output_param_annot)
@@ -35,7 +47,7 @@ def load_data_file(filename, headers: bool = True):
     if len(data[0]) > 4:
         raise ValueError('The CSV file is not in the standard format. Please refer to the documentation. (Too many columns)')
 
-    # Sorting the list in increasing times and experiment condition
+    # Sorting the list in increasing times and experimental condition
 
     data = sorted(data, key=itemgetter(3, 0))
     data = np.concatenate([i for i in data])
