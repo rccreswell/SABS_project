@@ -36,9 +36,9 @@ class Data_exp():
 
 def load_data_file(filename, headers: bool = True):
     # Data should be provided in 4 columns : time, data, experiment number, experiment condition,
-    data = np.loadtxt(filename, delimiter= ',', skiprows= int(headers))
+    data = pd.read_csv(filename, sep= ',', skiprows= int(headers))
 
-    if len(data[:,0]) != len(data[:,1]) :
+    if len(data[:,'times']) != len(data[:,'values']) :
         raise ValueError('The times and values must have the same length')
     if type(data[0][0]) == str :
         raise ValueError('The CSV file is not in the standard format. Please refer to the documentation. (More than one line of headers)')
