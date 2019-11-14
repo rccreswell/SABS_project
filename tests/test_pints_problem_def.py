@@ -7,7 +7,7 @@ def test_infer_params():
 
     # Fix the variables which have to be global
     sabs_pkpd.constants.n = 2
-    sabs_pkpd.constants.s = sabs_pkpd.run_model.set_myokit_simulation('./tests/test resources/pints_problem_def_test.mmt')
+    sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
 
     # Define all the conditions for parameters inference
     initial_point = [0.5, 0.5]

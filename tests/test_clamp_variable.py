@@ -10,19 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import myokit
 
-def def_clamp_protocol(protocol_filename, )
-    """
-    The clamped variable has to be defined with a fixed value in the model, not with a literal expression nor an ODE.
-    
-    :return: 
-    """
-
-
-
-
-
-
-modelname = 'C:/Users/yanral/Documents/Software Development/tests/test resources/clamp_exp_test.mmt'
+modelname = './tests/test resources/clamp_exp_test.mmt'
 # In[]
 m, p, script = myokit.load(modelname)
 s = myokit.Simulation(m, p)

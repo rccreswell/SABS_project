@@ -19,7 +19,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
 
     fit_values = np.concatenate(data_exp.values)
 
-    problem = pints.SingleOutputProblem(model = MyModel(), times = np.linspace(0,1,len(fit_values)), values = np.concatenate(data_exp.values))
+    problem = pints.SingleOutputProblem(model = MyModel(), times = np.linspace(0,1,len(fit_values)), values = fit_values)
     boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
     error_measure = pints.SumOfSquaresError(problem)
     found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints.XNES)
