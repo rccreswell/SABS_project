@@ -39,6 +39,7 @@ def convert_protocol(model):
     equations = original_protocol_component.equations()
     pacing_parameters = {}
     for equation in equations:
+
         if equation.lhs.pystr() in ['IstimStart',
                                     'IstimPeriod',
                                     'IstimPulseDuration']:
@@ -55,6 +56,7 @@ def convert_protocol(model):
     # component
     variables_to_delete = []
     for variable in original_protocol_component.variables():
+
         if variable.name() == 'IstimAmplitude':
             variable.set_rhs(0.5)
         elif variable.name() == 'Istim':
