@@ -1,0 +1,83 @@
+<?xml version='1.0'?>
+<!-- This CellML model is an example for the toy problem, as well as used by tests.
+
+ Author : Yann-Satnislas BARRAL
+-->
+<model cmeta:id="pints_problem_def" name="Pints_problem_Def" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#" xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+    <component name="comp1">
+        <variable name="time" public_interface="in" units="dimensionless"/>
+        <variable name="unknown_cst" public_interface="in" units="dimensionless"/>
+        <variable name="unknown_cst2" public_interface="in" units="dimensionless"/>
+        <variable name="T" public_interface="in" units="dimensionless"/>
+        <variable cmeta:id="xlabel" initial_value="1" name="x" units="dimensionless"/>
+        <variable cmeta:id="ylabel" initial_value="0" name="y" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>time</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <times/>
+                            <ci>x</ci>
+                            <ci>T</ci>
+                            <ci>unknown_cst2</ci>
+                        </apply>
+                    </apply>
+                    <ci>y</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>time</ci>
+                    </bvar>
+                    <ci>y</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <times/>
+                            <ci>y</ci>
+                            <ci>T</ci>
+                            <ci>unknown_cst</ci>
+                        </apply>
+                    </apply>
+                    <ci>x</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <component name="constants">
+        <variable initial_value="37" name="T" public_interface="out" units="dimensionless"/>
+        <variable initial_value="5" name="unknown_cst" public_interface="out" units="dimensionless"/>
+        <variable initial_value="3" name="unknown_cst2" public_interface="out" units="dimensionless"/>
+    </component>
+    <component name="engine">
+        <variable name="time" public_interface="out" units="dimensionless"/>
+    </component>
+    <connection>
+        <map_components component_1="comp1" component_2="constants"/>
+        <map_variables variable_1="unknown_cst" variable_2="unknown_cst"/>
+        <map_variables variable_1="unknown_cst2" variable_2="unknown_cst2"/>
+        <map_variables variable_1="T" variable_2="T"/>
+    </connection>
+    <connection>
+        <map_components component_1="comp1" component_2="engine"/>
+        <map_variables variable_1="time" variable_2="time"/>
+    </connection>
+</model>
