@@ -286,6 +286,10 @@ class PointwiseProtocol(Protocol):
     def value(self, t=None):
         """Calculate the stimulus signal over time.
 
+        Linear interpolation is used for any time points falling in between
+        those that are specified. Outside the range of specified time points,
+        the signal is assumed to be 0.
+
         Parameters
         ----------
         t : np.ndarray, optional (None)
@@ -300,7 +304,7 @@ class PointwiseProtocol(Protocol):
         if t is None:
             return self.values
         else:
-            return scipy.interpolate.interp1d(self.times, self.values)(t)
+            return scipy.interpolate.interp1d(self.times, self.values, fill_value=0.0, bounds_error=False)(t)
 
 
     def relevant_times(self):
@@ -308,6 +312,13 @@ class PointwiseProtocol(Protocol):
 
 
 if __name__ == '__main__':
+    t = [1,2,4,3]
+    v = [0,2,0,2]
+    p = PointwiseProtocol(times=t, values=v)
+    test_times = np.linspace(-1, 5, 1000)
+    plt.plot(test_times, p.value(test_times))
+    plt.show()
+
     t = [1,2,4,3]
     v = [0,2,0,2]
     p = PointwiseProtocol(times=t, values=v)
