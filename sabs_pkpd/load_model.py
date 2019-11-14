@@ -39,11 +39,11 @@ def convert_protocol(model):
     equations = original_protocol_component.equations()
     pacing_parameters = {}
     for equation in equations:
-        if equation.lhs.pystr() in ['i_Stim_Start',
-                                    'i_Stim_Period',
-                                    'i_Stim_PulseDuration']:
+        if equation.lhs.pystr() in ['IstimStart',
+                                    'IstimPeriod',
+                                    'IstimPulseDuration']:
             pacing_parameters[equation.lhs.pystr()] = equation.rhs
-        if equation.lhs.pystr() == 'i_Stim_Amplitude':
+        if equation.lhs.pystr() == 'IstimAmplitude':
             amplitude = equation.rhs
 
     # Add the level variable which is bound to pace
@@ -55,10 +55,10 @@ def convert_protocol(model):
     # component
     variables_to_delete = []
     for variable in original_protocol_component.variables():
-        if variable.name() == 'i_Stim_Amplitude':
+        if variable.name() == 'IstimAmplitude':
             variable.set_rhs(0.5)
         elif variable.name() == 'Istim':
-            variable.set_rhs(0.5)
+            variable.set_rhs('level * IstimAmplitude')
         elif variable.name() == 'level':
             pass
         else:
@@ -70,9 +70,9 @@ def convert_protocol(model):
     # Write the protocol in Myokit format
     new_protocol = myokit.Protocol()
     new_protocol.schedule(1.0,
-                          pacing_parameters['i_Stim_Start'],
-                          pacing_parameters['i_Stim_PulseDuration'],
-                          period=pacing_parameters['i_Stim_Period'],
+                          pacing_parameters['IstimStart'],
+                          pacing_parameters['IstimPulseDuration'],
+                          period=pacing_parameters['IstimPeriod'],
                           multiplier=0)
 
     return model, new_protocol
