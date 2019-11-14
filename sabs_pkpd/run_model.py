@@ -5,6 +5,21 @@ import matplotlib.pyplot as plt
 
 
 def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
+    """
+    This function runs the model in the same conditions (and with the same time sampling) as the experimental data
+    loaded in data_exp.
+    :param fitted_params_values: list
+        List of the values for the fitted parameters. It has to match the length of fitting parameters annotations.
+    :param s: Myokit.Simulation
+        Myokit simulation defined by the chosen model and protocol.
+    :param data_exp: Data_exp
+        Contains the data that the model is fitted too. See documentation for sabs_pkpd.load_data for further information.
+    :param pre_run: int
+        Defines the time for which the model is run without returning output. Useful for reaching (quasi-) steady-state
+    :return: output : list
+        List of the same shape as data_exp.times. It contains the model output in the given conditions at the time points
+        used to generate the experimental data.
+    """
 
     # This function is meant for comparison of simulation conditions to data, or to be called by the PINTS optimisation tool
 
@@ -40,9 +55,31 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
 def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp_cond_param_values = [], fixed_params_annot = [], fixed_params_values = [], pre_run = 0, time_samples = []):
 
-    '''This function is for quick simulation of user selected conditions
-    '''
-
+    """
+    This function returns a simulation for any desired conditions.
+    :param s: Myokit.Simulation
+        Myokit simulation defined by the chosen model and protocol.
+    :param time_max: int
+        Maximal time for which the model is run
+    :param read_out: str
+        MMT model annotation of the variable read out as output from the model simulation.
+    :param exp_cond_param_annot: str
+        MMT model annotation of the experimental condition varying when generating the data.
+    :param exp_cond_param_values: list
+        List of values for the experimental condition in which the model should be run. The model solving is looped over
+        the experimental condition values (1 run per value).
+    :param fixed_params_annot: list of str
+        List of the MMT model annotations of the constants set for the simulation.
+    :param fixed_params_values: list
+        List of values for the constants set for the simulation.
+    :param pre_run: int
+        Defines the time for which the model is run without returning output. Useful for reaching (quasi-) steady-state
+    :param time_samples: list
+        time points for which the model output is returned.
+    :return: output : list
+        List of shape (len(experimental conidition values), time_samples). It contains the model output in the given
+        conditions at the time points used to generate the experimental data.
+    """
     if time_samples != []:
         if time_samples[-1] > time_max :
             raise ValueError('The time samples have to be within the range (0 , time_max)')
