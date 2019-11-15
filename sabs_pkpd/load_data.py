@@ -50,7 +50,7 @@ def load_data_file(filename, headers: bool = True):
 
     data = data.sort_values(["Experimental conditions (e.g. Temp)", "Times"], ascending=[True, True])
     print(data)
-    data = np.concatenate([i for i in data])
+    data = np.concatenate(data["Times", "Values", "Experiment number", "Experimental conditions (e.g. Temp)"])
     data = data.reshape(len(data)//4, 4)
     exp_nums_list = list(set(data[:,2]))
     exp_conds_list = list(set(data[:, 3]))
