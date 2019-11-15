@@ -26,14 +26,14 @@ before_install:
   #- sudo apt-get -y install libsundials-serial-dev
 
 install:
-  - pip install -r requirements.txt
-  - pip install -e .
+  - pip install -u -r requirements.txt
+  - pip install -u -e .
   - wget https://github.com/pints-team/pints/archive/master.zip -O /tmp/pints-master.zip
   - unzip -q /tmp/pints-master.zip -d /home/travis/pints-master/
-  - pip install /home/travis/pints-master/pints-master/
+  - pip install -u /home/travis/pints-master/pints-master/
   - wget https://github.com/MichaelClerx/myokit/archive/master.zip -O /tmp/myokit-master.zip
   - unzip -q /tmp/myokit-master.zip -d /home/travis/myokit-master/
-  - pip install /home/travis/myokit-master/myokit-master/
+  - pip install -u /home/travis/myokit-master/myokit-master/
 
 script:
     - pytest
