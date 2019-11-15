@@ -4,3 +4,4 @@ from . import pints_problem_def
 from . import constants
 from . import load_model
 from . import protocols
+from. import clamp_experiment

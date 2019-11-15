@@ -20,7 +20,7 @@ exp_cond_param_annot = 'constants.T'
 exp_cond_param_values = [20, 37]
 fixed_params_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
 fixed_params_values = [0.1, 0.1]
-time_samples = np.linspace(0, time_max, 100)
+time_samples = [0, 0.01, 0.05, 0.1, 0.3, 0.5, 1, 5]
 
 x = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s, time_max, read_out1, exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples=time_samples)
 y = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s, time_max, read_out2, exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples=time_samples)
