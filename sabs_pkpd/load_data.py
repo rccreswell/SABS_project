@@ -36,7 +36,7 @@ class Data_exp():
 
 def load_data_file(filename, headers: bool = True):
     # Data should be provided in 4 columns : time, data, experiment number, experiment condition,
-    data = pd.read_csv(filename, sep= ',', skiprows= int(headers))
+    data = pd.read_csv(filename, sep= ',')
 
     if len(data["Times"].size) != len(data["Values"].size) :
         raise ValueError('The times and values must have the same length')
