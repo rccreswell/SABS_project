@@ -193,10 +193,15 @@ class SineWaveProtocol(Protocol):
     omega = frequency
     phi = phase
     """
-    def __init__(self, amplitude, frequency, phase):
+    def __init__(self, amplitude, frequency, phase, start=0, duration=None):
         self.amplitude = amplitude
         self.frequency = frequency
         self.phase = phase
+        self.start = start
+        if duration is None:
+            self.duration = 2 * np.pi / self.frequency
+        else:
+            sel.duration = duration
 
 
     def value(self, t):
@@ -212,7 +217,9 @@ class SineWaveProtocol(Protocol):
         np.ndarray
             The values of the stimulus signal at the given times
         """
-        return self.amplitude * np.sin(self.frequency * t + self.phase)
+        return (self.amplitude * np.sin(self.frequency * t + self.phase)) \
+               * (self.start <= t).astype(float) \
+               * (t<=self.start + self.duration).astype(float)
 
 
     def relevant_times(self, time_points=1000):
@@ -228,7 +235,7 @@ class SineWaveProtocol(Protocol):
         np.ndarray
             The time points covering all protocol activity
         """
-        return np.linspace(0, 2.5 * np.pi / self.frequency)
+        return np.linspace(0, 2.5 * np.pi / self.frequency, time_points)
 
 
     def to_myokit(self):
@@ -312,6 +319,10 @@ class PointwiseProtocol(Protocol):
 
 
 if __name__ == '__main__':
+    p = SineWaveProtocol(2.5, 10, 0)
+    p.plot()
+    exit()
+
     t = [1,2,4,3]
     v = [0,2,0,2]
     p = PointwiseProtocol(times=t, values=v)
@@ -334,7 +345,4 @@ if __name__ == '__main__':
 
     p = TwoStepProtocol(1, 3, 1.2, 4.5, -0.5)
     p.to_myokit()
-    p.plot()
-
-    p = SineWaveProtocol(2.5, 10, 1)
     p.plot()
