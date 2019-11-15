@@ -48,7 +48,8 @@ def load_data_file(filename, headers: bool = True):
 
     # Sorting the list in increasing times and experimental condition
 
-    data = data.sort_values(["Experimental conditions (e.g. Temp)", "Times"], ascending=[True, True])
+    data = data.sort(["Experimental conditions (e.g. Temp)", "Times"], ascending=[True, True])
+    print(data)
     times = data["Times"]
     values = data["Values"]
     exp_nums_list = data["Experiment number"]
