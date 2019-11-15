@@ -3,7 +3,9 @@
 May be useful for protocol optimization.
 """
 
+import pandas
 import numpy as np
+import scipy.interpolate
 import matplotlib.pyplot as plt
 import myokit
 
@@ -240,7 +242,92 @@ class SineWaveProtocol(Protocol):
         raise NotImplementedError
 
 
+class PointwiseProtocol(Protocol):
+    """A protocol given by arbitrary values at specified times.
+
+    This protocol allows the user to load any precalculated shape, either from
+    file or from python lists. It can also be used to hold protocols whose
+    shapes do not conform to standard step or sine wave patterns.
+    """
+    def __init__(self, times=None, values=None, filename=None):
+        """Initialize either from lists or from a file.
+
+        There are two choices to initialize an object of this class. Either
+        times and values can be specified as python lists, or a filename is
+        provided and times and values are read from the file. The file must be
+        a csv file with two columns, one with title 'times' and one with title
+        'values'.
+
+        Parameters
+        ----------
+        times : list of float, optional (None)
+            Time points where the protocol is specified
+        values : list of float, optional (None)
+            Values of the protocol at the given times
+        filename : str, optional (None)
+            Path to the file containing the saved protocol
+        """
+        if (times is not None and values is not None) and filename is not None:
+            raise ValueError('cannot load from both lists and file')
+
+        elif filename is not None:
+            data = pandas.read_csv(filename)
+            data = data.sort_values(by=['times'])
+            self.times = data['times']
+            self.values = data['values']
+
+        else:
+            self.times, self.values = zip(*sorted(zip(times, values)))
+
+        self.times = np.array(self.times)
+        self.values = np.array(self.values)
+
+
+    def value(self, t=None):
+        """Calculate the stimulus signal over time.
+
+        Linear interpolation is used for any time points falling in between
+        those that are specified. Outside the range of specified time points,
+        the signal is assumed to be 0.
+
+        Parameters
+        ----------
+        t : np.ndarray, optional (None)
+            The times at which to evaluate. If no times are supplied, the
+            original grid of times from initialization is automatically used.
+
+        Returns
+        -------
+        np.ndarray
+            The values of the stimulus signal at the given times
+        """
+        if t is None:
+            return self.values
+        else:
+            return scipy.interpolate.interp1d(self.times, self.values, fill_value=0.0, bounds_error=False)(t)
+
+
+    def relevant_times(self):
+        return self.times
+
+
 if __name__ == '__main__':
+    t = [1,2,4,3]
+    v = [0,2,0,2]
+    p = PointwiseProtocol(times=t, values=v)
+    test_times = np.linspace(-1, 5, 1000)
+    plt.plot(test_times, p.value(test_times))
+    plt.show()
+
+    t = [1,2,4,3]
+    v = [0,2,0,2]
+    p = PointwiseProtocol(times=t, values=v)
+    p.plot()
+
+    p2 = PointwiseProtocol(filename='abc.txt')
+    p2.plot()
+    exit()
+
     t = np.linspace(0, 5, 100)
     p = OneStepProtocol(1, 2, 5.6)
     p.to_myokit()
