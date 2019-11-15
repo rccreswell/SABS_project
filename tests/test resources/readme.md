@@ -18,4 +18,5 @@ This model has three constants :
 
 The figure below represents the outputs <strong>x</strong> and <strong>y</strong> against the time, for T = 20 and T = 37.
 
-![outputs](./model_outputs.PNG)
+![outputs](./model_output_T_20.PNG)
+![outputs](./model_output_T_37.PNG)
