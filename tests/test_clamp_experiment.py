@@ -15,7 +15,7 @@ def test_clamp_experiment_model():
 
     # Design the clamp protocol
     time_max = 30
-    n_timepoints = 100
+    n_timepoints = 10
     time_samples = np.linspace(2, time_max, n_timepoints)
     read_out = 'comp1.x'
     exp_clamped_parameter_annot = 'comp1.y'
