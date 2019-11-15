@@ -43,7 +43,7 @@ def load_data_file(filename, headers: bool = True):
     if type(data["Times"][0]) == str :
         raise ValueError('The CSV file is not in the standard format. Please refer to the documentation. (More than one line of headers)')
 
-    if data["Times"].size > 2:
+    if data["Times"].size < 2:
         raise ValueError('The CSV file is not in the standard format. Please refer to the documentation. (Minimum of two columns required)')
 
     # Sorting the list in increasing times and experimental condition
