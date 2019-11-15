@@ -1,5 +1,9 @@
 language: python
 
+python:
+  - 3.7
+
+
 sudo: required
 
 services:
@@ -12,9 +16,6 @@ secure: "mIvj+xTOWmN3kdyfc5+0B80mHXQ+fxjuw+qimq1k7Tm7da+pirEo0a49oqMbOfSJA1SG4IT
 
 
 
-python:
-
-  - 3.7
 
 before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
