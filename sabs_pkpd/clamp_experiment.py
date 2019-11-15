@@ -10,9 +10,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import myokit
 
-modelname = 'C:/Users/yanral/Documents/Software Development/tests/test resources/clamp_exp_test.mmt'
+modelname = 'C:/Users/yanral/Documents/Software Development/tests/test resources/pints_problem_def_test.mmt'
 # In[]
 m, p, script = myokit.load(modelname)
+
 s = myokit.Simulation(m, p)
 
 # In[]
