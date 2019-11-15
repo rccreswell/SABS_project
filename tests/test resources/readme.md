@@ -16,7 +16,7 @@ This model has three constants :
   
 ## Model output
 
-The figure below represents the outputs <strong>x</strong> and <strong>y</strong> against the time, for T = 20 and T = 37.
+The figure below represents the outputs <strong>x</strong> and <strong>y</strong> against the time, for T = 20 and T = 37. The unknown constants have been both set at 0.1.
 
 ![outputs](./model_output_T_20.png)
 ![outputs](./model_output_T_37.png)
