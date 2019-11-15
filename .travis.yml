@@ -1,41 +1,25 @@
 language: python
 
 python:
-  - "3.7"
 
-
-sudo: required
-
-services:
-  - docker
-
-env:
-global:
-secure:
-  - "XfnJ0KMLEbsiRIzqwwNlcbH61/+T1B4bzcKpIJarOr1W83pafOASHqSTXy+RFo9HcX2Y+Z6CtdZzm9cMWD8KmA9I+vRZDB5cICHMmcGJXiRNA1+2fo8yc49BIP96z2figQZiXgwDxQdxdvnjeuDSzEgvU2cbeNBSYQO7SIT2V8/JaljBe4bOIVBY3yyBoXuZulBVGhxFVWYDwOt9CJNW04dddqtjg5iNo2U7mF4ozVvSL+tW76h05nlsiF1fBKI4SM3B5LRpqh9oTe9pqTXDzSiu6eky+pLUMzA9udeik2YD7gCBQWppRjJYGD4xdqDOoOJuyO0VUdiL4xpxMaNZJMpXd8APcS2mrO/94xyza30iKRo8UpLiKObBd3FbialkyfE+5EVmMFAmwnwgVecna3zhVZ93R4JQjAygUIs8Hm/RpqBJ19ULpC7EUY8rsFtFGF1Pr4x8kUYTNwI4SpgdgHhQE8YOpuuTUOHO/TXcP0zcJcKCLvd4Y+UIxhAxU/XCzKfjgDAFWE1BM5t1IqTukl/xXUv3wNNlMylwPF71+MX5rNu8/tNdtX9QIwf3GlMPY8nNb+E6CCK3k1PTs2WToHOHo/IXIVsyQ1A92w2pMILtOznC6gD1+/Z9gj5/q/6yhkDIgmJIFF4nCd0IRWf5d2ZcoelqF6zazQUHoNeXxGs="
-  - "mIvj+xTOWmN3kdyfc5+0B80mHXQ+fxjuw+qimq1k7Tm7da+pirEo0a49oqMbOfSJA1SG4ITpWBRA4Pd/8NKW92gade5HDrv1zhSXJMT9XXwRswXAe3sMS5rS5N1WcVkfB7JUa21gOX6gulJ4KAYZ/F4V2nRst+5NFpZRebOFt9PDA0meOigir/3CI5MRgmEbOqBBUlP7t1I7Jo/e7oXJ5Y9XabmxtifD1S2FX646kEEnh5L4T5aJrNe6RIwfv0vzugeBun3JLSc3ngkg/i/JdPbEtlO1DlfOopOsw0y4H6l1vv8hb4hX9j8CanDQtP7hYpPsG3Z+K9FoVT/z/TPncTHep0Yk+zTeMdqdaHXN8aGdn3eNwKo/DXIUXdDeW43OUkYlCo1Yd187ig5blvcaexxwdsr8lVCBMNP2FxHIG5U1DkWm9L0gDpJaFLjYZD0GOSyVtq+aHyH3oVrQyY8D+5QghjasKI0ZyLyvaGupB92aCpzK2Jh7mUmT0f/7S0g2mdVEpQQz5rkP7EhQBABPWM4MuqkQgr9wgk0nuAvIXER/6RF4oBVLS/MkcvjBzK3IUrN200PuZvNlXRWV5572+RNc5ReeFioX9sTKyagBLXRcbDJekTFhn86RrF1FXBDeNxTmf2ENnoq4udFP+znsOayiobY991NoGlkTAiNFF8M="
-
-
-
+  - 3.7
 
 before_install:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker pull rcw5890docker/travis
-  #- sudo apt-get update
-  #- sudo apt-get -y install python3-pip python3-dev
-  #- sudo apt-get -y install python3-scipy python3-sympy
-  #- sudo apt-get -y install python3-pyqt5 python3-matplotlib
-  #- sudo apt-get -y install libsundials-serial-dev
+  - sudo apt-get update
+  - sudo apt-get -y install python3-pip python3-dev
+  - sudo apt-get -y install python3-scipy python3-sympy
+  - sudo apt-get -y install python3-pyqt5 python3-matplotlib
+  - sudo apt-get -y install libsundials-serial-dev
 
 install:
-  - pip install --user -r requirements.txt
-  - pip install --user -e .
+  - pip install -r requirements.txt
+  - pip install -e .
   - wget https://github.com/pints-team/pints/archive/master.zip -O /tmp/pints-master.zip
   - unzip -q /tmp/pints-master.zip -d /home/travis/pints-master/
-  - pip install --user /home/travis/pints-master/pints-master/
+  - pip install /home/travis/pints-master/pints-master/
   - wget https://github.com/MichaelClerx/myokit/archive/master.zip -O /tmp/myokit-master.zip
   - unzip -q /tmp/myokit-master.zip -d /home/travis/myokit-master/
-  - pip install --user /home/travis/myokit-master/myokit-master/
+  - pip install /home/travis/myokit-master/myokit-master/
 
 script:
     - pytest
