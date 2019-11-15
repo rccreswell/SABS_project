@@ -1,6 +1,32 @@
 import math
+import os
 import numpy as np
 import sabs_pkpd
+
+def test_pointwiseprotocol_lists():
+    """Test loading the pointwise protocol from lists.
+    """
+    t = [1,2,4,3]
+    v = [0,2,0,2]
+    p = sabs_pkpd.protocols.PointwiseProtocol(times=t, values=v)
+    test_times = np.linspace(-1, 5, 1000)
+    test_stimulus = p.value(test_times)
+    assert math.isclose(max(test_stimulus), 2.0)
+    assert math.isclose(min(test_stimulus), 0.0)
+    assert test_stimulus[0] == 0
+    assert test_stimulus[-1] == 0
+
+
+def test_pointwiseprotocol_file():
+    """Test loading the pointwise protocol from a file.
+    """
+    p = sabs_pkpd.protocols.PointwiseProtocol(filename=os.path.join('tests', 'test resources', 'input_protocol.csv'))
+    test_stimulus = p.value()
+    assert math.isclose(max(test_stimulus), 1)
+    assert math.isclose(min(test_stimulus), 0)
+    assert test_stimulus[0] == 0
+    assert test_stimulus[-1] == 0
+
 
 def test_onestepprotocol():
     """Test the shape of the one step protocol.
