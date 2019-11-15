@@ -11,7 +11,7 @@ import myokit
 
 
 def test_clamp_experiment_model():
-    modelname = 'C:/Users/yanral/Documents/Software Development/tests/test resources/pints_problem_def_test.mmt'
+    modelname = './tests/test resources/pints_problem_def_test.mmt'
 
     # Design the clamp protocol
     time_max = 30
@@ -26,7 +26,7 @@ def test_clamp_experiment_model():
         p.schedule(exp_clamped_parameter_values[i], time_samples[i], time_samples[i + 1] - time_samples[i])
 
     # Save the new model and protocol if the user provided the argument save_new_mmt_filename
-    newmodelname = 'C:/Users/yanral/Documents/Software Development/tests/test resources/model_clamped.mmt'
+    newmodelname = './tests/test resources/model_clamped.mmt'
 
     m = sabs_pkpd.clamp_experiment.clamp_experiment_model(modelname, exp_clamped_parameter_annot, p, newmodelname)
 
