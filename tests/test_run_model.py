@@ -19,7 +19,7 @@ def test_simulate_data():
     out = sabs_pkpd.run_model.simulate_data(fitted_params_values, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp)
     diff = np.array(out) - np.array([[0.0, 0.01975, 0.09404, 0.17718, 0.42628, 0.58526, 0.79111, 0.99642],
                                      [0.0, 0.019504, 0.08836, 0.15682, 0.30589, 0.35632, 0.37457, 0.37037]])
-    assert np.linalg.norm(diff) < 0.0002
+    assert np.linalg.norm(diff) < 0.0003
 
 
 def test_quick_simulate():
