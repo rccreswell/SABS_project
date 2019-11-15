@@ -1,6 +1,6 @@
 import sabs_pkpd
 
-
+'''
 def test_cellml_load():
     """Test that a CellML model can be loaded.
     """
@@ -8,7 +8,7 @@ def test_cellml_load():
     s = sabs_pkpd.load_model.load_model_from_cellml(cellml_file)
     assert True
 
-'''
+
 def test_cellml_protocol_convert():
     """Test that the stimulus in a CellML file is converted to Myokit pace.
 
