@@ -48,10 +48,10 @@ def load_data_file(filename, headers: bool = True):
 
     # Sorting the list in increasing times and experimental condition
 
-    data = data.sort_values([3, "Times"], ascending=[True, True])
+    data = data.sort_values(["Experimental conditions (e.g. Temp)", "Times"], ascending=[True, True])
     times = data["Times"]
-    values = data[1]
-    exp_nums_list = data[2]
-    exp_conds_list = data[3]    
+    values = data["Values"]
+    exp_nums_list = data["Experiment number"]
+    exp_conds_list = data["Experimental conditions (e.g. Temp)"]    
 
     return Data_exp(times,values, exp_nums_list, exp_conds_list)
