@@ -48,17 +48,10 @@ def load_data_file(filename, headers: bool = True):
 
     # Sorting the list in increasing times and experimental condition
 
-    data = sorted(data, key=itemgetter(3, 0))
-    data = np.concatenate([i for i in data])
-    data = data.reshape(len(data)//4, 4)
-    exp_nums_list = list(set(data[:,2]))
-    exp_conds_list = list(set(data[:, 3]))
-    times = []
-    values = []
-
-    for i in range(len(exp_nums_list)):
-        temp = data[ data[:, 2] == exp_nums_list[i] ]
-        times.append(temp[:, 0])
-        values.append(temp[:, 1])
+    data = data.sort_values([3, "Times"], ascending=[True, True])
+    times = data["Times"]
+    values = data[1]
+    exp_nums_list = data[2]
+    exp_conds_list = data[3]    
 
     return Data_exp(times,values, exp_nums_list, exp_conds_list)
