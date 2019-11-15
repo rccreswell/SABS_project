@@ -235,7 +235,7 @@ class SineWaveProtocol(Protocol):
         np.ndarray
             The time points covering all protocol activity
         """
-        return np.linspace(0, 2.5 * np.pi / self.frequency, time_points)
+        return np.linspace(0, self.duration*1.1, time_points)
 
 
     def to_myokit(self):
@@ -246,7 +246,13 @@ class SineWaveProtocol(Protocol):
         myokit.Protocol
             The protocol as a Myokit object
         """
-        raise NotImplementedError
+        p = myokit.Protocol()
+        times = self.relevant_times()
+        delta_t = times[1] - times[0]
+        values = self.value(t)
+        for t, v in zip(times, values):
+            p.schedule(v, t, delta_t)
+        return p
 
 
 class PointwiseProtocol(Protocol):
