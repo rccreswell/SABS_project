@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import myokit
 
-def clamp_experiment_model(model_filename, clamped_param_annot:str, protocol=None, save_new_mmt_filename=None):
+def clamp_experiment_model(model_filename, clamped_variable_annot:str, protocol=None, save_new_mmt_filename=None):
     """
     This function loads a mmt model, sets the equation for the desired variable to engine.pace (bound with the protocol)
     , and returns the Myokit.model generated this way. If the user provides the argument for save_new_mmt_filename, the
@@ -32,9 +32,9 @@ def clamp_experiment_model(model_filename, clamped_param_annot:str, protocol=Non
         m, protocol, script = myokit.load(model_filename)
 
     # Analyse the clamped_param_annot to find component name and variable name
-    i = clamped_param_annot.index('.')
-    component_name = clamped_param_annot[0:i]
-    variable_name = clamped_param_annot[i+1:]
+    i = clamped_variable_annot.index('.')
+    component_name = clamped_variable_annot[0:i]
+    variable_name = clamped_variable_annot[i+1:]
 
     # Change the model to clamp the selected value
     original_protocol_component = m.get(component_name,
@@ -47,7 +47,7 @@ def clamp_experiment_model(model_filename, clamped_param_annot:str, protocol=Non
             variable_found = True
 
     if variable_found == False:
-        raise ValueError('The variable ' + clamped_param_annot + 'could not be found.')
+        raise ValueError('The variable ' + clamped_variable_annot + 'could not be found.')
 
     # Save the new model and protocol if the user provided the argument save_new_mmt_filename
     if save_new_mmt_filename is not None:
