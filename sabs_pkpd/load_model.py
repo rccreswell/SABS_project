@@ -80,30 +80,29 @@ def convert_protocol(model):
     return model, new_protocol
 
 
-def load_simulation_from_cellml(filename):
+def load_model_from_cellml(cellml_filename, mmt_filename):
     """Load a model into Myokit from cellml file format.
 
     Parameters
     ----------
-    filename : str
-        Path to the CellML file
+    cellml_filename : str
+        Path to the CellML model
+    mmt_filename : str
+        Path to location to save the MMT model
 
     Returns
     -------
-    myokit.Simulation
-        Myokit Simulation object from the cellml file
+    None
+
     """
     if 'cellml' not in myokit.formats.importers():
         raise Exception('cellml support not detected in your Myokit')
 
-
     importer = myokit.formats.importer('cellml')
-    model = importer.model(filename)
+    model = importer.model(cellml_filename)
+    myokit.save_model(mmt_filename, model)
 
-    model, protocol = convert_protocol(model)
-    s = myokit.Simulation(model, protocol)
-
-    return s
+    return 0
 
     # Code for a simulation
     # d = s.run(1000)
@@ -129,13 +128,3 @@ def load_simulation_from_mmt(filename):
     """
     model, prot, script = myokit.load(filename)
     return myokit.Simulation(model, prot)
-
-
-if __name__ == '__main__':
-    load_simulation_from_cellml('beeler_reuter_1977.cellml')
-    exit()
-
-    print(myokit.formats.cellml.CellMLImporter)
-    fname = '../tests/test resources/pints_problem_def_test.mmt'
-    x = load_simulation_from_mmt(fname)
-    print(x)
