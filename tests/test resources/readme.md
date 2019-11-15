@@ -6,4 +6,4 @@ The toy model for all tests and user tutorial is available in the path ./tests/t
 
 This model is composed of two variables linked via a differential equation as follows:
 
-![Model equations](./tests/test resources/model equations.png)
+![Model equations](/tests/test resources/model_equations.png)
