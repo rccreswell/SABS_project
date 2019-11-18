@@ -74,4 +74,6 @@ def test_sinewaveprotocol():
     p = sabs_pkpd.protocols.SineWaveProtocol(1.5, 1.0, 0.5)
     assert math.isclose(max(p.value(t)), 1.5, abs_tol=0.01)
     assert math.isclose(min(p.value(t)), -1.5, abs_tol=0.01)
-    assert math.isclose(p.value(0), p.value(2*math.pi), abs_tol=0.01)
+    t = np.linspace(0, 2*math.pi, 1000)
+    values = p.value(t)
+    assert math.isclose(values[0], values[-1], abs_tol=0.01)
