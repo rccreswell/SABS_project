@@ -49,8 +49,8 @@ def load_data_file(filename, headers: bool = True):
     # Sorting the list in increasing times and experimental condition
 
     data = data.sort_values(["Experimental conditions (e.g. Temp)", "Times"], ascending=[True, True])
-    y = np.concatenate(data["Times"], data["Values"], data["Experiment number"])
-    data = np.concatenate(y, data["Experimental conditions (e.g. Temp)"])
+    y = pd.concat(data["Times"], data["Values"], data["Experiment number"])
+    data = pd.concat(y, data["Experimental conditions (e.g. Temp)"])
     data = data.reshape(len(data)//4, 4)
     exp_nums_list = list(set(data[:,2]))
     exp_conds_list = list(set(data[:, 3]))
