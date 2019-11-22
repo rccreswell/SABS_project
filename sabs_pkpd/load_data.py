@@ -54,7 +54,7 @@ def load_data_file(filename, headers: bool = True):
     #print(data)
     data = data.values.reshape(len(data)//4, 4)
     #print(data)
-    exp_nums_list = pd.data["Experiment number"])
+    exp_nums_list = pd.data["Experiment number"]
     print(exp_nums_list)
     exp_conds_list = list(set(data[:, 3]))
     print(exp_conds_list)
