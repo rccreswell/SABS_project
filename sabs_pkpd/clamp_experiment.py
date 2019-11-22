@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import myokit
 
-def clamp_experiment_model(model_filename, clamped_variable_annot:str, protocol=None, save_new_mmt_filename=None):
+def clamp_experiment_model(model_filename, clamped_variable_annot:str, pace_variable_annotation:str, protocol=None, save_new_mmt_filename=None):
     """
     This function loads a mmt model, sets the equation for the desired variable to engine.pace (bound with the protocol)
     , and returns the Myokit.model generated this way. If the user provides the argument for save_new_mmt_filename, the
@@ -19,6 +19,9 @@ def clamp_experiment_model(model_filename, clamped_variable_annot:str, protocol=
         Path and filename to the MMT model loaded.
     :param clamped_param_annot: str
         MMT model annotation for the model variable clamped. This variable's values will be set by the protocol.
+    :param pace_variable_annotation: str
+        Model annotation for the variable bound to pace, used to read out information from the Myokit protocol. Usually,
+        the annotation is either engine.pace or environment.pace
     :param protocol: Myokit.Protocol()
         If specified by the user, the protocol will be added to the MMT file saved.
     :param save_new_mmt_filename: str
@@ -41,13 +44,16 @@ def clamp_experiment_model(model_filename, clamped_variable_annot:str, protocol=
                                                 class_filter=myokit.Component)
 
     variable_found = False
+
     for variable in original_protocol_component.variables():
         if variable.name() == variable_name:
-            variable.set_rhs('engine.pace')
+            equation = variable.eq
+            variable.demote()
+            variable.set_rhs(pace_variable_annotation)
             variable_found = True
 
     if variable_found == False:
-        raise ValueError('The variable ' + clamped_variable_annot + 'could not be found.')
+        raise ValueError('The variable ' + clamped_variable_annot + ' could not be found.')
 
     # Save the new model and protocol if the user provided the argument save_new_mmt_filename
     if save_new_mmt_filename is not None:

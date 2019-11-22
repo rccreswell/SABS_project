@@ -1,0 +1,360 @@
+[[model]]
+author: Michael Clerx
+desc: """
+    Myokit implementation of the 2006 human ventricular myocyte model by
+    ten Tusscher and Panfilov.
+    
+    References:
+    
+    [1] The CellML versions of the model (http://models.cellml.org)
+    [2] Alternans and spiral breakup in a human ventricular tissue model,
+        ten Tusscher, Panfilov (2006) AJPHeart
+    [3] A model for human ventricular tissue,
+        ten Tusscher, Noble, Noble, Panfilov (2003) AJPHeart
+    
+    Original CellML meta-data follows below
+    ---------------------------------------------------------------------------
+    
+    Alternans and spiral breakup in a human ventricular tissue model
+    
+    Penny Noble
+    Oxford University Cardiac Electrophysiology Group
+    Model Status
+    This is the M-CELL VARIANT of the model. This model was created by Penny
+    Noble of Oxford University and is known to run in COR and PCEnv. A stimulus
+    protocol has been added that allows the model to simulate multiple action
+    potentials at 1Hz.
+    
+    Abstract:
+    
+    Ventricular fibrillation (VF) is one of the main causes of death in the
+    Western world. According to one hypothesis, the chaotic excitation dynamics
+    during VF are the result of dynamical instabilities in action potential
+    duration (APD) the occurrence of which requires that the slope of the APD
+    restitution curve exceeds 1. Other factors such as electrotonic coupling
+    and cardiac memory also determine whether these instabilities can develop.
+    In this paper we study the conditions for alternans and spiral breakup in
+    human cardiac tissue. Therefore, we develop a new version of our human
+    ventricular cell model, which is based on recent experimental measurements
+    of human APD restitution and includes a more extensive description of
+    intracellular calcium dynamics. We apply this model to study the conditions
+    for electrical instability in single cells, for reentrant waves in a ring
+    of cells, and for reentry in two-dimensional sheets of ventricular tissue.
+    We show that an important determinant for the onset of instability is the
+    recovery dynamics of the fast sodium current. Slower sodium current
+    recovery leads to longer periods of spiral wave rotation and more gradual
+    conduction velocity restitution, both of which suppress
+    restitution-mediated instability. As a result, maximum restitution slopes
+    considerably exceeding 1 (up to 1.5) may be necessary for electrical
+    instability to occur. Although slopes necessary for the onset of
+    instabilities found in our study exceed 1, they are within the range of
+    experimentally measured slopes. Therefore, we conclude that steep APD
+    restitution-mediated instability is a potential mechanism for VF in the
+    human heart.
+    
+    The original paper reference is cited below:
+    Alternans and spiral breakup in a human ventricular tissue model,
+    K.H.W.J. ten Tusscher, A.V. Panfilov,
+    Sep 2006, American Journal of Physiology, Heart and Circulatory Physiology,
+    291 3, H1088-1100.
+    PubMed ID: 16565318
+    """
+name: tentusscher-2006
+# Initial values
+calcium.Ca_i    =  1.05782268600543037e-4
+calcium.Ca_sr   =  3.55567791655852350
+calcium.Ca_ss   =  2.14172873269809840e-4
+calcium.R_prime =  9.89066126100902498e-1
+sodium.Na_i     =  1.01338761744302950e1
+potassium.K_i   =  1.35368636336204105e2
+ikr.xr1         =  2.07650883539678194e-4
+ikr.xr2         =  4.72733193318403078e-1
+iks.xs          =  3.23090984071628057e-3
+ina.m           =  1.66171456717857527e-3
+ina.h           =  7.48991583078272738e-1
+ina.j           =  7.48599753512242727e-1
+ical.d          =  3.30548499869733964e-5
+ical.f          =  9.77158843631106722e-1
+ical.f2         =  9.99406290178190937e-1
+ical.fCass      =  9.99972178434477055e-1
+ito.s           =  9.99997904693742057e-1
+ito.r           =  2.35709886030767176e-8
+
+[calcium]
+use membrane.V as V
+dot(Ca_i) = Ca_i_bufc * ((i_leak - i_up) * V_sr / phys.Vc + i_xfer - (ItCa - ical.ICaL) * phys.Cm / (2 * phys.Vc * phys.F))
+    in [mM]
+    Buf_c = 0.2 [mM]
+    Ca_i_bufc = 1 / (1 + Buf_c * K_buf_c / (Ca_i + K_buf_c) ^ 2)
+    K_buf_c = 0.001 [mM]
+dot(Ca_sr) = Ca_sr_bufsr * (i_up - (i_rel + i_leak))
+    in [mM]
+    Buf_sr = 10 [mM]
+    Ca_sr_bufsr = 1 / (1 + Buf_sr * K_buf_sr / (Ca_sr + K_buf_sr) ^ 2)
+    K_buf_sr = 0.3 [mM]
+dot(Ca_ss) = Ca_ss_bufss * (-ical.ICaL * phys.Cm / (2 * V_ss * phys.F) + i_rel * V_sr / V_ss - i_xfer * phys.Vc / V_ss)
+    in [mM]
+    Buf_ss = 0.4 [mM]
+    Ca_ss_bufss = 1 / (1 + Buf_ss * K_buf_ss / (Ca_ss + K_buf_ss) ^ 2)
+    K_buf_ss = 0.00025 [mM]
+    V_ss = 5.468e-5 [um^3]
+EC = 1.5 [mM]
+ItCa = icab.ICaB + ipca.IpCa + ical.ICaL - 2 * inaca.INaCa
+    desc: Total Calcium current
+K_up = 0.00025 [mM]
+O = k1 * Ca_ss ^ 2 * R_prime / (k3 + k1 * Ca_ss ^ 2)
+    k1 = k1_prime / kcasr
+    k1_prime = 0.15
+    k3 = 0.06 [mS/uF]
+dot(R_prime) = -k2 * Ca_ss * R_prime + k4 * (1 - R_prime)
+    k2 = k2_prime * kcasr
+    k2_prime = 0.045
+    k4 = 0.005 [mS/uF]
+V_sr = 0.001094 [um^3]
+i_leak = V_leak * (Ca_sr - Ca_i)
+    V_leak = 0.00036 [mS/uF]
+i_rel = V_rel * O * (Ca_sr - Ca_ss)
+    V_rel = 0.102 [mS/uF]
+i_up = Vmax_up / (1 + K_up ^ 2 / Ca_i ^ 2)
+    Vmax_up = 0.006375 [mM/ms]
+i_xfer = V_xfer * (Ca_ss - Ca_i)
+    V_xfer = 0.0038 [mS/uF]
+kcasr = max_sr - (max_sr - min_sr) / (1 + (EC / Ca_sr) ^ 2)
+max_sr = 2.5
+min_sr = 1
+
+[cell]
+type = 1 : The type of cell. Endo = 0, Epi = 1, Mid = 2
+
+[engine]
+pace = 0 bind pace
+time = 0 bind time
+    in [ms]
+
+[extra]
+Cao = 2 [mM]
+Ko = 5.4 [mM]
+Nao = 140 [mM]
+
+[icab]
+use membrane.V as V
+ICaB = g_bca * (V - rev.ECa)
+    in [A/F]
+g_bca = scale_in * 0.000592 [mS/uF]
+scale_in = 1
+
+[ical]
+use membrane.V as V
+ICaL = if(V == 15, p1 * (p2 - p4) / p3, p1 * (V - 15) * (p2 * exp(p3 * (V - 15)) - p4) / (exp(p3 * (V - 15)) - 1))
+    in [A/F]
+    p1 = gCaL * d * f * f2 * fCass * 4 * phys.FFTR
+    p2 = 0.25 * calcium.Ca_ss
+    p3 = 2 * phys.FTR
+    p4 = extra.Cao
+conductance_cal_compound = 1
+dot(d) = (inf - d) / tau
+    alpha = 1.4 / (1 + exp((-35 - V) / 13)) + 0.25
+    beta = 1.4 / (1 + exp((V + 5) / 5))
+    gamma = 1 / (1 + exp((50 - V) / 20))
+    inf = 1 / (1 + exp((-8 - V) / 7.5))
+    tau = alpha * beta + gamma
+dot(f) = (inf - f) / tau
+    inf = 1 / (1 + exp((V + 20) / 7))
+    tau = scale_tau_f * (1102.5 * exp(-(V + 27) ^ 2 / 225) + 200 / (1 + exp((13 - V) / 10)) + 180 / (1 + exp((V + 30) / 10)) + 20)
+dot(f2) = (inf - f2) / tau
+    inf = 0.67 / (1 + exp((V + 35) / 7)) + 0.33
+    tau = 562 * exp(-(V + 27) ^ 2 / 240) + 31 / (1 + exp((25 - V) / 10)) + 80 / (1 + exp((V + 30) / 10))
+dot(fCass) = (inf - fCass) / tau
+    inf = 0.6 / (1 + (calcium.Ca_ss / 0.05) ^ 2) + 0.4
+    tau = 80 / (1 + (calcium.Ca_ss / 0.05) ^ 2) + 2
+gCaL = conductance_cal_compound * scale_cal * 3.98e-5 [mS/uF]
+scale_cal = 1
+scale_tau_f = 1
+
+[ik1]
+use rev.EK as EK
+use membrane.V as V
+IK1 = gK1 * inf * sqrt(extra.Ko / 5.4) * (V - EK)
+    in [A/F]
+gK1 = scale_k1 * 5.405 [mS/uF]
+inf = alpha / (alpha + beta)
+    alpha = 0.1 / (1 + exp(0.06 * (V - EK - 200)))
+    beta = (3 * exp(0.0002 * (V - EK + 100)) + exp(0.1 * (V - EK - 10))) / (1 + exp(-0.5 * (V - EK)))
+scale_k1 = 1
+
+[ikr]
+use membrane.V as V
+use extra.Ko as Ko
+IKr = gKr * sqrt(Ko / 5.4) * xr1 * xr2 * (V - rev.EK)
+    in [A/F]
+conductance_kr_compound = 1
+gKr = scale_kr * conductance_kr_compound * 0.153 [mS/uF]
+scale_kr = 1
+dot(xr1) = (inf - xr1) / tau
+    alpha = 450 / (1 + exp((-45 - V) / 10))
+    beta = 6 / (1 + exp((V + 30) / 11.5))
+    inf = 1 / (1 + exp((-26 - V) / 7))
+    tau = 1 * alpha * beta
+dot(xr2) = (inf - xr2) / tau
+    alpha = 3 / (1 + exp((-60 - V) / 20))
+    beta = 1.12 / (1 + exp((V - 60) / 20))
+    inf = 1 / (1 + exp((V + 88) / 24))
+    tau = 1 [ms] * alpha * beta
+
+[iks]
+use membrane.V as V
+IKs = scale_out * gKs * xs * xs * (V - rev.EKs)
+    in [A/F]
+gKs = piecewise(cell.type == 2, 0.098, 0.392)
+scale_out = 1
+dot(xs) = (inf - xs) / tau
+    alpha = 1400 / sqrt(1 + exp((5 - V) / 6))
+    beta = 1 / (1 + exp((V - 35) / 15))
+    inf = 1 / (1 + exp((-5 - V) / 14))
+    tau = 1 * alpha * beta + 80
+
+[ina]
+use membrane.V as V
+INa = gNa * m ^ 3 * h * j * (V - rev.ENa)
+    in [A/F]
+conductance_na_compound = 1
+gNa = conductance_na_compound * scale_in * 14.838 [mS/uF]
+dot(h) = (inf - h) / tau
+    alpha = if(V < -40, 0.057 * exp(-(V + 80) / 6.8), 0)
+    beta = if(V < -40, 2.7 * exp(0.079 * V) + 310000 * exp(0.3485 * V), 0.77 / (0.13 * (1 + exp((V + 10.66) / -11.1))))
+    inf = 1 / (1 + exp((V + 71.55) / 7.43)) ^ 2
+    tau = 1 / (alpha + beta)
+dot(j) = (inf - j) / tau
+    alpha = if(V < -40, (-25428 * exp(0.2444 * V) - 6.948e-6 * exp(-0.04391 * V)) * (V + 37.78) / 1 / (1 + exp(0.311 * (V + 79.23))), 0)
+    beta = if(V < -40, 0.02424 * exp(-0.01052 * V) / (1 + exp(-0.1378 * (V + 40.14))), 0.6 * exp(0.057 * V) / (1 + exp(-0.1 * (V + 32))))
+    inf = 1 / (1 + exp((V + 71.55) / 7.43)) ^ 2
+    tau = 1 / (alpha + beta)
+dot(m) = (inf - m) / tau
+    alpha = 1 / (1 + exp((-60 - V) / 5))
+    beta = 0.1 / (1 + exp((V + 35) / 5)) + 0.1 / (1 + exp((V - 50) / 200))
+    inf = 1 / (1 + exp((-56.86 - V) / 9.03)) ^ 2
+    tau = alpha * beta
+scale_in = 1
+
+[inab]
+use membrane.V as V
+INaB = gNaB * (V - rev.ENa)
+    in [A/F]
+gNaB = scale_in * 0.00029 [mS/uF]
+scale_in = 1
+
+[inaca]
+use phys.FTR as FTR
+use membrane.V as V
+use sodium.Na_i as Na_i
+use extra.Nao as Nao
+use calcium.Ca_i as Ca_i
+use extra.Cao as Cao
+INaCa = scale_in * K_NaCa * (exp(g * V * FTR) * Nai3 * Cao - exp((g - 1) * V * FTR) * Nao3 * Ca_i * a) / ((Km_Nai ^ 3 + Nao3) * (Km_Ca + Cao) * (1 + K_sat * exp((g - 1) * V * FTR)))
+    in [A/F]
+K_NaCa = 1000
+    in [A/F]
+K_sat = 0.1
+Km_Ca = 1.38
+    in [mM]
+Km_Nai = 87.5
+    in [mM]
+Nai3 = Na_i * Na_i * Na_i
+Nao3 = Nao * Nao * Nao
+a = 2.5
+g = 0.35
+scale_in = 1
+
+[inak]
+use membrane.V as V
+use extra.Ko as Ko
+use sodium.Na_i as Na_i
+INaK = scale_out * P_NaK * Ko / (Ko + K_mk) * Na_i / (Na_i + K_mNa) / (1 + 0.1245 * exp(-0.1 * V * phys.FTR) + 0.0353 * exp(-V * phys.FTR))
+    in [A/F]
+K_mNa = 40 [mM]
+K_mk = 1 [mM]
+P_NaK = 2.724 [A/F]
+scale_out = 1
+
+[ipca]
+use calcium.Ca_i as Ca_i
+IpCa = g_pCa * Ca_i / (Ca_i + K_pCa)
+    in [A/F]
+K_pCa = 0.0005 [mM]
+g_pCa = scale_out * 0.1238 [A/F]
+scale_out = 1
+
+[ipk]
+use membrane.V as V
+IpK = gpK * (V - rev.EK) / (1 + exp((25 - V) / 5.98))
+    in [A/F]
+gpK = scale_in * 0.0146 [mS/uF]
+scale_in = 1
+
+[ito]
+use membrane.V as V
+ITo = scale_out * gTo * r * s * (V - rev.EK)
+    in [A/F]
+gTo = if(cell.type == 0, 0.073, 0.294)
+    in [mS/uF]
+dot(r) = (inf - r) / tau
+    inf = 1 / (1 + exp((20 - V) / 6))
+    tau = 9.5 * exp(-(V + 40) ^ 2 / 1800) + 0.8
+dot(s) = (inf - s) / tau
+    inf = 1 / (1 + exp((V + dv) / 5))
+        dv = if(cell.type == 0, 28, 20)
+    tau = if(cell.type == 0, 1000 * exp(-(V + 67) ^ 2 / 1000) + 8, 85 * exp(-(V + 45) ^ 2 / 320) + 5 / (1 + exp((V - 20) / 5)) + 3)
+scale_out = 1
+
+[membrane]
+use stimulus.i_stim as i_stim
+V = engine.pace
+    in [mV]
+    label membrane_potential
+i_diff = 0 bind diffusion_current
+    in [A/F]
+i_ion = potassium.ItK + calcium.ItCa + sodium.ItNa
+    in [A/F]
+    label cellular_current
+
+[phys]
+Cm = 0.185 [uF]
+F =  9.64853414999999950e4 [C/mmol]
+FFTR = F * F / (R * T)
+FTR = F / (R * T)
+R = 8314.472 [J/mol/K]
+RTF = R * T / F
+T = 310 [K]
+Vc = 0.016404 [um^3]
+
+[potassium]
+use membrane.V as V
+ItK = ik1.IK1 + ito.ITo + ikr.IKr + iks.IKs + ipk.IpK - 2 * inak.INaK
+dot(K_i) = -(ItK + stimulus.i_stim) / (phys.Vc * phys.F) * phys.Cm
+    in [mM]
+
+[rev]
+use phys.RTF as RTF
+ECa = 0.5 * RTF * log(extra.Cao / calcium.Ca_i)
+    in [mV]
+EK = RTF * log(extra.Ko / potassium.K_i)
+    in [mV]
+EKs = RTF * log((extra.Ko + P_kna * extra.Nao) / (potassium.K_i + P_kna * sodium.Na_i))
+    in [mV]
+ENa = RTF * log(extra.Nao / sodium.Na_i)
+    in [mV]
+P_kna = 0.03
+
+[sodium]
+ItNa = ina.INa + inab.INaB + 3 * inak.INaK + 3 * inaca.INaCa
+dot(Na_i) = -ItNa / (phys.Vc * phys.F) * phys.Cm
+    in [mM]
+
+[stimulus]
+i_stim = amplitude * engine.pace
+    amplitude = -52 [A/F]
+
+[[protocol]]
+# Level  Start    Length   Period   Multiplier
+1.0      50.0     0.5      1000.0   0
+

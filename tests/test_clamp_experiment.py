@@ -28,7 +28,7 @@ def test_clamp_experiment_model():
     # Save the new model and protocol if the user provided the argument save_new_mmt_filename
     newmodelname = './tests/test resources/model_clamped.mmt'
 
-    m = sabs_pkpd.clamp_experiment.clamp_experiment_model(modelname, exp_clamped_parameter_annot, p, newmodelname)
+    m = sabs_pkpd.clamp_experiment.clamp_experiment_model(modelname, exp_clamped_parameter_annot, 'engine.time', p, newmodelname)
 
     s = sabs_pkpd.load_model.load_simulation_from_mmt(newmodelname)
 
