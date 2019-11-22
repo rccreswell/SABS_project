@@ -53,9 +53,11 @@ def load_data_file(filename, headers: bool = True):
     data = pd.concat([data["Times"], data["Values"], data["Experiment number"], data["Experimental conditions (e.g. Temp)"]])
     #print(data)
     data = data.values.reshape(len(data)//4, 4)
-    print(data)
+    #print(data)
     exp_nums_list = list(set(data[:,2]))
+    print(exp_nums_list)
     exp_conds_list = list(set(data[:, 3]))
+    print(exp_conds_list)
     times = []
     values = []
     
