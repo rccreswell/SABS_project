@@ -65,5 +65,8 @@ def load_data_file(filename, headers: bool = True):
         temp = data[ data[:, 2] == exp_nums_list[i] ]
         times.append(temp[:, 0])
         values.append(temp[:, 1])
+        
+    print(times)
+    print(values)
     
     return Data_exp(times,values, exp_nums_list, exp_conds_list)
