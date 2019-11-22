@@ -47,8 +47,8 @@ def clamp_experiment_model(model_filename, clamped_variable_annot:str, pace_vari
 
     for variable in original_protocol_component.variables():
         if variable.name() == variable_name:
-            equation = variable.eq
-            variable.demote()
+            if variable.is_state() == True:
+                variable.demote()
             variable.set_rhs(pace_variable_annotation)
             variable_found = True
 

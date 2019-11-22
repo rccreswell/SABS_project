@@ -19,7 +19,7 @@ save_filename2 = 'C:/Users/yanral/Documents/Software Development/Examples/Exampl
 s = sabs_pkpd.load_model.load_simulation_from_mmt(filename1)
 
 # In[]
-time_max = 500 # ms
+time_max = 600 # ms
 n_timepoints = 5001
 time_samples = np.linspace(0, time_max, n_timepoints)
 pre_run = 20000
