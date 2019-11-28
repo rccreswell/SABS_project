@@ -28,7 +28,7 @@ def test_clamp_experiment_model():
     # Save the new model and protocol if the user provided the argument save_new_mmt_filename
     newmodelname = './tests/test resources/model_clamped.mmt'
 
-    m = sabs_pkpd.clamp_experiment.clamp_experiment_model(modelname, exp_clamped_parameter_annot, 'engine.time', p, newmodelname)
+    m = sabs_pkpd.clamp_experiment.clamp_experiment_model(modelname, exp_clamped_parameter_annot, 'engine.pace', p, newmodelname)
 
     s = sabs_pkpd.load_model.load_simulation_from_mmt(newmodelname)
 
@@ -42,4 +42,4 @@ def test_clamp_experiment_model():
     expected_output = np.array([0.00901, 0.06237, 0.06472, 0.11874, 0.12048, 0.17507, 0.17629, 0.23134, 0.23215])
     diff = np.linalg.norm(output-expected_output)
 
-    assert diff < 0.01
+    assert diff < 0.001
