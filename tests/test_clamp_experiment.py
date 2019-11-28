@@ -39,7 +39,7 @@ def test_clamp_experiment_model():
     a = s.run(time_max, log_times=time_samples)
     output = a[read_out]
 
-    expected_output = np.array([0.00901, 0.06237, 0.06472, 0.11874, 0.12048, 0.17507, 0.17629, 0.23134, 0.23215])
+    expected_output = np.array([0.00901, 0.02621, 0.00976, 0.02642, 0.00952, 0.02661, 0.00935, 0.02676, 0.00922])
     diff = np.linalg.norm(output-expected_output)
 
     assert diff < 0.001
