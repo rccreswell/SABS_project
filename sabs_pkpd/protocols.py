@@ -352,3 +352,4 @@ if __name__ == '__main__':
     p = TwoStepProtocol(1, 3, 1.2, 4.5, -0.5)
     p.to_myokit()
     p.plot()
+
