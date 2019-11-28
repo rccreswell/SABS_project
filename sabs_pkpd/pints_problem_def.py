@@ -128,8 +128,22 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     return chains
 
-def plot_distribution_map(mcmc_chains, RealValue, chain_index=0, fig_size=(15,15)):
-
+def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15)):
+    """
+    Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
+    couple of parameters to eventually identify linear relationships
+    :param mcmc_chains: list
+    List of length number of chains, each chain having a size (number of iterations, number of parameters + 1 for Noise)
+    :param expected_value: list
+    List of length number of parameters used for MCMC routine. If specified, it adds green lines for the expected
+    value of each parameter
+    :param chain_index: int
+    Index of the chain for which the parameters distribution map has to be plotted. If not specified, the first chain is
+    considered
+    :param fig_size: tuple
+    Defines the size of the figure for the plot
+    :return: None
+    """
     if chain_index > len(mcmc_chains)-1:
         raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + chain_index + '. Only ' +
                          len(mcmc_chains) + ' chains in this MCMC output.')
@@ -149,7 +163,8 @@ def plot_distribution_map(mcmc_chains, RealValue, chain_index=0, fig_size=(15,15
             if i == j:
                 # Plot the diagonal
                 hist_1d(mcmc_chains[chain_index][:, i], ax=axes[i, j])
-                axes[i, j].axvline(RealValue[i], c='g')
+                if expected_value is not None:
+                    axes[i, j].axvline(expected_value[i], c='g')
                 axes[i, j].axvline(start_parameter[i], c='b')
                 axes[i, j].legend()
             elif i < j:
@@ -158,9 +173,9 @@ def plot_distribution_map(mcmc_chains, RealValue, chain_index=0, fig_size=(15,15
             else:
                 # Lower triangle: Pairwise plot
                 plot_kde_2d(j, i, mcmc_chains, ax=axes[i, j], chain_index=chain_index)
-                axes[i, j].axhline(RealValue[i], c='g')
-                axes[i, j].axvline(RealValue[j], c='g')
-
+                if expected_value is not None:
+                    axes[i, j].axhline(expected_value[i], c='g')
+                    axes[i, j].axvline(expected_value[j], c='g')
                 axes[i, j].axhline(start_parameter[i], c='b')
                 axes[i, j].axvline(start_parameter[j], c='b')
 
@@ -182,9 +197,18 @@ def plot_distribution_map(mcmc_chains, RealValue, chain_index=0, fig_size=(15,15
 
     plt.show()
 
+    return None
+
 
 def hist_1d(x, ax):
-    """ Creates a 1d histogram and an estimate of the PDF using KDE. """
+    """
+    Creates a 1d histogram and an estimate of the PDF using KDE.
+    :param x : list
+    PDF list that we want to plot as an histogram
+    :param ax :matplotlib.axes._subplots.AxesSubplot
+    Axes of the figure that we want to plot the histogram on
+    :returns None
+    """
     xmin = np.min(x)
     xmax = np.max(x)
     x1 = np.linspace(xmin, xmax, 100)
@@ -194,9 +218,25 @@ def hist_1d(x, ax):
     hist = ax.hist(x, bins=x2, density=True)
     ax.plot(x1, f)
 
+    return None
+
 
 def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
-
+    """
+    Returns the 2D distribution of parameter j versus parameter i
+    :param i: int
+    Index of the first parameter for the distriubtion 2D map
+    :param j: int
+    Index of the second parameter for the distribution 2D map
+    :param mcmc_chains: list
+    List of length number of chains, each chain having a size (number of iterations, number of parameters + 1 for Noise)
+    :param ax :matplotlib.axes._subplots.AxesSubplot
+    Axes of the figure that we want to plot the histogram on
+    :param chain_index: int
+    Index of the chain for which the parameters distribution map has to be plotted. If not specified, the first chain is
+    considered
+    :return: None
+    """
     ax.set_xlabel('parameter ' + str(i))
     ax.set_ylabel('parameter '+ str(j))
     x = mcmc_chains[chain_index][:, i]
@@ -227,3 +267,5 @@ def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
     im = ax.get_images()
     extent = im[0].get_extent()
     ax.set_aspect(abs((extent[1] - extent[0]) / (extent[3] - extent[2])))
+
+    return None
