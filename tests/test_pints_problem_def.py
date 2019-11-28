@@ -28,30 +28,32 @@ def test_infer_params():
     assert np.linalg.norm(diff) < 0.01
 
 def test_MCMC_inference_model_params():
-    # Prepare the data for example problem
-    filename = 'C:/Users/yanral/Documents/Software Development/Examples/Example loading CellML model/tentusscher_2006_pints_and_Chons_hERG.mmt'
-
+    # Set the model annotations for the MCMC routine
     fitting_param_annot = ['ikr.scale_kr', 'ical.scale_cal']
-    sabs_pkpd.constants.n = 2
-
-    sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(filename)
-
-    times = [np.linspace(0,1000,1001)]
-    val = sabs_pkpd.constants.s.run(1001, log_times =times[0])
-    values = [val['membrane.V']]
-    exp_nums_list = [1]
-    exp_conds_list = [310]
     exp_cond_annot = 'phys.T'
     readout = 'membrane.V'
-    sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.Data_exp(times,values, exp_nums_list, exp_conds_list)
-    sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitting_param_annot,exp_cond_annot, readout)
 
+    # Load model and data
+    sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(
+        './tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt')
+    sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file(
+        './tests/test resources/mcmc_test_data.csv')
+    sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitting_param_annot, exp_cond_annot, readout)
+
+    # Start from a starting point close to the values of parameters used to generate the synthetic data
     RealValue = [1, 1]
-    Noise_sigma=0.5 # variance of N distributed noise to add to the trace
+    Noise_sigma = 0.5  # variance of N distributed noise to add to the trace
 
     set_to_test = np.zeros(len(RealValue))
     for i in range(len(RealValue)):
-      set_to_test[i] = np.random.uniform(low=0.9, high=1.11, size=None)*RealValue[i]
+        set_to_test[i] = np.random.uniform(low=0.7, high=1.5, size=None) * RealValue[i]
     starting_point = [np.array(list(set_to_test) + [Noise_sigma])]
 
-    chains = sabs_pkpd.pints_problem_def.MCMC_inference_model_params(starting_point,max_iter=3000)
+    chains = sabs_pkpd.pints_problem_def.MCMC_inference_model_params(starting_point, max_iter=3000)
+
+    mean_param0 = np.mean(chains[0][:,0])
+    mean_param1 = np.mean(chains[0][:,1])
+
+    assert abs(mean_param0 - 1) < 0.1
+    assert abs(mean_param1 - 1) < 0.1
+
