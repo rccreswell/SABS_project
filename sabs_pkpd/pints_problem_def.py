@@ -294,7 +294,7 @@ class MyProtocol(pints.ForwardModel):
         return out
 
 
-def infer_protocol_params(list_of_models, protocol_clamped_variable_annotation, protocol_pace_annotation):
+def infer_protocol_params(list_of_models, protocol_clamped_variable_annotation, protocol_pace_annotation, time_max):
 
     sabs_pkpd.constants.models_list = []
     sabs_pkpd.constants.s = []
@@ -306,3 +306,9 @@ def infer_protocol_params(list_of_models, protocol_clamped_variable_annotation, 
                                                                   protocol_pace_annotation)
         sabs_pkpd.constants.s.append(model)
 
+    fit_values = 9999999999
+    problem = pints.SingleOutputProblem(model=MyProtocol(), times=np.linspace(0, 1, len(fit_values)), values=fit_values)
+    boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
+    error_measure = pints.SumOfSquaresError(problem)
+    found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries,
+                                                   method=pints.XNES)
