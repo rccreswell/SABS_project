@@ -50,6 +50,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
     error_measure = pints.SumOfSquaresError(problem)
     found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints.XNES)
     print(data_exp.fitting_instructions.fitted_params_annot)
+    print(found_parameters)
     return found_parameters
 
 
@@ -269,3 +270,39 @@ def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
     ax.set_aspect(abs((extent[1] - extent[0]) / (extent[3] - extent[2])))
 
     return None
+
+
+class MyProtocol(pints.ForwardModel):
+    def n_parameters(self):
+        # Define the amount of fitted parameters
+        return sabs_pkpd.constants.n
+
+    def simulate(self, parameters, times):
+
+        if len(parameters)%3 != 1:
+            raise ValueError('3 parameters should be provided by step, plus one for baseline')
+
+        nb_steps = len(parameters)//3
+        starting_times = parameters[0:nb_steps]
+        durations = parameters[nb_steps:2*nb_steps]
+        amplitudes = parameters[2*nb_steps:]
+
+        time_series = sabs_pkpd.protocols.TimeSeriesFromSteps(starting_times, durations, amplitudes)
+        prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(time_series)
+
+        out = sabs_pkpd.run_model.simulate_protocol(prot, sabs_pkpd.constants.models_list)
+        return out
+
+
+def infer_protocol_params(list_of_models, protocol_clamped_variable_annotation, protocol_pace_annotation):
+
+    sabs_pkpd.constants.models_list = []
+    sabs_pkpd.constants.s = []
+
+    for i in range(len(list_of_models)):
+        sabs_pkpd.constants.models_list.append(list_of_models[i])
+        model = sabs_pkpd.clamp_experiment.clamp_experiment_model(list_of_models[i],
+                                                                  protocol_clamped_variable_annotation,
+                                                                  protocol_pace_annotation)
+        sabs_pkpd.constants.s.append(model)
+
