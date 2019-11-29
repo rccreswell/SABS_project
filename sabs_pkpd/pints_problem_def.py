@@ -4,6 +4,7 @@ import numpy as np
 import sabs_pkpd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+import scipy
 
 
 class MyModel(pints.ForwardModel):
@@ -272,43 +273,89 @@ def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
     return None
 
 
-class MyProtocol(pints.ForwardModel):
-    def n_parameters(self):
-        # Define the amount of fitted parameters
-        return sabs_pkpd.constants.n
+"""
+def infer_protocol_params(protocol_optimisation_instructions):
 
-    def simulate(self, parameters, times):
-
-        if len(parameters)%3 != 1:
-            raise ValueError('3 parameters should be provided by step, plus one for baseline')
-
-        nb_steps = len(parameters)//3
-        starting_times = parameters[0:nb_steps]
-        durations = parameters[nb_steps:2*nb_steps]
-        amplitudes = parameters[2*nb_steps:]
-
-        time_series = sabs_pkpd.protocols.TimeSeriesFromSteps(starting_times, durations, amplitudes)
-        prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(time_series)
-
-        out = sabs_pkpd.run_model.simulate_protocol(prot, sabs_pkpd.constants.models_list)
-        return out
-
-
-def infer_protocol_params(list_of_models, protocol_clamped_variable_annotation, protocol_pace_annotation, time_max):
-
-    sabs_pkpd.constants.models_list = []
     sabs_pkpd.constants.s = []
 
-    for i in range(len(list_of_models)):
-        sabs_pkpd.constants.models_list.append(list_of_models[i])
-        model = sabs_pkpd.clamp_experiment.clamp_experiment_model(list_of_models[i],
-                                                                  protocol_clamped_variable_annotation,
-                                                                  protocol_pace_annotation)
+    for i in range(len(protocol_optimisation_instructions.list_of_models)):
+        sabs_pkpd.constants.models_list.append(protocol_optimisation_instructions.list_of_models[i])
+        model = sabs_pkpd.clamp_experiment.clamp_experiment_model(protocol_optimisation_instructions.list_of_models[i],
+                                                                  protocol_optimisation_instructions.protocol_clamped_variable_annotation,
+                                                                  protocol_optimisation_instructions.protocol_pace_annotation)
         sabs_pkpd.constants.s.append(model)
 
-    fit_values = 9999999999
+    fit_values = [9999999999]
     problem = pints.SingleOutputProblem(model=MyProtocol(), times=np.linspace(0, 1, len(fit_values)), values=fit_values)
-    boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
+    boundaries = pints.RectangularBoundaries(protocol_optimisation_instructions.boundaries_low, protocol_optimisation_instructions.boundaries_high)
     error_measure = pints.SumOfSquaresError(problem)
     found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries,
                                                    method=pints.XNES)
+"""
+
+def objective(starting_times, duration, amplitude, baseline):
+    time_series = sabs_pkpd.protocols.TimeSeriesFromSteps(starting_times, duration, amplitude, baseline=baseline)
+    prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(time_series)
+
+    sample_timepoints = 10000
+
+    response = np.zeros((len(sabs_pkpd.constants.s), sample_timepoints))
+    for i in range(len(sabs_pkpd.constants.s)):
+        simulation = myokit.Simulation(model=sabs_pkpd.constants.s[i], protocol=prot)
+        simulated = simulation.run(sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
+                                   log_times=np.linspace(0, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time))
+        response[i, :] = simulation[sabs_pkpd.constants.protocol_optimisation_instructions.model_readout]
+
+    score = 0
+    for i in range(len(sabs_pkpd.constants.s)):
+        score_model = 0
+        for j in range(len(sabs_pkpd.constants.s) - i):
+            score_model += np.sum(np.square(response[i, :] - response[j, :]))
+        score_model = np.log(score_model)
+        score += score_model
+
+    return score
+
+if __name__ == 'main':
+    list_of_models = ['C:/Users/yanral/Documents/Software Development/mmt_models/lei-2019-ikr.mmt',
+                      'C:/Users/yanral/Documents/Software Development/mmt_models/beattie-2018-ikr.mmt']
+    clamped_variable_model_annotation = 'membrane.v'
+    pacing_model_annotation = 'engine.pace'
+    simulation_time = 1500
+    readout = 'ikr.IKr'
+    sabs_pkpd.constants.protocol_optimisation_instructions = sabs_pkpd.constants.Protocol_optimisation_instructions(list_of_models, clamped_variable_model_annotation, pacing_model_annotation, simulation_time, readout)
+
+    # Pre load all the models required for protocol optimisation
+    sabs_pkpd.constants.s = []
+
+    for i in range(len(sabs_pkpd.constants.protocol_optimisation_instructions.models)):
+        model = sabs_pkpd.clamp_experiment.clamp_experiment_model(sabs_pkpd.constants.protocol_optimisation_instructions.models[i],
+                                                                  sabs_pkpd.constants.protocol_optimisation_instructions.clamped_variable_model_annotation,
+                                                                  sabs_pkpd.constants.protocol_optimisation_instructions.pacing_model_annotation)
+        sabs_pkpd.constants.s.append(model)
+
+    # Define the starting point for the optimisation
+    starting_times = [100, 500, 1000, 2000, 3000, 3200, 3400, 3500, 3800]
+    duration = [200, 200, 400, 800, 200, 500, 250, 150, 500, 100]
+    amplitude = [30, 40, 60, 50, 25, 30, 40, 15, 25, 10]
+    baseline = -85
+    protocol = np.concatenate((starting_times, duration, amplitude, baseline))
+
+    """
+    if len(parameters) % 3 != 1:
+        raise ValueError('3 parameters should be provided by step, plus one for baseline')
+
+    nb_steps = len(parameters) // 3
+    starting_times = parameters[0:nb_steps]
+    durations = parameters[nb_steps:2 * nb_steps]
+    amplitudes = parameters[2 * nb_steps:-1]
+    baseline = parameters[-1]
+    """
+    np_objective = lambda protocol_paramaters : objective(protocol_paramaters[0 : len(protocol_paramaters)//3],
+                                                          protocol_parameters[len(protocol_paramaters)//3 : 2*len(protocol_paramaters)//3],
+                                                          protocol_parameters[2*len(protocol_paramaters)//3 : 3*len(protocol_paramaters)//3],
+                                                          protocol_parameters[-1])
+
+    res = scipy.optimize.maximize(np_objective, x0=protocol, method='L-BFGS-B',
+                                  options={'eps': 5e-2, 'disp': True, 'maxiter': 100})
+
