@@ -8,6 +8,7 @@ import numpy as np
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import myokit
+from operator import itemgetter
 
 class Protocol:
     """Class for any protocol.
@@ -323,7 +324,57 @@ class PointwiseProtocol(Protocol):
     def relevant_times(self):
         return self.times
 
+def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=-80):
+    """
+    Returns a time series of a protocol defined by steps on top of each other.
+    :param start_times_list: list
+    List of times of start of each step.
+    :param duration_list: list
+    List of durations of each step
+    :param amplitude_list: list
+    List of amplitudes of each step
+    :param baseline: float
+    Defines the baseline of the protocol, to which the steps are added. If not specified, the default value is -80.
+    :return: time_series: array
+    Time series of the model parameter clamped during the protocol.
+    """
 
+    if len(start_times_list) != len(duration_list):
+        raise ValueError('Start times and durations should have the same length. len(start_times_list) =  ' + str(
+            np.shape(start_times_list))
+                         + ' and len(duration_list) = ' + str(np.shape(duration_list)))
+    if len(start_times_list) != len(amplitude_list):
+        raise ValueError('Start times and durations should have the same length. len(start_times_list) =  ' + str(
+            np.shape(start_times_list))
+                         + ' and len(duration_list) = ' + str(np.shape(amplitude_list)))
+    data_input = np.vstack((amplitude_list, start_times_list, duration_list))
+    data_input = sorted(data_input, key=itemgetter(0))
+
+    t_max = np.max(start_times_list + duration_list)
+    times = np.linspace(0, t_max, int(t_max + 1))
+
+    time_series = np.zeros((int(t_max) + 1))
+    for i in range(len(start_times_list)):
+        time_series[int(start_times_list[i]):int(start_times_list[i] + duration_list[i])] += \
+            amplitude_list[i] * np.ones(int(duration_list[i]))
+
+    output = []
+    output_times = []
+    for i in range(1, len(time_series)):
+        if time_series[i - 1] != time_series[i]:
+            output.append(time_series[i])
+            output_times.append(times[i])
+
+    return np.vstack((np.array(output), np.array(output_times)))
+
+start_times_list = np.array([10, 150, 350, 700, 1000, 1050, 1350])
+duration_list = np.array([100, 600, 800, 100, 400, 150, 200])
+amplitude_list = np.array([10, 7, 8, 9, 3, 5, 8])
+baseline = -80
+
+check = TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list)
+
+"""
 if __name__ == '__main__':
     p = SineWaveProtocol(2.5, 10, 0)
     p.plot()
@@ -353,3 +404,5 @@ if __name__ == '__main__':
     p.to_myokit()
     p.plot()
 
+
+"""
