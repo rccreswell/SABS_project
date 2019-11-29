@@ -353,13 +353,13 @@ def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baselin
     t_max = np.max(start_times_list + duration_list)
     times = np.linspace(0, t_max, int(t_max + 1))
 
-    time_series = np.zeros((int(t_max) + 1))
+    time_series = baseline * np.ones((int(t_max) + 1))
     for i in range(len(start_times_list)):
         time_series[int(start_times_list[i]):int(start_times_list[i] + duration_list[i])] += \
             amplitude_list[i] * np.ones(int(duration_list[i]))
 
-    output = []
-    output_times = []
+    output = [baseline]
+    output_times = [0]
     for i in range(1, len(time_series)):
         if time_series[i - 1] != time_series[i]:
             output.append(time_series[i])
@@ -367,14 +367,7 @@ def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baselin
 
     return np.vstack((np.array(output), np.array(output_times)))
 
-start_times_list = np.array([10, 150, 350, 700, 1000, 1050, 1350])
-duration_list = np.array([100, 600, 800, 100, 400, 150, 200])
-amplitude_list = np.array([10, 7, 8, 9, 3, 5, 8])
-baseline = -80
 
-check = TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list)
-
-"""
 if __name__ == '__main__':
     p = SineWaveProtocol(2.5, 10, 0)
     p.plot()
@@ -404,5 +397,3 @@ if __name__ == '__main__':
     p.to_myokit()
     p.plot()
 
-
-"""
