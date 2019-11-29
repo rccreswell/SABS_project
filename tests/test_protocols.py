@@ -81,12 +81,12 @@ def test_sinewaveprotocol():
 
 def test_TimeSeriesFromStep():
 
-    start_times_list = np.array([10, 150, 350, 700, 1000, 1050, 1350])
+    start_times_list = np.array([10, 150, 350.5, 750, 1000, 1050, 1350])
     duration_list = np.array([100, 600, 800, 100, 400, 150, 200])
     amplitude_list = np.array([10, 7, 8, 9, 3, 5, 8])
     baseline = -50
 
     check = sabs_pkpd.protocols.TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=baseline)
-    assert check == np.array([[-50., -40., -50., -43., -35., -26., -33., -42., -39., -34., -42., -47., -39., -42., -50.],
-                              [0., 10., 110., 150., 350., 700., 750., 800., 1000., 1050., 1150., 1200., 1350., 1400., 1550.]])
-
+    assert math.isclose(np.array([[0, 10, 110, 150, 350.5, 750, 850, 1000, 1050, 1150.5, 1200, 1350, 1400, 1550],
+                              [-50, -40, -50, -43, -35, -33, -42, -39, -34, -42, -47, -39, -42, -50]]),
+                        check, abs_tol=0.1)

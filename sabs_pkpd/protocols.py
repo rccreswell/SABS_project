@@ -327,11 +327,11 @@ class PointwiseProtocol(Protocol):
 def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=-80):
     """
     Returns a time series of a protocol defined by steps on top of each other.
-    :param start_times_list: list
+    :param start_times_list: list or numpy.array
     List of times of start of each step.
-    :param duration_list: list
+    :param duration_list: list or numpy.array
     List of durations of each step
-    :param amplitude_list: list
+    :param amplitude_list: list or numpy.array
     List of amplitudes of each step
     :param baseline: float
     Defines the baseline of the protocol, to which the steps are added. If not specified, the default value is -80.
@@ -339,33 +339,45 @@ def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baselin
     Time series of the model parameter clamped during the protocol.
     """
 
-    if len(start_times_list) != len(duration_list):
-        raise ValueError('Start times and durations should have the same length. len(start_times_list) =  ' + str(
-            np.shape(start_times_list))
-                         + ' and len(duration_list) = ' + str(np.shape(duration_list)))
-    if len(start_times_list) != len(amplitude_list):
-        raise ValueError('Start times and durations should have the same length. len(start_times_list) =  ' + str(
-            np.shape(start_times_list))
-                         + ' and len(duration_list) = ' + str(np.shape(amplitude_list)))
-    data_input = np.vstack((amplitude_list, start_times_list, duration_list))
-    data_input = sorted(data_input, key=itemgetter(0))
+    times = np.array([0, start_times_list[0], start_times_list[0] + duration_list[0]])
+    values = np.array([baseline, baseline + amplitude_list[0], baseline])
 
-    t_max = np.max(start_times_list + duration_list)
-    times = np.linspace(0, t_max, int(t_max + 1))
+    for i in range(1, len(start_times_list)):
+        index_start = np.max(np.where(times <= start_times_list[i]))
+        index_end = np.max(np.where(times <= start_times_list[i] + duration_list[i]))
+        if times[index_start] == start_times_list[i]:
+            times = np.insert(times, index_end + 1, start_times_list[i] + duration_list[i])
+            values = np.insert(values, index_end + 1, values[index_end])
+            values[index_start:index_end + 1] += amplitude_list[i]
 
-    time_series = baseline * np.ones((int(t_max) + 1))
-    for i in range(len(start_times_list)):
-        time_series[int(start_times_list[i]):int(start_times_list[i] + duration_list[i])] += \
-            amplitude_list[i] * np.ones(int(duration_list[i]))
+        elif times[index_end] == start_times_list[i] + duration_list[i]:
+            times = np.insert(times, index_start + 1, start_times_list[i])
+            values = np.insert(values, index_start + 1, values[index_start])
+            values[index_start + 1:index_end] += amplitude_list[i]
 
-    output = [baseline]
-    output_times = [0]
-    for i in range(1, len(time_series)):
-        if time_series[i - 1] != time_series[i]:
-            output.append(time_series[i])
-            output_times.append(times[i])
+        else:
+            times = np.insert(times, index_start + 1, start_times_list[i])
+            times = np.insert(times, index_end + 2, start_times_list[i] + duration_list[i])
+            values = np.insert(values, index_start + 1, values[index_start])
+            values = np.insert(values, index_end + 2, values[index_end + 1])
+            values[index_start + 1:index_end + 2] += amplitude_list[i]
 
-    return np.vstack((np.array(output), np.array(output_times)))
+    return np.vstack((times, values))
+
+def MyokitProtocolFromTimeSeries(time_series):
+    """
+    Translates a time series to a Myokit Protocol.
+    :param time_series: numpy.array
+    Array of shape(2, number of steps). time_series[0,j] contains the j-th event of the protocol, time_series[1,j] the
+    protocol value at the j-th event.
+    :return: prot: myokit.protocol
+    """
+
+    prot = myokit.Protocol()
+    for i in range(len(time_series-1)):
+        prot.schedule(time_series[1, i], time_series[0, i], time_series[0, i+1] - time_series[0, i])
+
+    return prot
 
 
 if __name__ == '__main__':
@@ -397,3 +409,10 @@ if __name__ == '__main__':
     p.to_myokit()
     p.plot()
 
+    start_times_list = np.array([10, 150, 350.5, 750, 1000, 1050, 1350])
+    duration_list = np.array([100, 600, 800, 100, 400, 150, 200])
+    amplitude_list = np.array([10, 7, 8, 9, 3, 5, 8])
+    baseline = -50
+
+    time_series = TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=baseline)
+    plt.plot(time_series[0], time_series[1])
