@@ -38,7 +38,8 @@ class ProtocolOptimizer:
                  times,
                  x0,
                  model_params,
-                 protocol_params):
+                 protocol_params,
+                 num_mcmc_iterations):
         """
         Parameters
         ----------
@@ -58,8 +59,8 @@ class ProtocolOptimizer:
         x0 : float
             The value x(time=0)
         model_params : list of float
-            The initial values of the model parameters. Must be compatible with
-            simulator
+            The initial/ground truth values of the model parameters. Must be
+            compatible with simulator
         protocol_params : list of float
             The initial values of the protocol parameters. Must be compatible
             with protocol_form
@@ -70,6 +71,8 @@ class ProtocolOptimizer:
         self.protocol_form = protocol_form
         self.model_params = model_params
         self.protocol_params = protocol_params
+
+        self.num_mcmc_iterations = num_mcmc_iterations
 
 
     def run_original_protocol(self):
@@ -102,6 +105,15 @@ class ProtocolOptimizer:
         float
             The value of the objective function
         """
+        # If a matrix of protocol params is supplied, evaluate each one sequentially
+        # and return a list of objectives
+        if type(protocol_params) is np.ndarray:
+            if protocol_params.ndim == 2:
+                all_F = []
+                for p in protocol_params:
+                    all_F.append(self.objective(p))
+                return np.array(all_F)
+
         # Get the protocol as a function of t
         protocol = self.protocol_form(*protocol_params)
 
@@ -119,7 +131,7 @@ class ProtocolOptimizer:
         # Take the derivatives with respect to each model variable
         derivatives = []
         for i, partial in enumerate(partials):
-            dfda = nd.Derivative(partial, n=1)
+            dfda = nd.Derivative(partial, n=1, step=1e-2)
 
             # Evaluate the derivative at that model parameter value
             dfda = dfda(self.model_params[i])
@@ -134,8 +146,15 @@ class ProtocolOptimizer:
         true_sigma = 0.1
         J = 1/true_sigma**2 * J
 
+        print(protocol_params)
+
         # Calculate the objective function from the CRLBs
-        J_inv = np.linalg.inv(J)
+        try:
+            J_inv = np.linalg.inv(J)
+        except:
+            # Singular matrix when all zeros, so changing the parameters has no
+            # effect on the trajectory. Treat this as a bad objective??
+            J_inv = np.diag([1e10] * len(self.model_params))
         F = np.sum([J_inv[i,i] / self.model_params[i] \
                     for i in range(len(self.model_params))])
 
@@ -147,15 +166,32 @@ class ProtocolOptimizer:
         """
         objective = lambda protocol_params : self.objective(protocol_params)
 
-        res = scipy.optimize.minimize(
-                  objective,
-                  x0=self.protocol_params,
-                  method='L-BFGS-B',
-                  options={'eps':5e-2, 'disp':True, 'maxiter':100}
-              )
+        # res = scipy.optimize.minimize(
+        #           objective,
+        #           x0=self.protocol_params,
+        #           method='L-BFGS-B',
+        #           options={'eps':1e-2, 'disp':True, 'maxiter':1000,}
+        #       )
+        # res = scipy.optimize.minimize(
+        #           objective,
+        #           x0=self.protocol_params,
+        #           method='COBYLA',
+        #           options={'rhobeg': .5, 'disp': True}
+        #       )
 
-        protocol = res.x
-        print('optimized_protocol', protocol)
+        # protocol = res.x
+        # print('optimized_protocol', protocol)
+
+
+        import pyswarms as ps
+        options = {'c1': 0.5, 'c2': 0.3, 'w':0.9}
+        optimizer = ps.single.GlobalBestPSO(n_particles=10, dimensions=6, options=options)
+        cost, pos = optimizer.optimize(objective, iters=20)
+        print(cost)
+        print(pos)
+        protocol = pos
+
+
         self.protocol_params = protocol
 
 
@@ -167,7 +203,8 @@ class ProtocolOptimizer:
                             self.x0,
                             self.protocol_form(*self.protocol_params),
                             self.model_params,
-                            self.times
+                            self.times,
+                            self.num_mcmc_iterations
                          )
 
         self.data = values
@@ -177,7 +214,7 @@ class ProtocolOptimizer:
     def plot(self):
         """Make a plot of the original and optimized protocols.
         """
-        burnin = 2000
+        burnin = self.num_mcmc_iterations // 2
 
         # columns = protocol, data, and one posterior per model parameter
         n_cols = 2 + len(self.model_params)
@@ -216,7 +253,8 @@ def infer_model_parameters(simulator,
                            xinit,
                            protocol,
                            true_model_params,
-                           times):
+                           times,
+                           num_mcmc_iterations):
     """Infer model parameters from synthetic data.
 
     Parameters
@@ -270,7 +308,7 @@ def infer_model_parameters(simulator,
 
     # Run MCMC chain
     mcmc = pints.MCMCController(log_posterior, 1, x0)
-    mcmc.set_max_iterations(4000)
+    mcmc.set_max_iterations(num_mcmc_iterations)
     chains = mcmc.run()
 
     return values, chains
@@ -281,6 +319,25 @@ def infer_model_parameters(simulator,
 def one_step_protocol(amplitude, duration):
     return lambda times : np.array(((times > 1.0) & (times < 1.0 + duration))).astype(float) * amplitude
 
+def sine_wave_protocol(amplitude, frequency):
+    return lambda times : amplitude * np.sin(frequency * times)
+
+def three_event_protocol(d1, d2, d3, a1, a2, a3):
+    def f(t):
+        if type(t) is float or type(t) is np.float64:
+            t = np.array([t])
+
+        baseline = np.zeros(len(t))
+        l1 = np.ones(len(t)) * a1
+        l2 = np.ones(len(t)) * a2
+        l3 = np.ones(len(t)) * a3
+
+        return baseline + \
+                (l1 * ((t > 1) & (t < 1+d1))) + \
+                (l2 * ((t > 1+d1) & (t < 1+d1+d2))) + \
+                (l3 * ((t > 1+d1+d2) & (t < 1 +d1+d2+d3)))
+
+    return f
 
 def logistic_growth_additive_protocol(alpha, beta, protocol, t, x0):
     """Logistic growth model with additive stimulus.
@@ -319,18 +376,83 @@ def logistic_growth_additive_protocol(alpha, beta, protocol, t, x0):
     return result
 
 
-def main():
-    opt = ProtocolOptimizer(logistic_growth_additive_protocol,
-                           one_step_protocol,
-                           np.linspace(0, 10, 1000),
-                           10,
-                           [1, -0.1],
-                           [0.5, 1.5])
+def damped_harmonic_oscillator(c, k, m, beta, protocol, t, x0):
+    """Damped harmonic oscillator with forcing.
 
-    opt.run_original_protocol()
-    opt.optimize_protocol()
-    opt.infer_model_parameters()
-    opt.plot()
+    d^2x/dt^2 + c/m dx/dt + k/m x = 1/m protocol(t)
+
+    The solution is accomplished by converting this second-order equation into
+    a system of two first-order ODEs. Only the solution for x is returned.
+
+    Parameters
+    ----------
+    c : float
+        damping constant
+    k : float
+        spring constant
+    m : float
+        mass
+    """
+    # print(c, k, m, beta)
+    m = 1e-1 if m < 0 else m
+    beta = 0 if beta < 0 else beta
+    c = 0 if c < 0 else c
+    k = 0 if k < 0 else k
+
+    def f(t, x):
+        d = [0, 0]
+        d[0] = x[1]
+        d[1] = 1/m * protocol(t) - c/m * x[1] -k/m * x[0] - beta * x[0]**3
+        return d
+
+    result = scipy.integrate.solve_ivp(
+            f, (min(t), max(t)), [x0, 0], t_eval=t, max_step=0.1, vectorized=True).y[0]
+
+    return result
+
+def main():
+
+    if False:
+        t = np.linspace(0, 10, 1000)
+        x = damped_harmonic_oscillator(10.0, 1.0, 1.0, 1.0, sine_wave_protocol(1, 1), t, 0)
+        plt.plot(t, x)
+        plt.show()
+
+        _, chains = infer_model_parameters(damped_harmonic_oscillator, 0, one_step_protocol(1000,1),
+                                        [10,1,1, 1.0], t, 4000)
+
+        import pints.plot
+        pints.plot.trace(chains)
+        plt.show()
+        exit()
+
+    if True:
+        opt = ProtocolOptimizer(damped_harmonic_oscillator,
+                               three_event_protocol,
+                               np.linspace(0, 10, 1000),
+                               0.0,
+                               [10, 1.0, 1.0, 1.0],
+                               [1, 1, 1, 1, 2, 3],
+                               4000)
+
+        opt.run_original_protocol()
+        opt.optimize_protocol()
+        opt.infer_model_parameters()
+        opt.plot()
+
+    if False:
+        opt = ProtocolOptimizer(logistic_growth_additive_protocol,
+                               one_step_protocol,
+                               np.linspace(0, 10, 1000),
+                               10,
+                               [1, -0.1],
+                               [0.5, 1.5],
+                               4000)
+
+        opt.run_original_protocol()
+        opt.optimize_protocol()
+        opt.infer_model_parameters()
+        opt.plot()
 
 
 if __name__ == '__main__':
