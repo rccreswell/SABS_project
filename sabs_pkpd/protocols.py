@@ -383,10 +383,9 @@ def MyokitProtocolFromTimeSeries(durations, amplitudes):
     prot = myokit.Protocol()
     starting_time = 0
     for i in range(len(durations)):
-        starting_time += durations[i]
         prot.schedule(amplitudes[i], starting_time, durations[i])
+        starting_time += durations[i]
 
-    starting_time += durations[-1]
     if starting_time < sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time:
         prot.schedule(amplitudes[-1], starting_time, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time - starting_time + 100)
 
