@@ -14,7 +14,7 @@ class MyModel(pints.ForwardModel):
 
     def simulate(self, parameters, times):
 
-        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = 0)
+        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = sabs_pkpd.constants.pre_run)
         out = np.concatenate([i for i in out])
         return out
 
@@ -130,7 +130,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     return chains
 
-def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15)):
+def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000):
     """
     Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
     couple of parameters to eventually identify linear relationships
@@ -164,7 +164,7 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
             # Create subplot
             if i == j:
                 # Plot the diagonal
-                hist_1d(mcmc_chains[chain_index][:, i], ax=axes[i, j])
+                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
                 if expected_value is not None:
                     axes[i, j].axvline(expected_value[i], c='g')
                 axes[i, j].axvline(start_parameter[i], c='b')
@@ -357,5 +357,5 @@ if __name__ == 'main':
                                                           protocol_parameters[-1])
 
     res = scipy.optimize.maximize(np_objective, x0=protocol, method='L-BFGS-B',
-                                  options={'eps': 5e-2, 'disp': True, 'maxiter': 100})
+                                  options={'eps': 5e-2, 'disp': True, 'maxiter': 1000})
 

@@ -161,8 +161,28 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     return output
 
 
-def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s):
+def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, figsize = (20,20)):
+    """
+    This function plots the experimental data and the output of the model for parameters rescaled as precised by the user
 
+    :param plotting_parameters_annot:
+    List of strings. Model annotations for the parameters the user wants to rescale for the plotting
+
+    :param plotting_parameters_values:
+    List or numpy.array. Contains the values for the parameters annotated with plotting_params_annot
+
+    :param data_exp:
+    Data_exp class. Contains all the experimental data. The fitting instructions must have been initialised previously.
+
+    :param s:
+    myokit.Simulation. myokit object used to run the model.
+
+    :param figsize:
+    Tuple. Defines the size of the figure for the plots. If not specified, it is (20, 20)
+
+    :return: None
+
+    """
     read_out = data_exp.fitting_instructions.sim_output_param_annot
     exp_cond_param_annot = data_exp.fitting_instructions.exp_cond_param_annot
     fixed_params_annot = list(plotting_parameters_annot)
@@ -170,7 +190,7 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
 
     number_of_plots = len(data_exp.exp_conds)
     number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
-    fig1 = plt.figure()
+    fig1, axes = plt.subplots(number_of_rows, 2, figsize=figsize)
 
     for i in range(0, number_of_plots):
         plt.subplot(number_of_rows, 2, i+1)
