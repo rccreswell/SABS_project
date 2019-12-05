@@ -56,7 +56,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
 
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior = None, mmt_model_filename = None,
-                                chain_filename = None, pdf_filename = None, log_likelihood=None, method = None):
+                                chain_filename = None, pdf_filename = None, log_likelihood='UnknownNoiseLogLikelihood', method = 'AdaptiveCovarianceMCMC'):
     """
     Runs a MCMC routine for the selected model
 
@@ -96,23 +96,16 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     problem = pints.SingleOutputProblem(model, times=np.linspace(0,1,len(fit_values)), values=fit_values)
 
-    # Create a log-likelihood function if not specified (adds an extra parameter!)
-    if log_likelihood is not None:
-        pass
-    else:
-        log_likelihood = pints.UnknownNoiseLogLikelihood(problem)
+    # Create a log-likelihood function (adds an extra parameter!)
+    log_likelihood = eval('pints.'+ log_likelihood + '(problem)')
 
     # Create a posterior log-likelihood (log(likelihood * prior))
     log_posterior = pints.LogPosterior(log_likelihood, log_prior)
 
-    if method is not None:
-        pass
-    else:
-        method = pints.AdaptiveCovarianceMCMC
+    method = eval('pints.' + method)
 
     # Create mcmc routine
-    mcmc = pints.MCMCSampling(log_posterior, 1, starting_point, method=method)
-
+    mcmc = pints.MCMCSampling(log_posterior, len(starting_point), starting_point, method=method)
     # Add stopping criterion
     mcmc.set_max_iterations(max_iter)
     # Start adapting after adapt_start iterations
@@ -151,9 +144,6 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
                          len(mcmc_chains) + ' chains in this MCMC output.')
 
     n_param = sabs_pkpd.constants.n
-
-    if fig_size is None:
-        fig_size = (15, 15)
 
     start_parameter = mcmc_chains[0][0, :]
     fig, axes = plt.subplots(n_param, n_param, figsize=fig_size)

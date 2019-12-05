@@ -4,9 +4,8 @@ import numpy as np
 import scipy
 
 
-def objective(starting_times, duration, amplitude, baseline):
-    events_list = sabs_pkpd.protocols.TimeSeriesFromSteps(starting_times, duration, amplitude, baseline=baseline)
-    prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(events_list)
+def objective(duration, amplitude):
+    prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(duration, amplitude)
 
     sample_timepoints = 10000
 
