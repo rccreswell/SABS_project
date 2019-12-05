@@ -1,0 +1,206 @@
+[[model]]
+author: Cellml converter
+desc: """
+    McAllister-Noble-Tsien Purkinje Fibre Model 1975
+    Catherine
+    Lloyd
+    Auckland
+    Bioengineering Institute, The University of Auckland
+    Model Status
+    This is a
+    code and units checked version of the model including two variants - A and
+    B - with different formulations for the transient chloride current r gate.
+    The kinetics for this gate in Model B come from an extensive study by
+    Fozzard and Hiraoka. Results using model A are very dependent on initial
+    conditions. Model B has a notch which is less frequency labile than that of
+    model A. This is model B. The model runs in both OpenCell and COR to
+    replicate the published results. The units have been checked and are
+    consistent.
+    Model Structure
+    Following Denis Noble's 1962 model of cardiac
+    action potentials in Purkinje fibres, the next significant development in
+    cardiac membrane modelling occurred when R.E. McAllister, D. Noble and R.W.
+    Tsien (1975) published a paper which formulated new ionic current equations
+    based on new experimental data.  The description of the kinetics of the
+    currents is still based on the Hodgkin-Huxley formalism, but the currents
+    themselves incorporate some significant new changes, and the total ionic
+    current is broken down into nine discrete, individual ionic fluxes (see the
+    figure below).
+    The complete original paper reference is cited below:
+    Reconstruction of the Electrical Activity of Cardiac Purkinje Fibres,
+    McAllister, R.E. Noble, D. and Tsien, R.W. 1975,
+    Journal of Physiology
+    ,
+    251, 1-59.
+    PubMed ID: 1185607
+    cell diagram of the MNT model showing ionic
+    currents across the sarcoplasmic reticulum
+    A schematic diagram describing
+    the current flows across the cell membrane that are captured in the MNT
+    model.
+    """
+name: mcallister_noble_tsien_1975_modelB
+# Initial values
+secondary_inward_current_d_gate.d     =  2.93135000000000010e-3
+secondary_inward_current_f_gate.f     =  8.08739169999999952e-1
+
+[environment]
+time = 0 bind time
+    in [ms]
+
+[membrane]
+C = 10
+    in [uF/cm^2]
+V = -80
+    in [mV]
+
+[secondary_inward_current]
+E_si = 70
+    in [mV]
+g_si = 0.8
+    in [mS/cm^2]
+g_si_ = 0.04
+    in [mS/cm^2]
+i_si = g_si * secondary_inward_current_d_gate.d * secondary_inward_current_f_gate.f * (membrane.V - E_si) + g_si_ * secondary_inward_current_d1_gate.d1 * (membrane.V - E_si)
+    in [uA/cm^2]
+
+[secondary_inward_current_d1_gate]
+d1 = 1 / (1 + exp(-0.15 [1/mV] * (membrane.V + 40 [mV])))
+    in [1]
+
+[secondary_inward_current_d_gate]
+alpha_d = 0.002 [1/mV/ms] * (membrane.V + 40 [mV]) / (1 - exp(-0.1 [1/mV] * (membrane.V + 40 [mV])))
+    in [mS/uF]
+beta_d = 0.02 [mS/uF] * exp(-0.0888 [1/mV] * (membrane.V + 40 [mV]))
+    in [mS/uF]
+dot(d) = alpha_d * (1 - d) - beta_d * d
+    in [1]
+
+[secondary_inward_current_f_gate]
+alpha_f = 0.000987 [mS/uF] * exp(-0.04 [1/mV] * (membrane.V + 60 [mV]))
+    in [mS/uF]
+beta_f = 0.02 [mS/uF] / (exp(-0.087 [1/mV] * (membrane.V + 26 [mV])) + 1)
+    in [mS/uF]
+dot(f) = alpha_f * (1 - f) - beta_f * f
+    in [1]
+
+[[protocol]]
+# Level  Start    Length   Period   Multiplier
+1.0      100.0    0.5      1000.0   0
+
+[[script]]
+import matplotlib.pyplot as plt
+import numpy as np
+import myokit
+
+#
+# This example shows how to simulate an activation experiment "by hand" (i.e.
+# without using the class myokit.lib.common.Activation).
+#
+# It also shows how a step protocol experiment is unable to extract the
+# steady state activation perfectly, as inactivation kicks in at higher
+# potentials.
+#
+
+# Holding potentials to test
+#holding_potentials = np.arange(-90, -50, 10)
+holding_potentials = [-90, -80, -70, -60, -50, -30, -20, -10, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+
+# Create simulation
+m = get_model()
+s = myokit.Simulation(m)
+
+# Create figure for results
+fig = plt.figure()
+
+# Top-left: the holding potentials
+ax1 = fig.add_subplot(1,3,1)
+ax1.set_title('Holding potential')
+ax1.set_ylim([-100, 60])
+
+# Top-right: simulated INa traces (overlaid)
+ax2 = fig.add_subplot(1,3,2)
+ax2.set_title('Simulated Isi')
+#ax2.set_xlim([0, 3])
+#ax2.set_ylim([-400, 100])
+
+# Bottom-left: IV profile
+ax3 = fig.add_subplot(1,3,3)
+ax3.set_title('IV curve')
+ax3.set_xlim([-100, 60])
+ax3.set_ylim([-400, 100])
+
+# Bottom-right: Activation / Normalized conductance
+#ax4 = fig.add_subplot(2,2,4)
+#ax4.set_title('Activation')
+#ax4.set_xlim([-100, 70])
+#ax4.set_ylim([-0.1, 1.1])
+
+# Create list to store peak currents in
+peaks = []
+
+# Run simulations
+for vhold in holding_potentials:
+
+    # Pre-pace at low potential
+    s.set_constant('membrane.V', -140)
+    s.pre(5000)
+
+    # Perform step
+    s.set_constant('membrane.V', vhold)
+    d = s.run(25)
+
+    # Change the logged times so all simulated INa traces overlap
+    d = d.npview()
+    d['environment.time'] -= d['environment.time'][0]
+
+    # Plot the voltage step
+    ax1.plot(d['environment.time'], vhold * np.ones(d['environment.time'].shape))
+
+    # Plot INa
+    ax2.plot(d['environment.time'], d['secondary_inward_current.i_si'])
+
+    # Find peak current
+    current = d['secondary_inward_current.i_si']
+    index = np.argmax(np.abs(current))
+    peak = current[index]
+    peaks.append(peak)
+
+    # Plot peak
+    ax3.plot(vhold, peak, marker='o')
+
+# Now, calculate the activation / normalized conductance
+# - Get the reversal potential
+#reversal_potential = m.get('sodium_current.ENa').value()
+# - Create a numpy array with the peak currents
+#peaks = np.array(peaks)
+# - Divide the peak currents by (V - E)
+#act = peaks / (holding_potentials - reversal_potential)
+# - Normalize by dividing by the biggest value
+#act = act / np.max(act)
+
+# Display the activation measured in the protocol
+#ax4.plot(holding_potentials, act, label='simulated')
+
+# Now, let's compare this with the model values
+# - Get python functions to evaluate m.alpha and m.beta
+#   To do this, make V a state variable, and then use pyfunc() to get the
+#   equations for alpha and beta as functions of V
+#v = m.get('membrane.V')
+#v.promote()
+#a = m.get('sodium_current.m.alpha').pyfunc('V')
+#b = m.get('sodium_current.m.beta').pyfunc('V')
+# - Evaluate these functions at the holding potentials
+#A = a(holding_potentials)
+#B = b(holding_potentials)
+# - Calculate activation:
+#m = A / (A + B)
+
+# Display the model activation
+#ax4.plot(holding_potentials, m, label='m_inf')
+#ax4.plot(holding_potentials, m**3, label='m_inf^3')
+#ax4.legend(loc='lower right')
+
+# Display the results
+plt.show()
+
