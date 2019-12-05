@@ -4,7 +4,7 @@ import numpy as np
 import scipy
 
 
-def objective(duration, amplitude, sample_timepoints = 1000):
+def objective(duration, amplitude, sample_timepoints = 1000, normalise_output = True):
     prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(duration, amplitude)
 
     response = np.zeros((len(sabs_pkpd.constants.s), sample_timepoints))
@@ -13,7 +13,8 @@ def objective(duration, amplitude, sample_timepoints = 1000):
         simulated = simulation.run(sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time*1.0001,
                                    log_times=np.linspace(0, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time, sample_timepoints))
         response[i, :] = simulated[sabs_pkpd.constants.protocol_optimisation_instructions.model_readout]
-        response[i, :] = (response[i, :] - np.min(response[i, :])) / (np.max(response[i, :]) - np.min(response[i, :]))
+        if normalise_output == True:
+            response[i, :] = (response[i, :] - np.min(response[i, :])) / (np.max(response[i, :]) - np.min(response[i, :]))
 
     score = 0
     for i in range(len(sabs_pkpd.constants.s)-1):
