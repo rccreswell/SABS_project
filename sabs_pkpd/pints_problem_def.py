@@ -273,29 +273,9 @@ def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
     return None
 
 
-"""
-def infer_protocol_params(protocol_optimisation_instructions):
-
-    sabs_pkpd.constants.s = []
-
-    for i in range(len(protocol_optimisation_instructions.list_of_models)):
-        sabs_pkpd.constants.models_list.append(protocol_optimisation_instructions.list_of_models[i])
-        model = sabs_pkpd.clamp_experiment.clamp_experiment_model(protocol_optimisation_instructions.list_of_models[i],
-                                                                  protocol_optimisation_instructions.protocol_clamped_variable_annotation,
-                                                                  protocol_optimisation_instructions.protocol_pace_annotation)
-        sabs_pkpd.constants.s.append(model)
-
-    fit_values = [9999999999]
-    problem = pints.SingleOutputProblem(model=MyProtocol(), times=np.linspace(0, 1, len(fit_values)), values=fit_values)
-    boundaries = pints.RectangularBoundaries(protocol_optimisation_instructions.boundaries_low, protocol_optimisation_instructions.boundaries_high)
-    error_measure = pints.SumOfSquaresError(problem)
-    found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries,
-                                                   method=pints.XNES)
-"""
-
 def objective(starting_times, duration, amplitude, baseline):
-    time_series = sabs_pkpd.protocols.TimeSeriesFromSteps(starting_times, duration, amplitude, baseline=baseline)
-    prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(time_series)
+    events_list = sabs_pkpd.protocols.TimeSeriesFromSteps(starting_times, duration, amplitude, baseline=baseline)
+    prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(events_list)
 
     sample_timepoints = 10000
 
@@ -351,9 +331,9 @@ if __name__ == 'main':
     amplitudes = parameters[2 * nb_steps:-1]
     baseline = parameters[-1]
     """
-    np_objective = lambda protocol_paramaters : objective(protocol_paramaters[0 : len(protocol_paramaters)//3],
-                                                          protocol_parameters[len(protocol_paramaters)//3 : 2*len(protocol_paramaters)//3],
-                                                          protocol_parameters[2*len(protocol_paramaters)//3 : 3*len(protocol_paramaters)//3],
+    np_objective = lambda protocol_parameters : objective(protocol_parameters[0 : len(protocol_parameters)//3],
+                                                          protocol_parameters[len(protocol_parameters)//3 : 2*len(protocol_parameters)//3],
+                                                          protocol_parameters[2*len(protocol_parameters)//3 : 3*len(protocol_parameters)//3],
                                                           protocol_parameters[-1])
 
     res = scipy.optimize.maximize(np_objective, x0=protocol, method='L-BFGS-B',
