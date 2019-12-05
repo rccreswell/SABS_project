@@ -4,6 +4,7 @@ import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 import pints
+import scipy
 
 def test_infer_params():
 
@@ -26,6 +27,7 @@ def test_infer_params():
     diff = inferred_params - np.array([0.1, 0.1])
     print(inferred_params)
     assert np.linalg.norm(diff) < 0.01
+
 
 def test_MCMC_inference_model_params():
     # Set the model annotations for the MCMC routine
