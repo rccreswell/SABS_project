@@ -1,0 +1,80 @@
+[[model]]
+name: Ten Tusscher 2006 ikr
+desc: """
+
+"""
+# Initial values
+ikr.xr1         =  2.07650883539678194e-04
+ikr.xr2         =  4.72733193318403078e-01
+
+[ikr]
+use membrane.V
+use potassium.Ko
+gKr = 0.153*1e3 [mS/uF]
+IKr = gKr * sqrt(Ko / 5.4) * xr1 * xr2 * (V - rev.EK)
+    in [A/F]
+dot(xr1) = (inf - xr1) / tau
+    alpha = 450 / (1 + exp((-45 - V) / 10))
+    beta = 6 / (1 + exp((V + 30) / 11.5))
+    tau = 1 * alpha * beta
+    inf = 1 / (1 + exp((-26 - V) / 7))
+dot(xr2) = (inf - xr2) / tau
+    alpha = 3 / (1 + exp((-60 - V) / 20))
+    beta = 1.12 / (1 + exp((V - 60) / 20))
+    tau = 1 [ms] * alpha * beta
+    inf = 1 / (1 + exp((V + 88) / 24))
+
+[engine]
+time = 0 bind time
+    in [ms]
+pace = 0 bind pace
+
+[membrane]
+V = engine.pace
+    desc: membrane potential
+    in [mV]
+
+#
+# Potassium concentrations
+#
+[potassium]
+Ki = 110 [mM]
+Ko = 4 [mM]
+
+#
+# Sodium concentrations
+#
+[sodium]
+Nai = 10 [mM]
+Nao = 97.5 [mM]
+
+#
+# Calcium concentrations (clamp)
+#
+[calcium]
+Cai = 1e-5 in [mM]
+Cao = 2.05 [mM]
+
+
+#
+# Reversal parameters
+#
+[rev]
+use phys.RTF
+ECa = 0.5 * RTF * log(calcium.Cao / calcium.Cai)
+    in [V]
+EK = RTF * log(potassium.Ko / potassium.Ki)
+    in [V]
+ENa = RTF * log(sodium.Nao / sodium.Nai)
+    in [V]
+
+
+#
+# Physical constants
+#
+[phys]
+R = 8.314472 [J/mol/K]
+T = 295 [K]  # 37C (BT)
+F = 9.64853415e4 [C/mol]
+RTF = R * T / F * 1e3 in [mV]
+
