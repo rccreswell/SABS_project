@@ -17,6 +17,7 @@ sabs_pkpd.constants.protocol_optimisation_instructions = sabs_pkpd.constants.Pro
 
 # Pre load all the models required for protocol optimisation
 sabs_pkpd.constants.s = []
+sabs_pkpd.constants.pre_run = 0
 
 for i in range(len(sabs_pkpd.constants.protocol_optimisation_instructions.models)):
     model = sabs_pkpd.clamp_experiment.clamp_experiment_model(
