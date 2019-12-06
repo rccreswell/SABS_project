@@ -60,24 +60,29 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     """
     Runs a MCMC routine for the selected model
 
-    :param starting_point: list
-        List of starting values for the MCMC for the optimisation parameters. Must have the same length as
-        data_exp.fitting_parms_annot + 1 (for Noise). len(starting_point) defines the amount of MCMC chains.
-    :param log_prior: pints.log_prior()
+    :param starting_point:
+        List of numpy.array. List of starting values for the MCMC for the optimisation parameters. Must have the same
+        length as data_exp.fitting_parms_annot + 1 (for Noise). len(starting_point) defines the amount of MCMC chains.
+
+    :param log_prior: pints.log_priors
         Type of prior. If not specified, pints.UniformLogPrior
+
     :param mmt_model_filename: str
         location of the mmt model to run if different from the one loaded previously. It will replace the
         sabs_pkpd.constants.s myokit.Simulation() already present
+
     :param log_likelihood: pints.LogLikelihood
         Type of log likelihood. If not specified, pints.UnknownNoiseLogLikelihood
+
     :param method: pints.method
         method of optimisation. If not specified, pints.AdaptiveCovarianceMCMC.
+
     :return: chains
         The chain for the MCMC routine.
 
     """
 
-    if len(starting_point[0]) != len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)+1:
+    if len(starting_point[0][0]) != len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)+1:
         raise ValueError('Starting point and Parameters annotations + Noise must have the same length')
 
     if mmt_model_filename is not None:

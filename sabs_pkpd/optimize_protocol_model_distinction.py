@@ -32,7 +32,6 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
 
     response = np.zeros((len(sabs_pkpd.constants.s), sample_timepoints))
     for i in range(len(sabs_pkpd.constants.s)):
-        sabs_pkpd.constants.s[i].set_time(0)
         sabs_pkpd.constants.s[i].reset()
         sabs_pkpd.constants.s[i].set_protocol(prot)
         simulated = sabs_pkpd.constants.s[i].run(
