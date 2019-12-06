@@ -65,6 +65,6 @@ def time_series_from_fourier_spectrum(fourier_spectrum, frequencies, n_periods =
 
     invert_fourier = scipy.fftpack.ifft(fourier_spectrum)
     values = abs(invert_fourier).tolist() * n_periods
-    times = np.linspace(0, n_periods / frequency_sampling, len(fourier_spectrum) * n_reps)
+    times = np.linspace(0, n_periods / freq_sampling, len(fourier_spectrum) * n_reps)
 
     return values, times
