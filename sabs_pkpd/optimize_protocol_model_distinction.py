@@ -3,29 +3,8 @@ import myokit
 import numpy as np
 
 
-def objective(duration, amplitude, sample_timepoints = 1000, normalise_output=True):
-    """
-    This function returns the score of separation of the models provided by sabs_pkpd.constants.s
+def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalise_output=True):
 
-    :param duration:
-    list or numpy.array. Contains the list of durations of all of the steps for the step phase of the protocol
-
-
-    :param amplitude:
-    :param sample_timepoints:
-    :param normalise_output:
-    :return:
-    """
-
-    step_score = step_phase_score(duration, amplitude, sample_timepoints, normalise_output)
-    # fourier_score = fourier_phase_score(low_freq, high_freq, freq_sampling, sample_timepoints)
-    fourier_score =0
-    score = step_score + fourier_score
-
-    return score
-
-
-def step_phase_score(duration, amplitude, sample_timepoints = 1000, normalise_output=True):
     """
     This function returns the score of separation of the models provided by sabs_pkpd.constants.s for the steps phase
 
@@ -36,8 +15,14 @@ def step_phase_score(duration, amplitude, sample_timepoints = 1000, normalise_ou
     list or numpy.array. Contains the list of amplitudes of all of the steps for the step phase of the protocol
 
     :param sample_timepoints:
+    int. Amount of points defining times at which the output is sampled, linearly spaced from 0 to sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time.
+
     :param normalise_output:
-    :return:
+    bool. Defines whether the model output is normalised to the interval [0, 1] or not. True if not specified.
+
+    :return: score
+    float. The score is computed as log of the sum of distances between each models.
+
     """
 
     if len(duration) != len(amplitude):
@@ -70,8 +55,16 @@ def step_phase_score(duration, amplitude, sample_timepoints = 1000, normalise_ou
     return score
 
 
-def fourier_phase_score(low_freq, high_freq, freq_sampling, sample_timepoints, normalise_output=True):
+def objective_fourier_phase(low_freq, high_freq, freq_sampling, sample_timepoints, normalise_output=True):
+    """
 
+    :param low_freq:
+    :param high_freq:
+    :param freq_sampling:
+    :param sample_timepoints:
+    :param normalise_output:
+    :return:
+    """
     if len(low_freq) >= len(high_freq):
         raise ValueError('Lowest frequency must be lower than highest frequency for the Fourier phase of the protocol.')
 
