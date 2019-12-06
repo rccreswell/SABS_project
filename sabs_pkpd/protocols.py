@@ -397,7 +397,7 @@ def EventsListFromFourier(low_freq, high_freq, freq_sampling, ):
 
     time_series = scipy.fft.ifft(fourier_spectrum)
 
-    return time_series
+    return (durations, amplitudes)
 
 if __name__ == '__main__':
     p = SineWaveProtocol(2.5, 10, 0)

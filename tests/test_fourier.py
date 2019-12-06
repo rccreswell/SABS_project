@@ -23,3 +23,12 @@ plt.subplot(3, 1, 2)
 plt.plot(xf, 2.0/N * np.abs(yf[0:int(N/2)]))
 plt.subplot(3, 1, 3)
 plt.plot(xf[1:], 2.0/N * np.abs(yf[0:int(N/2)])[1:])
+
+low_freq = 1
+high_freq = 200
+freq_sampling = 1 # Hz
+
+fourier_spectrum = np.linspace(low_freq, high_freq, freq_sampling)
+
+amplitudes = scipy.fft.ifft(fourier_spectrum)
+print(amplitudes)
