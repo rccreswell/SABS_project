@@ -82,7 +82,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     """
 
-    if len(starting_point[0][0]) != len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)+1:
+    if len(starting_point[0]) != len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)+1:
         raise ValueError('Starting point and Parameters annotations + Noise must have the same length')
 
     if mmt_model_filename is not None:
@@ -95,7 +95,10 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     if log_prior is not None:
         pass
     else:
-        log_prior = pints.UniformLogPrior(np.array(starting_point[0] * 0.5).tolist(), np.array(starting_point[0] * 2).tolist())
+        mini = np.array(np.min(starting_point, axis=0).tolist())
+        maxi = np.array(np.max(starting_point, axis=0).tolist())
+        log_prior = pints.UniformLogPrior(np.array(mini * 0.5).tolist() * len(starting_point),
+                                          np.array(maxi * 2).tolist() * len(starting_point))
 
     fit_values = np.concatenate(sabs_pkpd.constants.data_exp.values)
 
