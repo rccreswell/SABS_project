@@ -189,11 +189,18 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
     fixed_params_annot.append(exp_cond_param_annot)
 
     number_of_plots = len(data_exp.exp_conds)
-    number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
-    fig1, axes = plt.subplots(number_of_rows, 2, figsize=figsize)
+
+    if number_of_plots == 1:
+        number_of_rows = 1    
+        fig1 = plt.figure()
+    else:
+        number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
+        fig1, axes = plt.subplots(number_of_rows, 2, figsize=figsize)
+
 
     for i in range(0, number_of_plots):
-        plt.subplot(number_of_rows, 2, i+1)
+        if number_of_plots > 1:
+            plt.subplot(number_of_rows, 2, i+1)
 
         time_max = data_exp.times[i][-1]
         time_samples = data_exp.times[i]

@@ -325,9 +325,8 @@ class PointwiseProtocol(Protocol):
     def relevant_times(self):
         return self.times
 
-
-"""def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=-80):
-    DOCSTRING
+def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=-80):
+    """
     Returns a time series of a protocol defined by steps on top of each other.
     :param start_times_list: list or numpy.array
     List of times of start of each step.
@@ -339,7 +338,7 @@ class PointwiseProtocol(Protocol):
     Defines the baseline of the protocol, to which the steps are added. If not specified, the default value is -80.
     :return: time_series: array
     Time series of the model parameter clamped during the protocol.
-    
+    """
 
     times = np.array([0, start_times_list[0], start_times_list[0] + duration_list[0]])
     values = np.array([baseline, baseline + amplitude_list[0], baseline])
@@ -364,9 +363,9 @@ class PointwiseProtocol(Protocol):
             values = np.insert(values, index_end + 2, values[index_end + 1])
             values[index_start + 1:index_end + 2] += amplitude_list[i]
 
-    return np.vstack((times, values))"""
+    return np.vstack((times, values))
 
-
+  
 def MyokitProtocolFromTimeSeries(durations, amplitudes):
     """
     Translates a time series of events to a Myokit Protocol.
@@ -427,4 +426,3 @@ if __name__ == '__main__':
     p = TwoStepProtocol(1, 3, 1.2, 4.5, -0.5)
     p.to_myokit()
     p.plot()
-

@@ -120,9 +120,9 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     mcmc.set_initial_phase_iterations(adapt_start)
 
     if chain_filename is not None:
-        mcmc.set_chain_filename(chain_filename) # 'C:/Users/yanral/Documents/Software Development/Examples/Example fitting protocol/MCMC_chain_log.csv'
+        mcmc.set_chain_filename(chain_filename)
     if pdf_filename is not None:
-        mcmc.set_log_pdf_filename(pdf_filename) # 'C:/Users/yanral/Documents/Software Development/Examples/Example fitting protocol/MCMC_log_pdf_log.csv'
+        mcmc.set_log_pdf_filename(pdf_filename)
 
     # Run!
     print('Running...')

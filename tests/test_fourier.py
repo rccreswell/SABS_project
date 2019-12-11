@@ -1,10 +1,5 @@
 import sabs_pkpd
-import numpy as np
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.fftpack
 import myokit
-
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.fftpack
