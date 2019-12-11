@@ -4,6 +4,7 @@ import numpy as np
 import sabs_pkpd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+import scipy
 
 
 class MyModel(pints.ForwardModel):
@@ -13,7 +14,7 @@ class MyModel(pints.ForwardModel):
 
     def simulate(self, parameters, times):
 
-        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = 0)
+        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = sabs_pkpd.constants.pre_run)
         out = np.concatenate([i for i in out])
         return out
 
@@ -50,26 +51,32 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
     error_measure = pints.SumOfSquaresError(problem)
     found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints.XNES)
     print(data_exp.fitting_instructions.fitted_params_annot)
+    print(found_parameters)
     return found_parameters
 
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior = None, mmt_model_filename = None,
-                                chain_filename = None, pdf_filename = None, log_likelihood=None, method = None):
+                                chain_filename = None, pdf_filename = None, log_likelihood='UnknownNoiseLogLikelihood', method = 'AdaptiveCovarianceMCMC'):
     """
     Runs a MCMC routine for the selected model
 
-    :param starting_point: list
-        List of starting values for the MCMC for the optimisation parameters. Must have the same length as
-        data_exp.fitting_parms_annot + 1 (for Noise). len(starting_point) defines the amount of MCMC chains.
-    :param log_prior: pints.log_prior()
+    :param starting_point:
+        List of numpy.array. List of starting values for the MCMC for the optimisation parameters. Must have the same
+        length as data_exp.fitting_parms_annot + 1 (for Noise). len(starting_point) defines the amount of MCMC chains.
+
+    :param log_prior: pints.log_priors
         Type of prior. If not specified, pints.UniformLogPrior
+
     :param mmt_model_filename: str
         location of the mmt model to run if different from the one loaded previously. It will replace the
         sabs_pkpd.constants.s myokit.Simulation() already present
+
     :param log_likelihood: pints.LogLikelihood
         Type of log likelihood. If not specified, pints.UnknownNoiseLogLikelihood
+
     :param method: pints.method
         method of optimisation. If not specified, pints.AdaptiveCovarianceMCMC.
+
     :return: chains
         The chain for the MCMC routine.
 
@@ -88,29 +95,25 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     if log_prior is not None:
         pass
     else:
-        log_prior = pints.UniformLogPrior(np.array(starting_point[0] * 0.5).tolist(), np.array(starting_point[0] * 2).tolist())
+        mini = np.array(np.min(starting_point, axis=0).tolist())
+        maxi = np.array(np.max(starting_point, axis=0).tolist())
+        log_prior = pints.UniformLogPrior(np.array(mini * 0.5).tolist() * len(starting_point),
+                                          np.array(maxi * 2).tolist() * len(starting_point))
 
     fit_values = np.concatenate(sabs_pkpd.constants.data_exp.values)
 
     problem = pints.SingleOutputProblem(model, times=np.linspace(0,1,len(fit_values)), values=fit_values)
 
-    # Create a log-likelihood function if not specified (adds an extra parameter!)
-    if log_likelihood is not None:
-        pass
-    else:
-        log_likelihood = pints.UnknownNoiseLogLikelihood(problem)
+    # Create a log-likelihood function (adds an extra parameter!)
+    log_likelihood = eval('pints.'+ log_likelihood + '(problem)')
 
     # Create a posterior log-likelihood (log(likelihood * prior))
     log_posterior = pints.LogPosterior(log_likelihood, log_prior)
 
-    if method is not None:
-        pass
-    else:
-        method = pints.AdaptiveCovarianceMCMC
+    method = eval('pints.' + method)
 
     # Create mcmc routine
-    mcmc = pints.MCMCSampling(log_posterior, 1, starting_point, method=method)
-
+    mcmc = pints.MCMCSampling(log_posterior, len(starting_point), starting_point, method=method)
     # Add stopping criterion
     mcmc.set_max_iterations(max_iter)
     # Start adapting after adapt_start iterations
@@ -128,7 +131,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     return chains
 
-def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15)):
+def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000):
     """
     Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
     couple of parameters to eventually identify linear relationships
@@ -150,9 +153,6 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
 
     n_param = sabs_pkpd.constants.n
 
-    if fig_size is None:
-        fig_size = (15, 15)
-
     start_parameter = mcmc_chains[0][0, :]
     fig, axes = plt.subplots(n_param, n_param, figsize=fig_size)
 
@@ -162,7 +162,7 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
             # Create subplot
             if i == j:
                 # Plot the diagonal
-                hist_1d(mcmc_chains[chain_index][:, i], ax=axes[i, j])
+                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
                 if expected_value is not None:
                     axes[i, j].axvline(expected_value[i], c='g')
                 axes[i, j].axvline(start_parameter[i], c='b')

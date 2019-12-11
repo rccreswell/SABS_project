@@ -79,14 +79,13 @@ def test_sinewaveprotocol():
     assert math.isclose(values[0], values[-1], abs_tol=0.01)
 
 
-def test_TimeSeriesFromStep():
+def test_MyokitProtocolFromTimeSeries():
+    sabs_pkpd.constants.protocol_optimisation_instructions = sabs_pkpd.constants.Protocol_optimisation_instructions(
+        ['model1'], ['clamp variable annot'], ['pace'], 1500, 'readout')
 
-    start_times_list = np.array([10, 150, 350.5, 750, 1000, 1050, 1350])
-    duration_list = np.array([100, 600, 800, 100, 400, 150, 200])
-    amplitude_list = np.array([10, 7, 8, 9, 3, 5, 8])
-    baseline = -50
+    durations = [50, 20, 30, 400, 50, 200, 300, 10, 200, 40]
+    amplitudes = [-85, -50, -55, 20, -30, 20, 0, -40, 10, -75]
+    prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(durations, amplitudes)
 
-    check = sabs_pkpd.protocols.TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=baseline)
-    assert math.isclose(np.array([[0, 10, 110, 150, 350.5, 750, 850, 1000, 1050, 1150.5, 1200, 1350, 1400, 1550],
-                              [-50, -40, -50, -43, -35, -33, -42, -39, -34, -42, -47, -39, -42, -50]]),
-                        check, abs_tol=0.1)
+    assert np.array_equal(prot.log_for_times([0, 50, 70, 100, 500, 550, 750, 1050, 1060, 1260, 1300])['pace'],
+                          [-85.0, -50.0, -55.0, 20.0, -30.0, 20.0, 0.0, -40.0, 10.0, -75.0, -75.0])

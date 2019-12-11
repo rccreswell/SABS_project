@@ -8,6 +8,7 @@ import numpy as np
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import myokit
+import sabs_pkpd
 from operator import itemgetter
 
 class Protocol:
@@ -202,7 +203,7 @@ class SineWaveProtocol(Protocol):
         if duration is None:
             self.duration = 2 * np.pi / self.frequency
         else:
-            sel.duration = duration
+            self.duration = duration
 
 
     def value(self, t):
@@ -364,21 +365,38 @@ def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baselin
 
     return np.vstack((times, values))
 
-def MyokitProtocolFromTimeSeries(time_series):
+  
+def MyokitProtocolFromTimeSeries(durations, amplitudes):
     """
-    Translates a time series to a Myokit Protocol.
-    :param time_series: numpy.array
-    Array of shape(2, number of steps). time_series[0,j] contains the j-th event of the protocol, time_series[1,j] the
-    protocol value at the j-th event.
+    Translates a time series of events to a Myokit Protocol.
+
+    :param durations:
+    numpy.array .Array of shape(1, number of steps). Contains the durations of all steps of the protocol
+
+    :param amplitudes:
+    numpy.array. Array of shape(1, number of steps). Contains the amplitudes of all steps of the protocol
+
     :return: prot: myokit.protocol
     """
 
     prot = myokit.Protocol()
-    for i in range(len(time_series-1)):
-        prot.schedule(time_series[1, i], time_series[0, i], time_series[0, i+1] - time_series[0, i])
+    starting_time = 0
+    for i in range(len(durations)):
+        prot.schedule(amplitudes[i], starting_time, durations[i])
+        starting_time += durations[i]
+
+    if starting_time < sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time:
+        prot.schedule(amplitudes[-1], starting_time, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time - starting_time + 100)
 
     return prot
 
+
+def EventsListFromFourier(low_freq, high_freq, freq_sampling, ):
+    fourier_spectrum = np.linspace(low_freq, high_freq, freq_sampling)
+
+    time_series = scipy.fft.ifft(fourier_spectrum)
+
+    return (durations, amplitudes)
 
 if __name__ == '__main__':
     p = SineWaveProtocol(2.5, 10, 0)
@@ -408,11 +426,3 @@ if __name__ == '__main__':
     p = TwoStepProtocol(1, 3, 1.2, 4.5, -0.5)
     p.to_myokit()
     p.plot()
-
-    start_times_list = np.array([10, 150, 350.5, 750, 1000, 1050, 1350])
-    duration_list = np.array([100, 600, 800, 100, 400, 150, 200])
-    amplitude_list = np.array([10, 7, 8, 9, 3, 5, 8])
-    baseline = -50
-
-    time_series = TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=baseline)
-    plt.plot(time_series[0], time_series[1])
