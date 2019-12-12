@@ -2,8 +2,46 @@ import sabs_pkpd
 import myokit
 import numpy as np
 
+class Constraint:
+    def __init__(self, constraint_matrix, lower_bound=None, upper_bound=None):
+        """
+        To check whether a tested matrix M verifies the constraints conditions, a dot product is applied to each dimension
+        of M and the constraint matrix and the following inequation is asserted:
+        lb < constraint_matrix.dot(M) < ub
 
-def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalise_output=True):
+        :param constraint_matrix:
+        list of numpy.array or numpy.array of dimension 3
+
+        :param lower_bound:
+
+
+        :param upper_bound:
+
+        """
+        self.matrix = constraint_matrix
+
+        if lower_bound is not None:
+            self.lb = lower_bound
+            if len(self.matrix) != len(self.lb):
+                raise ValueError('The constraint matrix length must match lower boundaries length')
+
+        if upper_bound is not None:
+            self.ub = upper_bound
+            if len(self.matrix) != len(self.ub):
+                raise ValueError('The constraint matrix length must match upper boundaries length')
+
+
+    def verification(self, M):
+        res = np.dot(self.matrix, M)
+        verif = True
+        if self.lb is not None:
+            if np.shape(self.lb) != (len(self.matrix), np.shape(M)[1]):
+                raise ValueError('')
+            verif = (res > self.lb).all()
+
+
+
+def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalise_output=True, constraint=None):
 
     """
     This function returns the score of separation of the models provided by sabs_pkpd.constants.s for the steps phase
@@ -20,10 +58,16 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
     :param normalise_output:
     bool. Defines whether the model output is normalised to the interval [0, 1] or not. True if not specified.
 
+    :param constraint_matrix:
+    numpy.array. Defines the constraint on the parameters. The constraint is verified by computing
+
     :return: score
     float. The score is computed as log of the sum of distances between each models.
 
     """
+    if constraint_matrix is not None:
+
+        return np.inf
 
     if len(duration) != len(amplitude):
         raise ValueError('Durations and Amplitudes for the step phase of the protocol must have the same number of values.')
