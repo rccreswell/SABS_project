@@ -3,42 +3,56 @@ import myokit
 import numpy as np
 
 class Constraint:
-    def __init__(self, constraint_matrix, lower_bound=None, upper_bound=None):
+    def __init__(self, fun, lower_bound=None, upper_bound=None):
         """
         To check whether a tested matrix M verifies the constraints conditions, a dot product is applied to each dimension
         of M and the constraint matrix and the following inequation is asserted:
-        lb < constraint_matrix.dot(M) < ub
+        lb[i] < numpy.matmul(constraint_matrix[i], M[i]) < ub[i]
 
         :param constraint_matrix:
         list of numpy.array or numpy.array of dimension 3
 
         :param lower_bound:
-
+        list or numpy.array. Lower boundary for the result of the matrix multiplication of constraint matrix by tested
+        matrix.
 
         :param upper_bound:
-
+        list or numpy.array. Lower boundary for the result of the matrix multiplication of constraint matrix by tested
+        matrix.
         """
-        self.matrix = constraint_matrix
+        self.fun = fun
 
         if lower_bound is not None:
             self.lb = lower_bound
-            if len(self.matrix) != len(self.lb):
-                raise ValueError('The constraint matrix length must match lower boundaries length')
 
         if upper_bound is not None:
             self.ub = upper_bound
-            if len(self.matrix) != len(self.ub):
-                raise ValueError('The constraint matrix length must match upper boundaries length')
-
 
     def verification(self, M):
-        res = np.dot(self.matrix, M)
-        verif = True
-        if self.lb is not None:
-            if np.shape(self.lb) != (len(self.matrix), np.shape(M)[1]):
-                raise ValueError('')
-            verif = (res > self.lb).all()
+        res = self.fun(M)
 
+        if self.lb is not None and self.ub is not None:
+            if (res > self.lb).all() and (res < self.ub).all():
+                verif = True
+            else:
+                return False
+
+        elif self.lb is None and self.ub is not None:
+            if (res < self.ub).all():
+                verif = True
+            else:
+                return False
+
+        elif self.lb is not None and self.ub is None:
+            if (res > self.lb).all():
+                verif = True
+            else:
+                return False
+
+        elif self.lb is None and self.ub is None:
+            verif = True
+
+        return verif
 
 
 def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalise_output=True, constraint=None):
@@ -59,15 +73,17 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
     bool. Defines whether the model output is normalised to the interval [0, 1] or not. True if not specified.
 
     :param constraint_matrix:
-    numpy.array. Defines the constraint on the parameters. The constraint is verified by computing
+    sabs_pkpd.optimize_protocol_model_distinction.Constraint. Used to verify that provided parameters are verifying the
+    constraints.
 
     :return: score
     float. The score is computed as log of the sum of distances between each models.
 
     """
-    if constraint_matrix is not None:
-
-        return np.inf
+    if constraint is not None:
+        verification = constraint.verification([duration, amplitude])
+        if verification == False:
+            return np.inf
 
     if len(duration) != len(amplitude):
         raise ValueError('Durations and Amplitudes for the step phase of the protocol must have the same number of values.')
