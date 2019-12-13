@@ -56,6 +56,7 @@ def get_steady_state(s, time_to_steady_state, data_exp=None, save_location=None,
         if data_exp is None:
             steady_state = []
             for i in range(len(s)):
+                s[i].reset()
                 s[i].run(time_to_steady_state)
                 steady_state.append([s[i].state()])
                 s[i].set_default_state(steady_state[i][0])
@@ -73,6 +74,7 @@ def get_steady_state(s, time_to_steady_state, data_exp=None, save_location=None,
 
     else:
         if data_exp is None:
+            s.reset()
             s.run(time_to_steady_state)
             steady_state = [[s.state()]]
             s.set_default_state(steady_state[0][0])
