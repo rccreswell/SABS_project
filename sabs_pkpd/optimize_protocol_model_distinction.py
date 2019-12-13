@@ -3,7 +3,7 @@ import myokit
 import numpy as np
 
 class Constraint:
-    def __init__(self, fun, lower_bound=None, upper_bound=None):
+    def __init__(self, fun, lower_bound=None, upper_bound=None, out_of_constraints_score = 100):
         """
         To check whether a tested matrix M verifies the constraints conditions, a dot product is applied to each dimension
         of M and the constraint matrix and the following inequation is asserted:
@@ -21,6 +21,7 @@ class Constraint:
         matrix.
         """
         self.fun = fun
+        self.out_of_constraints_score = out_of_constraints_score
 
         if lower_bound is not None:
             self.lb = lower_bound
@@ -81,9 +82,9 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
 
     """
     if constraint is not None:
-        verification = constraint.verification([duration, amplitude])
+        verification = constraint.verification(np.reshape([duration, amplitude], (np.shape([duration, amplitude])[1] * 2)))
         if verification == False:
-            return np.inf
+            return constraint.out_of_constraints_score
 
     if len(duration) != len(amplitude):
         raise ValueError('Durations and Amplitudes for the step phase of the protocol must have the same number of values.')

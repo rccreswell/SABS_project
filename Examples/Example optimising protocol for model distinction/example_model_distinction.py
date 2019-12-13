@@ -4,6 +4,7 @@ import scipy
 import myokit
 import matplotlib.pyplot as plt
 import time
+import pints
 
 list_of_models = ['C:/Users/yanral/Documents/Software Development/mmt_models/lei-2019-ikr.mmt',
                   'C:/Users/yanral/Documents/Software Development/mmt_models/beattie-2018-ikr.mmt',
@@ -18,7 +19,7 @@ sabs_pkpd.constants.protocol_optimisation_instructions = sabs_pkpd.constants.Pro
 
 
 # Define the starting point for the optimisation
-events_list = [[10, 100, 400, 100, 400, 100, 400, 100, 400, 100, 40], [-85, -60, -85, -50, -85, -40, -85, -30, -85, -20, -85]]
+events_list = [[200, 320, 400, 100, 400, 100, 400, 100, 400, 100, 40], [-85, -60, -85, -50, -85, -40, -85, -30, -85, -20, -85]]
 prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(events_list[0], events_list[1])
 
 
@@ -39,11 +40,7 @@ for i in range(len(sabs_pkpd.constants.protocol_optimisation_instructions.models
 # as input
 x0 = np.reshape(events_list, (np.shape(events_list)[1] * 2))
 
-# Define the boundaries for
-constraint_matrix = np.zeros((1, len(events_list[0])*2))
-constraint_matrix[0, : int(len(x0)/2)] = 1.0
-constraints_dict = scipy.optimize.LinearConstraint(A=constraint_matrix, lb=0, ub=sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time)
-
+# Define the boundaries for the parameters
 low_bounds = np.zeros(np.shape(x0))
 low_bounds[:int(len(x0)/2)] = 5
 low_bounds[int(len(x0)/2):] = -110
@@ -51,21 +48,41 @@ low_bounds[int(len(x0)/2):] = -110
 up_bounds = np.zeros(np.shape(x0))
 up_bounds[:int(len(x0)/2)] = 500
 up_bounds[int(len(x0)/2):] = 50
-boundaries = scipy.optimize.Bounds(low_bounds, up_bounds)
+boundaries = pints.RectangularBoundaries(low_bounds, up_bounds)
+# boundaries = scipy.optimize.Bounds(low_bounds, up_bounds)
 
+# Define the constraint on the parameters
+
+def Constraint_fun(x):
+    tot_duration = np.sum(x[:int(len(x) / 2)])
+    min_amp = np.min(x[:])
+    max_amp = np.max(x[int(len(x) / 2):])
+    return tot_duration
+
+
+lb = 5*len(x0) / 2 - 1
+ub = simulation_time
+
+constraint = sabs_pkpd.optimize_protocol_model_distinction.Constraint(Constraint_fun,lower_bound=lb, upper_bound=ub)
 
 # Define the objective function used
-np_objective = lambda events: sabs_pkpd.optimize_protocol_model_distinction.objective_step_phase(
-    events[:int(len(events)/2)], events[int(len(events)/2):], sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time, normalise_output=False)
+def np_objective(events):
+    return sabs_pkpd.optimize_protocol_model_distinction.objective_step_phase(events[:int(len(events)/2)],
+                                                                              events[int(len(events)/2):],
+                                                                              sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
+                                                                              normalise_output=False,
+                                                                              constraint=constraint)
 
 
 print('Starting score point: ' + str(np_objective(x0)) + '\n')
 t0 = time.time()
 print('Starting optimisation...')
-res = scipy.optimize.minimize(np_objective, x0=x0, method='SLSQP', bounds=boundaries, constraints=constraints_dict,
-                              options={'disp': True, 'maxiter': 10000})
+found_params, score = pints.fmin(np_objective, x0, boundaries=boundaries, max_iter=2000, parallel=False, method=None)
+"""res = scipy.optimize.minimize(np_objective, x0=x0, method='SLSQP', bounds=boundaries,
+                              options={'disp': True, 'maxiter': 10000})"""
 t1 = time.time()
 print('Optimisation time is ' + str(t1-t0) + ' seconds.')
+
 
 
 # Plot initial point protocol and model response
@@ -97,7 +114,7 @@ plt.suptitle('Initial protocol and models response')
 
 
 # Plot results
-prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(res.x[: int(len(res.x)/2)], res.x[int(len(res.x)/2):])
+prot = sabs_pkpd.protocols.MyokitProtocolFromTimeSeries(found_params[: int(len(found_params)/2)], found_params[int(len(found_params)/2):])
 
 fig4 = plt.figure(2)
 fig2 = plt.subplot(2, 1, 1)
