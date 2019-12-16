@@ -94,28 +94,31 @@ def get_steady_state(s, time_to_steady_state, data_exp=None, save_location=None,
                 list_of_models_names = []
                 for i in range(len(steady_state)):
                     list_of_models_names.append('model ' + str(i))
-            save_steady_state_to_mmt(s, steady_state, save_location, list_of_models_names)
+            save_steady_state_to_mmt(s, steady_state, list_of_models_names, save_location)
 
     return steady_state
 
 
-def save_steady_state_to_mmt(s, steady_state, save_location, list_of_models_names):
+def save_steady_state_to_mmt(s, steady_state, list_of_models_names, save_location):
     """
-
+    Saves the steady states as new mmt models. The structure of the (if necessary created) folder is:
+    save_location\\one folder per model\\one .mmt model per experimental condition.
 
     :param s:
     myokit.Simulation or list of myokit.Simulation. Contains the model(s) for which the steady-state will be computed.
 
     :param steady-state:
-    list. List of length the number of models, and each index contains the number of different experimental conditions
-    provided with data_exp.
+    list.  List of length the number of models, and each index contains the number of different experimental conditions
+    provided with data_exp. Refer to steady_state[i][j] for the i-th model steady-state under j-th experimental
+    conditions
 
     :param save_filename:
     string. Filename for the location where to save the new model produced. If more than one model is provided,
     sub-directories matching the models names in list_of_models_names will be created, and a .mmt file created for each
-    .
+    steady-state of the model (generated previously with different experimental conditions).
 
     :param list_of_models_names:
+    list of strings. List of the names of the models. If not specified, the models will be named model #.
 
     :return:
     """
@@ -123,20 +126,19 @@ def save_steady_state_to_mmt(s, steady_state, save_location, list_of_models_name
     if len(steady_state) != list_of_models_names:
         raise ValueError('Steady_state and list_of_models_names should have the same length.')
 
-    if len(steady_state) == 1:
-        if len(steady_state[0]) == 1:
-            s.set_default_state(steady_state[0])
-            if save_location[-4:] != '.mmt':
-                save_filename = save_location + '.mmt'
+    if not os.path.exists(save_location):
+        os.makedirs(save_location)
+    for i in range(len(list_of_models_names)):
+        folder = os.path.join(save_location, list_of_models_names[i])
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
-            save_location = save_location + '.mmt'
-        if not os.path.exists(save_location):
-            os.makedirs(save_location)
-            os.path.join('C:', 'Documents')
+        for j in range(len(steady_state[0])):
+            save_filename = os.path.join(folder, list_of_models_names[i] +'_exp_cond_' + str(j) + '.mmt')
+            model_to_save = s[i][j]._model
+            myokit.save_model(save_filename, model_to_save)
 
-    else:
-        pass
-    return None
+
 
 
 def clamp_experiment_model(model_filename, clamped_variable_annot:str, pace_variable_annotation:str, protocol=None, save_new_mmt_filename=None):

@@ -6,9 +6,7 @@ Created on Mon Nov 11 15:06:09 2019
 """
 import sabs_pkpd
 import numpy as np
-import matplotlib.pyplot as plt
 import myokit
-import math
 
 
 def test_get_steady_state():
@@ -41,6 +39,24 @@ def test_get_steady_state():
     test2 = np.array(res2[1][0])
     rel_diff2 = abs((expected2 - test2) / test2)
     assert np.nanmax(rel_diff2) < 0.05
+
+
+def test_save_steady_state_to_mmt():
+    # model_filename1 = 'C:/Users/yanral/Documents/Software Development/mmt_models/tentusscher_2006.mmt'
+    # model_filename2 = 'C:/Users/yanral/Documents/Software Development/mmt_models/ohara_rudy_cipa_v1_2017.mmt'
+    model_filename1 = './mmt_models/tentusscher_2006.mmt'
+    model_filename2 = './mmt_models/ohara_rudy_cipa_v1_2017.mmt'
+
+    time_ss = 6000
+    sabs_pkpd.constants.s = [sabs_pkpd.load_model.load_simulation_from_mmt(model_filename1)]
+    sabs_pkpd.constants.s.append(sabs_pkpd.load_model.load_simulation_from_mmt(model_filename2))
+    res = sabs_pkpd.clamp_experiment.get_steady_state(sabs_pkpd.constants.s, time_ss)
+
+    list_of_models_names = ['TT06', 'Ohara 2017']
+    save_location = './mmt_models/test_save_steady_state'
+    sabs_pkpd.clamp_experiment.save_steady_state_to_mmt(sabs_pkpd.constants.s, res, list_of_models_names, save_location)
+
+    assert True
 
 
 def test_clamp_experiment_model():

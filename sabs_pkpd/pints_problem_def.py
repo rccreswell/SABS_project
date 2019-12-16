@@ -83,7 +83,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
         The chain for the MCMC routine.
 
     """
-    sabs_pkpd.constants.n = len(starting_point[0])
+    sabs_pkpd.constants.n = len(starting_point[0]) -1
 
     if len(starting_point[0]) != len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)+1:
         raise ValueError('Starting point and Parameters annotations + Noise must have the same length')
