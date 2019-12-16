@@ -134,7 +134,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     return chains
 
-def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000):
+def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000, bound_max = None, bound_min = None):
     """
     Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
     couple of parameters to eventually identify linear relationships
@@ -168,17 +168,27 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
                 hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
                 if expected_value is not None:
                     axes[i, j].axvline(expected_value[i], c='g')
+                if bound_max is not None:
+                    axes[i, j].axvline(bound_max[i], c='r')
+                if bound_min is not None:
+                    axes[i, j].axvline(bound_min[i], c='r')
+
                 axes[i, j].axvline(start_parameter[i], c='b')
-                axes[i, j].legend()
             elif i < j:
                 # Upper triangle: No plot
                 axes[i, j].axis('off')
             else:
                 # Lower triangle: Pairwise plot
-                plot_kde_2d(j, i, mcmc_chains, ax=axes[i, j], chain_index=chain_index)
+                plot_kde_2d(j, i, mcmc_chains, explor_iter, ax=axes[i, j], chain_index=chain_index)
                 if expected_value is not None:
                     axes[i, j].axhline(expected_value[i], c='g')
                     axes[i, j].axvline(expected_value[j], c='g')
+                if bound_max is not None:
+                    axes[i, j].axvline(bound_max[j], c='r')
+                    axes[i, j].axhline(bound_max[i], c='r')
+                if bound_min is not None:
+                    axes[i, j].axvline(bound_min[j], c='r')
+                    axes[i, j].axhline(bound_min[i], c='r')
                 axes[i, j].axhline(start_parameter[i], c='b')
                 axes[i, j].axvline(start_parameter[j], c='b')
 
@@ -224,7 +234,7 @@ def hist_1d(x, ax):
     return None
 
 
-def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
+def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
     """
     Returns the 2D distribution of parameter j versus parameter i
     :param i: int
@@ -242,9 +252,8 @@ def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
     """
     ax.set_xlabel('parameter ' + str(i))
     ax.set_ylabel('parameter '+ str(j))
-    x = mcmc_chains[chain_index][:, i]
-    y = mcmc_chains[chain_index][:, j]
-    plt.show()
+    x = mcmc_chains[chain_index][explor_iter:, i]
+    y = mcmc_chains[chain_index][explor_iter:, j]
 
     # Get minimum and maximum values
     xmin, xmax = np.min(x), np.max(x)
