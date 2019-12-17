@@ -277,3 +277,49 @@ def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
     ax.set_aspect(abs((extent[1] - extent[0]) / (extent[3] - extent[2])))
 
     return None
+
+
+def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min):
+    """
+    Plots the convergence of the MCMC chains, with boundaries and expected values.
+
+    :param mcmc_chains:
+    list. List of length number of chains, each chain having a size (number of iterations, number of parameters + 1 for Noise)
+
+    :param expected_values:
+    list. List containing the expected values of all of the parameters fitted during MCMC.
+
+    :param bound_max:
+    Maximal values allowed for each parameter
+
+    :param bound_min:
+    Minimal values allowed for each parameter
+
+    :return: (fig, axes)
+    """
+
+    if len(bound_min) != len(bound_max):
+        raise ValueError('Both boundaries should have the same length. Length of low boundaries: ' + str(len(bound_min))
+                         + ' , Length of upper boundaries: ' + str(len(bound_max)))
+
+    if len(expected_values) != len(mcmc_chains[0, 0, :]):
+        raise ValueError(
+            'The expected values must have the same length as the chain parameters. (Make sure a value is provided for noise)')
+
+    n_params = len(expected_values)
+    fig_size = (10, 5 * (n_params // 2 + n_params % 2))
+
+    fig, axes = plt.subplots(n_params // 2 + n_params % 2, 2, figsize=fig_size)
+
+    for i in range(n_params):
+        row = i // 2
+        col = i % 2
+        axes[row, col].axhline(expected_values[i], c='k', LineWidth=3)
+        axes[row, col].axhline(bound_max[i], c='r', LineWidth=3)
+        axes[row, col].axhline(bound_min[i], c='r', LineWidth=3)
+        for j in range(len(mcmc_chains)):
+            axes[row, col].plot(mcmc_chains[j, :, i], label='chain ' + str(j), LineWidth=1.5)
+        axes[row, col].legend()
+        axes[row, col].set_title('Parameter ' + str(i))
+
+    return fig, axes
