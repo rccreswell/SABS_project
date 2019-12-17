@@ -279,7 +279,7 @@ def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
     return None
 
 
-def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min):
+def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, parameters_annotations=None):
     """
     Plots the convergence of the MCMC chains, with boundaries and expected values.
 
@@ -298,16 +298,18 @@ def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min):
     :return: (fig, axes)
     """
 
-    if len(bound_min) != len(bound_max):
-        raise ValueError('Both boundaries should have the same length. Length of low boundaries: ' + str(len(bound_min))
-                         + ' , Length of upper boundaries: ' + str(len(bound_max)))
+    n_params = len(mcmc_chains[0, 0, :])
 
-    if len(expected_values) != len(mcmc_chains[0, 0, :]):
+    if len(bound_min) != len(bound_max) or len(bound_min) != n_params:
+        raise ValueError('Boundaries length must match the amount of parameters. Length of low boundaries: ' +
+                         str(len(bound_min)) + ' , Length of upper boundaries: ' + str(len(bound_max)))
+
+    if n_params != len(expected_values):
         raise ValueError(
-            'The expected values must have the same length as the chain parameters. (Make sure a value is provided for noise)')
+            'The expected values must have the same length as the MCMC parameters. (Make sure a value is provided for noise)')
 
-    n_params = len(expected_values)
-    fig_size = (10, 5 * (n_params // 2 + n_params % 2))
+
+    fig_size = (12, 5 * (n_params // 2 + n_params % 2))
 
     fig, axes = plt.subplots(n_params // 2 + n_params % 2, 2, figsize=fig_size)
 
@@ -320,6 +322,9 @@ def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min):
         for j in range(len(mcmc_chains)):
             axes[row, col].plot(mcmc_chains[j, :, i], label='chain ' + str(j), LineWidth=1.5)
         axes[row, col].legend()
-        axes[row, col].set_title('Parameter ' + str(i))
+        if parameters_annotations is None:
+            axes[row, col].set_title('Parameter ' + str(i))
+        else:
+            axes[row, col].set_title(parameters_annotations[i])
 
     return fig, axes
