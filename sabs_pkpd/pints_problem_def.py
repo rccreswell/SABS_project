@@ -154,6 +154,7 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
         raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + chain_index + '. Only ' +
                          len(mcmc_chains) + ' chains in this MCMC output.')
 
+    sabs_pkpd.constants.n = len(mcmc_chains[0][0,:])-1
     n_param = sabs_pkpd.constants.n
 
     start_parameter = mcmc_chains[0][0, :]
@@ -247,8 +248,8 @@ def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
     """
     ax.set_xlabel('parameter ' + str(i))
     ax.set_ylabel('parameter '+ str(j))
-    x = mcmc_chains[chain_index][explor_iter:, i]
-    y = mcmc_chains[chain_index][explor_iter:, j]
+    x = mcmc_chains[chain_index][:, i]
+    y = mcmc_chains[chain_index][:, j]
 
     # Get minimum and maximum values
     xmin, xmax = np.min(x), np.max(x)
