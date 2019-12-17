@@ -165,15 +165,15 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
             # Create subplot
             if i == j:
                 # Plot the diagonal
-                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
                 if expected_value is not None:
                     axes[i, j].axvline(expected_value[i], c='g')
                 if bound_max is not None:
                     axes[i, j].axvline(bound_max[i], c='r')
                 if bound_min is not None:
                     axes[i, j].axvline(bound_min[i], c='r')
-
                 axes[i, j].axvline(start_parameter[i], c='b')
+                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
+
             elif i < j:
                 # Upper triangle: No plot
                 axes[i, j].axis('off')
@@ -183,12 +183,6 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
                 if expected_value is not None:
                     axes[i, j].axhline(expected_value[i], c='g')
                     axes[i, j].axvline(expected_value[j], c='g')
-                if bound_max is not None:
-                    axes[i, j].axvline(bound_max[j], c='r')
-                    axes[i, j].axhline(bound_max[i], c='r')
-                if bound_min is not None:
-                    axes[i, j].axvline(bound_min[j], c='r')
-                    axes[i, j].axhline(bound_min[i], c='r')
                 axes[i, j].axhline(start_parameter[i], c='b')
                 axes[i, j].axvline(start_parameter[j], c='b')
 
@@ -226,9 +220,10 @@ def hist_1d(x, ax):
     xmax = np.max(x)
     x1 = np.linspace(xmin, xmax, 100)
     x2 = np.linspace(xmin, xmax, 50)
+
+    hist = ax.hist(x, bins=x2, density=True)
     kernel = stats.gaussian_kde(x)
     f = kernel(x1)
-    hist = ax.hist(x, bins=x2, density=True)
     ax.plot(x1, f)
 
     return None
