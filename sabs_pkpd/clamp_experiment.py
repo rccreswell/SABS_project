@@ -123,7 +123,7 @@ def save_steady_state_to_mmt(s, steady_state, list_of_models_names, save_locatio
     :return:
     """
 
-    if len(steady_state) != list_of_models_names:
+    if len(steady_state) != len(list_of_models_names):
         raise ValueError('Steady_state and list_of_models_names should have the same length.')
 
     if not os.path.exists(save_location):
