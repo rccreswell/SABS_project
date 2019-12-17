@@ -89,3 +89,36 @@ def test_MyokitProtocolFromTimeSeries():
 
     assert np.array_equal(prot.log_for_times([0, 50, 70, 100, 500, 550, 750, 1050, 1060, 1260, 1300])['pace'],
                           [-85.0, -50.0, -55.0, 20.0, -30.0, 20.0, 0.0, -40.0, 10.0, -75.0, -75.0])
+
+
+def test_Constraints_def():
+    def function(x):
+        intermediate = np.ones(np.shape(x))
+        return np.linalg.norm(intermediate)
+
+    lb1 = 3
+    ub1 = 4
+
+    def function2(x):
+        return np.sum(x)
+
+    lb2 = 22
+    ub2 = 24
+
+    matrix_to_test_true = [[1, 1, 2, 3, 4], [0, 1, 2, 4, 5]]
+    matrix_to_test_false = [0]
+
+    con = sabs_pkpd.optimize_protocol_model_distinction.Constraint(function, lb1, ub1)
+    verif1 = con.verification(matrix_to_test_true)
+    verif3 = con.verification(matrix_to_test_false)
+
+    con = sabs_pkpd.optimize_protocol_model_distinction.Constraint(function2, lb2, ub2)
+    verif2 = con.verification(matrix_to_test_true)
+    verif4 = con.verification(matrix_to_test_false)
+
+    assert verif1 == True
+    assert verif2 == True
+    assert verif3 == False
+    assert verif4 == False
+
+    return verif1, verif2, verif3, verif4

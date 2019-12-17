@@ -13,7 +13,7 @@ class MyModel(pints.ForwardModel):
         return sabs_pkpd.constants.n
 
     def simulate(self, parameters, times):
-
+        sabs_pkpd.constants.n = len(parameters)
         out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = sabs_pkpd.constants.pre_run)
         out = np.concatenate([i for i in out])
         return out
@@ -45,6 +45,8 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
         raise ValueError('The higher boundaries should have the same length as the fitted parameters annotations (defined in data_exp.fitting_instructions')
 
     fit_values = np.concatenate(data_exp.values)
+
+    sabs_pkpd.constants.n = len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)
 
     problem = pints.SingleOutputProblem(model = MyModel(), times = np.linspace(0,1,len(fit_values)), values = fit_values)
     boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
@@ -81,6 +83,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
         The chain for the MCMC routine.
 
     """
+    sabs_pkpd.constants.n = len(starting_point[0]) -1
 
     if len(starting_point[0]) != len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)+1:
         raise ValueError('Starting point and Parameters annotations + Noise must have the same length')
@@ -131,7 +134,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     return chains
 
-def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000):
+def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000, bound_max = None, bound_min = None):
     """
     Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
     couple of parameters to eventually identify linear relationships
@@ -151,6 +154,7 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
         raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + chain_index + '. Only ' +
                          len(mcmc_chains) + ' chains in this MCMC output.')
 
+    sabs_pkpd.constants.n = len(mcmc_chains[0][0,:])-1
     n_param = sabs_pkpd.constants.n
 
     start_parameter = mcmc_chains[0][0, :]
@@ -162,17 +166,21 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
             # Create subplot
             if i == j:
                 # Plot the diagonal
-                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
                 if expected_value is not None:
                     axes[i, j].axvline(expected_value[i], c='g')
+                if bound_max is not None:
+                    axes[i, j].axvline(bound_max[i], c='r')
+                if bound_min is not None:
+                    axes[i, j].axvline(bound_min[i], c='r')
                 axes[i, j].axvline(start_parameter[i], c='b')
-                axes[i, j].legend()
+                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
+
             elif i < j:
                 # Upper triangle: No plot
                 axes[i, j].axis('off')
             else:
                 # Lower triangle: Pairwise plot
-                plot_kde_2d(j, i, mcmc_chains, ax=axes[i, j], chain_index=chain_index)
+                plot_kde_2d(j, i, mcmc_chains, explor_iter, ax=axes[i, j], chain_index=chain_index)
                 if expected_value is not None:
                     axes[i, j].axhline(expected_value[i], c='g')
                     axes[i, j].axvline(expected_value[j], c='g')
@@ -213,15 +221,16 @@ def hist_1d(x, ax):
     xmax = np.max(x)
     x1 = np.linspace(xmin, xmax, 100)
     x2 = np.linspace(xmin, xmax, 50)
+
+    hist = ax.hist(x, bins=x2, density=True)
     kernel = stats.gaussian_kde(x)
     f = kernel(x1)
-    hist = ax.hist(x, bins=x2, density=True)
     ax.plot(x1, f)
 
     return None
 
 
-def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
+def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
     """
     Returns the 2D distribution of parameter j versus parameter i
     :param i: int
@@ -241,7 +250,6 @@ def plot_kde_2d(i, j, mcmc_chains, ax, chain_index=0):
     ax.set_ylabel('parameter '+ str(j))
     x = mcmc_chains[chain_index][:, i]
     y = mcmc_chains[chain_index][:, j]
-    plt.show()
 
     # Get minimum and maximum values
     xmin, xmax = np.min(x), np.max(x)

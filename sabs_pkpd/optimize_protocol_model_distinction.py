@@ -2,8 +2,61 @@ import sabs_pkpd
 import myokit
 import numpy as np
 
+class Constraint:
+    def __init__(self, fun, lower_bound=None, upper_bound=None, out_of_constraints_score = 100):
+        """
+        To check whether a tested matrix M verifies the constraints conditions, a dot product is applied to each dimension
+        of M and the constraint matrix and the following inequation is asserted:
+        lb[i] < numpy.matmul(constraint_matrix[i], M[i]) < ub[i]
 
-def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalise_output=True):
+        :param constraint_matrix:
+        list of numpy.array or numpy.array of dimension 3
+
+        :param lower_bound:
+        list or numpy.array. Lower boundary for the result of the matrix multiplication of constraint matrix by tested
+        matrix.
+
+        :param upper_bound:
+        list or numpy.array. Lower boundary for the result of the matrix multiplication of constraint matrix by tested
+        matrix.
+        """
+        self.fun = fun
+        self.out_of_constraints_score = out_of_constraints_score
+
+        if lower_bound is not None:
+            self.lb = lower_bound
+
+        if upper_bound is not None:
+            self.ub = upper_bound
+
+    def verification(self, M):
+        res = self.fun(M)
+
+        if self.lb is not None and self.ub is not None:
+            if (res > self.lb).all() and (res < self.ub).all():
+                verif = True
+            else:
+                return False
+
+        elif self.lb is None and self.ub is not None:
+            if (res < self.ub).all():
+                verif = True
+            else:
+                return False
+
+        elif self.lb is not None and self.ub is None:
+            if (res > self.lb).all():
+                verif = True
+            else:
+                return False
+
+        elif self.lb is None and self.ub is None:
+            verif = True
+
+        return verif
+
+
+def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalise_output=True, constraint=None):
 
     """
     This function returns the score of separation of the models provided by sabs_pkpd.constants.s for the steps phase
@@ -20,10 +73,18 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
     :param normalise_output:
     bool. Defines whether the model output is normalised to the interval [0, 1] or not. True if not specified.
 
+    :param constraint_matrix:
+    sabs_pkpd.optimize_protocol_model_distinction.Constraint. Used to verify that provided parameters are verifying the
+    constraints.
+
     :return: score
     float. The score is computed as log of the sum of distances between each models.
 
     """
+    if constraint is not None:
+        verification = constraint.verification(np.reshape([duration, amplitude], (np.shape([duration, amplitude])[1] * 2)))
+        if verification == False:
+            return constraint.out_of_constraints_score
 
     if len(duration) != len(amplitude):
         raise ValueError('Durations and Amplitudes for the step phase of the protocol must have the same number of values.')
