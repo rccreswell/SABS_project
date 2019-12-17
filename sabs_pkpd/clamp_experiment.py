@@ -135,7 +135,8 @@ def save_steady_state_to_mmt(s, steady_state, list_of_models_names, save_locatio
 
         for j in range(len(steady_state[0])):
             save_filename = os.path.join(folder, list_of_models_names[i] +'_exp_cond_' + str(j) + '.mmt')
-            model_to_save = s[i][j]._model
+            s[i].set_default_state(steady_state[i][j])
+            model_to_save = s[i]._model
             myokit.save_model(save_filename, model_to_save)
 
 
