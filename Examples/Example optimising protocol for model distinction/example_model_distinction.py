@@ -40,9 +40,9 @@ steady_state = sabs_pkpd.clamp_experiment.get_steady_state(sabs_pkpd.constants.s
                                                            save_location=save_loc,
                                                            list_of_models_names=save_models_names)
 
-list_of_models = []
+models = []
 for i in range(len(save_models_names)):
-    list_of_models.append(save_loc + '/' + save_models_names[i])
+    models.append(save_loc + '/' + save_models_names[i] + '_exp_cond_1.mmt')
 
 # Define the starting point for the optimisation
 events_list = [[200, 100, 400, 100, 400, 100, 400, 100, 400, 100, 40], [-85, -60, -85, -50, -85, -40, -85, -30, -85, -20, -85]]

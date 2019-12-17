@@ -139,8 +139,6 @@ def save_steady_state_to_mmt(s, steady_state, list_of_models_names, save_locatio
             myokit.save_model(save_filename, model_to_save)
 
 
-
-
 def clamp_experiment_model(model_filename, clamped_variable_annot:str, pace_variable_annotation:str, protocol=None, save_new_mmt_filename=None):
     """
     This function loads a mmt model, sets the equation for the desired variable to engine.pace (bound with the protocol)
