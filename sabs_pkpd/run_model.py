@@ -161,7 +161,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     return output
 
 
-def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, figsize = (20,20)):
+def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, pre_run = 0, figsize = (20,20)):
     """
     This function plots the experimental data and the output of the model for parameters rescaled as precised by the user
 
@@ -209,7 +209,7 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
         exp_cond_param_values = float(data_exp.exp_conds[i])
         fixed_params_values.append(exp_cond_param_values)
 
-        sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples = time_samples)
+        sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples = time_samples, pre_run=pre_run)
 
         plt.plot(time_samples, sim_data[0], label='Simulated values')
         plt.plot(time_samples, data_exp.values[i], label='Experimental data')
