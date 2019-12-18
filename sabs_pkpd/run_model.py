@@ -183,6 +183,7 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
     :return: None
 
     """
+    print('Running the model with pre_run : ' + str(pre_run))
     read_out = data_exp.fitting_instructions.sim_output_param_annot
     exp_cond_param_annot = data_exp.fitting_instructions.exp_cond_param_annot
     fixed_params_annot = list(plotting_parameters_annot)
