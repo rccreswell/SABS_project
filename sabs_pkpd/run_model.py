@@ -120,7 +120,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
         s.reset()
 
         # Set parameters for simulation
-        if len(list(fixed_params_annot)) > 0:
+        if fixed_params_annot is not None:
             for i in range(0, len(fixed_params_annot)):
                 s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
