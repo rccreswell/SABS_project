@@ -23,7 +23,7 @@ def test_infer_params():
     # Fix the random seed so that the parameter inference always returns the same fitted parameters
     np.random.seed(19580)
 
-    inferred_params = sabs_pkpd.pints_problem_def.infer_params(initial_point, sabs_pkpd.constants.data_exp, boundaries_low, boundaries_high)
+    inferred_params, found_value = sabs_pkpd.pints_problem_def.infer_params(initial_point, sabs_pkpd.constants.data_exp, boundaries_low, boundaries_high)
     diff = inferred_params - np.array([0.1, 0.1])
     print(inferred_params)
     assert np.linalg.norm(diff) < 0.01

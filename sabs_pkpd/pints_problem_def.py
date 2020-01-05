@@ -15,7 +15,7 @@ class MyModel(pints.ForwardModel):
     def simulate(self, parameters, times):
         sabs_pkpd.constants.n = len(parameters)
         out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = sabs_pkpd.constants.pre_run)
-        out = np.concatenate([i for i in out])
+        out = np.concatenate(out)
         return out
 
 
@@ -54,7 +54,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
     found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints.XNES)
     print(data_exp.fitting_instructions.fitted_params_annot)
     print(found_parameters)
-    return found_parameters
+    return found_parameters, found_value
 
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior = None, mmt_model_filename = None,
