@@ -12,6 +12,9 @@ def test_infer_params():
     sabs_pkpd.constants.n = 2
     sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
 
+    # Save the default state as defined in the mmt file
+    sabs_pkpd.constants.default_state = sabs_pkpd.constants.s.default_state()
+
     # Define all the conditions for parameters inference
     initial_point = [0.5, 0.5]
     boundaries_low = [0, 0]
@@ -41,6 +44,9 @@ def test_MCMC_inference_model_params():
     sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file(
         './tests/test resources/mcmc_test_data.csv')
     sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitting_param_annot, exp_cond_annot, readout)
+
+    # Save the default state as defined in the mmt file
+    sabs_pkpd.constants.default_state = sabs_pkpd.constants.s.default_state()
 
     # Start from a starting point close to the values of parameters used to generate the synthetic data
     RealValue = [1, 1]
