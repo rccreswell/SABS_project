@@ -1,5 +1,5 @@
-import pints
 import myokit
+import sabs_pkpd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -32,7 +32,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
     # Run the model solving for all experiment conditions
     for k in range(0, len(set(data_exp.exp_conds))):
-        s.reset()
+        s.set_state(sabs_pkpd.constants.default_state)
         # reset timer
         s.set_time(0)
 
@@ -99,7 +99,9 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     if exp_cond_param_values is not None:
         for k in range(0, len(exp_cond_param_values)):
 
-            s.reset()
+            s.set_state(sabs_pkpd.constants.default_state)
+            # reset timer
+            s.set_time(0)
 
             # Set parameters for simulation in case specified
             if fixed_params_annot is not None:
@@ -111,21 +113,21 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
 
             # Eventually run a pre-run to reach steady-state
             s.pre(pre_run)
+            print(s.state())
 
             # Run the simulation with starting parameters
             a = s.run(time_max*1.001, log_times=time_samples)
             # Convert output in concentration
             output.append(list(a[read_out]))
     else:
-        s.reset()
+        s.set_state(sabs_pkpd.constants.default_state)
+        # reset timer
+        s.set_time(0)
 
         # Set parameters for simulation
         if fixed_params_annot is not None:
             for i in range(0, len(fixed_params_annot)):
                 s.set_constant(fixed_params_annot[i], fixed_params_values[i])
-
-        # reset timer
-        s.set_time(0)
 
         # Eventually run a pre-run to reach steady-state
         s.pre(pre_run)
