@@ -113,7 +113,6 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
 
             # Eventually run a pre-run to reach steady-state
             s.pre(pre_run)
-            print(s.state())
 
             # Run the simulation with starting parameters
             a = s.run(time_max*1.001, log_times=time_samples)
