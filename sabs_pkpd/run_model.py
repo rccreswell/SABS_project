@@ -50,6 +50,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
         a = s.run(data_exp.times[k][-1]*1.001, log_times=data_exp.times[k])
         # Convert output in concentration
         output.append(list(a[data_exp.fitting_instructions.sim_output_param_annot]))
+
     return output
 
 
