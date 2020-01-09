@@ -27,6 +27,5 @@ install:
 
 script:
     - pytest
-    - scipy
 
 cache: pip
