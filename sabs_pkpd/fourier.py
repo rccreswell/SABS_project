@@ -1,5 +1,5 @@
 import numpy as np
-import scipy
+import scipy.fftpack
 
 
 def fourier_spectrum_from_parameters(real_part, imag_part, low_freq, high_freq):
