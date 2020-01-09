@@ -323,8 +323,6 @@ class PointwiseProtocol(Protocol):
     def relevant_times(self):
         return self.times
 
-<<<<<<< Updated upstream
-=======
 
 def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=-80):
     """
@@ -395,5 +393,6 @@ def MyokitProtocolFromTimeSeries(durations, amplitudes):
 
 def MyokitProtocolFromFourier(real_part, imag_part, low_freq, high_freq):
 
+    prot = 0
 
     return prot
