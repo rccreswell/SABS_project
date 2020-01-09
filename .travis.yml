@@ -13,7 +13,7 @@ before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull rcw5890docker/travis
   - sudo apt-get -y install libsundials-serial-dev
-  - sudo apt-get install -qq python-numpy python-scipy
+  - sudo apt-get install -qq python-numpy python-scipy.fftpack
 
 install:
   - pip install -r requirements.txt
