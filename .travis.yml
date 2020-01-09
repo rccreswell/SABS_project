@@ -20,9 +20,9 @@ install:
   - wget https://github.com/pints-team/pints/archive/master.zip -O /tmp/pints-master.zip
   - unzip -q /tmp/pints-master.zip -d /home/travis/pints-master/
   - pip install /home/travis/pints-master/pints-master/
-  - wget install https://github.com/scipy/scipy/archive/master.zip -O /tmp/scipy-master.zip
-  - unzip -q /tmp/scipy-master.zip -d /home/travis/scipy-master/
-  - pip install /home/travis/scipy-master/scipy-master/
+#  - wget https://github.com/scipy/scipy/archive/master.zip -O /tmp/scipy-master.zip
+#  - unzip -q /tmp/scipy-master.zip -d /home/travis/scipy-master/
+#  - pip install /home/travis/scipy-master/scipy-master/
   - pip install myokit
 
 script:
