@@ -1,0 +1,91 @@
+[[model]]
+author: Cellml converter
+desc: """
+    McAllister-Noble-Tsien Purkinje Fibre Model 1975 REDUCED TO CAV
+    Catherine
+    Lloyd
+    Auckland
+    Bioengineering Institute, The University of Auckland
+    Model Status
+    This is a
+    code and units checked version of the model including two variants - A and
+    B - with different formulations for the transient chloride current r gate.
+    The kinetics for this gate in Model B come from an extensive study by
+    Fozzard and Hiraoka. Results using model A are very dependent on initial
+    conditions. Model B has a notch which is less frequency labile than that of
+    model A. This is model B. The model runs in both OpenCell and COR to
+    replicate the published results. The units have been checked and are
+    consistent.
+    Model Structure
+    Following Denis Noble's 1962 model of cardiac
+    action potentials in Purkinje fibres, the next significant development in
+    cardiac membrane modelling occurred when R.E. McAllister, D. Noble and R.W.
+    Tsien (1975) published a paper which formulated new ionic current equations
+    based on new experimental data.  The description of the kinetics of the
+    currents is still based on the Hodgkin-Huxley formalism, but the currents
+    themselves incorporate some significant new changes, and the total ionic
+    current is broken down into nine discrete, individual ionic fluxes (see the
+    figure below).
+    The complete original paper reference is cited below:
+    Reconstruction of the Electrical Activity of Cardiac Purkinje Fibres,
+    McAllister, R.E. Noble, D. and Tsien, R.W. 1975,
+    Journal of Physiology
+    ,
+    251, 1-59.
+    PubMed ID: 1185607
+    cell diagram of the MNT model showing ionic
+    currents across the sarcoplasmic reticulum
+    A schematic diagram describing
+    the current flows across the cell membrane that are captured in the MNT
+    model.
+    """
+name: mcallister_noble_tsien_1975_modelB
+# Initial values
+secondary_inward_current_d_gate.d     =  2.93135000000000010e-3
+secondary_inward_current_f_gate.f     =  8.08739169999999952e-1
+
+[environment]
+time = 0 bind time
+    in [ms]
+
+[membrane]
+C = 10
+    in [uF/cm^2]
+V = -80
+    in [mV]
+
+[secondary_inward_current]
+E_si = 70
+    in [mV]
+g_si = 0.8
+    in [mS/cm^2]
+g_si_ = 0.04
+    in [mS/cm^2]
+i_si = g_si * secondary_inward_current_d_gate.d * secondary_inward_current_f_gate.f * (membrane.V - E_si) + g_si_ * secondary_inward_current_d1_gate.d1 * (membrane.V - E_si)
+    in [uA/cm^2]
+
+[secondary_inward_current_d1_gate]
+d1 = 1 / (1 + exp(-0.15 [1/mV] * (membrane.V + 40 [mV])))
+    in [1]
+
+[secondary_inward_current_d_gate]
+alpha_d = 0.002 [1/mV/ms] * (membrane.V + 40 [mV]) / (1 - exp(-0.1 [1/mV] * (membrane.V + 40 [mV])))
+    in [mS/uF]
+beta_d = 0.02 [mS/uF] * exp(-0.0888 [1/mV] * (membrane.V + 40 [mV]))
+    in [mS/uF]
+dot(d) = alpha_d * (1 - d) - beta_d * d
+    in [1]
+
+[secondary_inward_current_f_gate]
+alpha_f = 0.000987 [mS/uF] * exp(-0.04 [1/mV] * (membrane.V + 60 [mV]))
+    in [mS/uF]
+beta_f = 0.02 [mS/uF] / (exp(-0.087 [1/mV] * (membrane.V + 26 [mV])) + 1)
+    in [mS/uF]
+dot(f) = alpha_f * (1 - f) - beta_f * f
+    in [1]
+
+
+
+
+
+

@@ -1,5 +1,6 @@
-import numpy as np
 import sabs_pkpd
+import myokit
+import numpy as np
 
 
 def test_Fourier_to_protocol():
@@ -22,4 +23,3 @@ def test_Fourier_to_protocol():
                        0.22300143413482795, 0.08807202790591157, 0.5247644916149904, 0.30631082576308805, 0.3263374809772719,
                        0.049851011157463695]
     assert(np.allclose(values, expected_values, rtol=1e-3, atol=1e-6))
-

@@ -114,7 +114,7 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
 
     return score
 
-
+  
 def objective_fourier_phase(low_freq, high_freq, real_part, imag_part, sample_timepoints, normalise_output=True):
     """
 
