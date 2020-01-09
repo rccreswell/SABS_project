@@ -467,7 +467,29 @@ def MyokitProtocolFromTimeSeries(durations, amplitudes):
 
 
 def MyokitProtocolFromFourier(real_part, imag_part, low_freq, high_freq):
+    """
+    This function provides the Myokit Protocol for a Fourier spectrum defined by its real and imaginary parts. Please
+    note that the returned protocol starts at time t=0. It may lead to issues if the Myokit Simulation time is not reset.
 
-    prot = 0
+    :param real_part:
+    1D-list or 1D-numpy.array. Contains the real part of the Fourier spectrum.
+
+    :param imag_part:
+    1D-list or 1D-numpy.array. Contains the imaginary part of the Fourier spectrum.
+
+    :param low_freq:
+    float. Defines the lowest frequency of the Fourier transform
+
+    :param high_freq:
+    float. Defines the highest frequency of the Fourier transform
+
+    :return: prot
+    Myokit.Protocol. Myoktit Protocol corresponding to the provided Fourier spectrum.
+    """
+
+    fourier_spectrum, frequencies = sabs_pkpd.fourier.fourier_spectrum_from_parameters(real_part, imag_part, low_freq, high_freq)
+    values, times = sabs_pkpd.fourier.time_series_from_fourier_spectrum(fourier_spectrum, frequencies)
+    durations = np.ones(len(values))*(times[1]-times[0])
+    prot = MyokitProtocolFromTimeSeries(durations, values)
 
     return prot
