@@ -115,15 +115,30 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
     return score
 
   
-def objective_fourier_phase(low_freq, high_freq, real_part, imag_part, sample_timepoints, normalise_output=True):
+def objective_fourier_phase(low_freq, high_freq, real_part, imag_part, sample_timepoints=1001, normalise_output=True):
     """
+    This function returns the score of separation of the models provided by sabs_pkpd.constants.s for the steps phase
+
+    :param real_part:
+    1D-list or 1D-numpy.array. Contains the real part of the Fourier spectrum.
+
+    :param imag_part:
+    1D-list or 1D-numpy.array. Contains the imaginary part of the Fourier spectrum.
 
     :param low_freq:
+    float. Defines the lowest frequency of the Fourier transform
+
     :param high_freq:
-    :param freq_sampling:
+    float. Defines the highest frequency of the Fourier transform
+
     :param sample_timepoints:
+    int. Amount of points defining times at which the output is sampled, linearly spaced from 0 to sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time.
+
     :param normalise_output:
-    :return:
+    bool. Defines whether the model output is normalised to the interval [0, 1] or not. True if not specified.
+
+    :return: score
+    float. The score is computed as log of the sum of distances between each models.
     """
     if len(low_freq) >= len(high_freq):
         raise ValueError('Lowest frequency must be lower than highest frequency for the Fourier phase of the protocol.')
@@ -137,7 +152,8 @@ def objective_fourier_phase(low_freq, high_freq, real_part, imag_part, sample_ti
         response[i, :] = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s[i],
                                                        sample_timepoints[-1],
                                                        sabs_pkpd.constants.protocol_optimisation_instructions.model_readout,
-                                                       time_samples=sample_timepoints)
+                                                       time_samples=np.linspace(0, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
+                                                                                sample_timepoints))
 
         if normalise_output == True:
             response[i, :] = (response[i, :] - np.min(response[i, :])) / (

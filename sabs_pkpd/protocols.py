@@ -392,13 +392,6 @@ def MyokitProtocolFromTimeSeries(durations, amplitudes):
     return prot
 
 
-def EventsListFromFourier(low_freq, high_freq, freq_sampling, ):
-    fourier_spectrum = np.linspace(low_freq, high_freq, freq_sampling)
-
-    time_series = scipy.fft.ifft(fourier_spectrum)
-
-    return (durations, amplitudes)
-
 def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baseline=-80):
     """
     Returns a time series of a protocol defined by steps on top of each other.
