@@ -93,13 +93,14 @@ def objective_step_phase(duration, amplitude, sample_timepoints = 1000, normalis
 
     response = np.zeros((len(sabs_pkpd.constants.s), sample_timepoints))
     for i in range(len(sabs_pkpd.constants.s)):
-        sabs_pkpd.constants.s[i].reset()
         sabs_pkpd.constants.s[i].set_protocol(prot)
-        simulated = sabs_pkpd.constants.s[i].run(
-            sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time * 1.0001,
-            log_times=np.linspace(0, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
-                                  sample_timepoints))
-        response[i, :] = simulated[sabs_pkpd.constants.protocol_optimisation_instructions.model_readout]
+        response[i, :] = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s[i],
+                                                            sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
+                                                            sabs_pkpd.constants.protocol_optimisation_instructions.model_readout,
+                                                            time_samples=np.linspace(0,
+                                                                                     sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
+                                                                                     sample_timepoints))
+
         if normalise_output == True:
             response[i, :] = (response[i, :] - np.min(response[i, :])) / (
                         np.max(response[i, :]) - np.min(response[i, :]))
@@ -150,7 +151,7 @@ def objective_fourier_phase(low_freq, high_freq, real_part, imag_part, sample_ti
     for i in range(len(sabs_pkpd.constants.s)):
         sabs_pkpd.constants.s[i].set_protocol(prot)
         response[i, :] = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s[i],
-                                                       sample_timepoints[-1],
+                                                       sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
                                                        sabs_pkpd.constants.protocol_optimisation_instructions.model_readout,
                                                        time_samples=np.linspace(0, sabs_pkpd.constants.protocol_optimisation_instructions.simulation_time,
                                                                                 sample_timepoints))
