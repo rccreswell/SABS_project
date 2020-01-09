@@ -13,6 +13,7 @@ before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull rcw5890docker/travis
   - sudo apt-get -y install libsundials-serial-dev
+  - sudo apt-get install -qq python-numpy python-scipy
 
 install:
   - pip install -r requirements.txt
@@ -21,6 +22,9 @@ install:
   - unzip -q /tmp/pints-master.zip -d /home/travis/pints-master/
   - pip install /home/travis/pints-master/pints-master/
   - pip install myokit
+  - wget https://github.com/scipy/scipy/archive/master.zip -O /tmp/scipy-master.zip
+  - unzip -q /tmp/scipy-master.zip -d /home/travis/scipy-master/
+  - pip install /home/travis/scipy-master/scipy-master/
 
 script:
     - pytest
