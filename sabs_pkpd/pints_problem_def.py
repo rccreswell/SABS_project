@@ -151,8 +151,8 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
     :return: None
     """
     if chain_index > len(mcmc_chains)-1:
-        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + chain_index + '. Only ' +
-                         len(mcmc_chains) + ' chains in this MCMC output.')
+        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) + '. Only ' +
+                         str(len(mcmc_chains)) + ' chains in this MCMC output.')
 
     sabs_pkpd.constants.n = len(mcmc_chains[0][0,:])-1
     n_param = sabs_pkpd.constants.n
