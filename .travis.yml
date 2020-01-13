@@ -28,7 +28,7 @@ install:
 
 script:
     - pytest
-    - coverager run -m pytest
+    - coverage run -m pytest
 #    - python -m flake8
 
 after_success:
