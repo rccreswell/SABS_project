@@ -1,0 +1,1011 @@
+[[model]]
+author: Cellml converter
+name: ohara_rudy_cipa_v1_2017
+# Initial values
+membrane.v               = -8.80019046500000002e1
+CaMK.CaMKt               =  1.25840446999999998e-2
+intracellular_ions.nai   =  7.26800449799999981
+intracellular_ions.nass  =  7.26808997699999981
+intracellular_ions.ki    =  1.44655591799999996e2
+intracellular_ions.kss   =  1.44655565099999990e2
+intracellular_ions.cai   = 8.6e-5
+intracellular_ions.cass  = 8.49e-5
+intracellular_ions.cansr =  1.61957453799999995
+intracellular_ions.cajsr =  1.57123401400000007
+INa.m                    =  7.34412110199999992e-3
+INa.hf                   =  6.98107191299999985e-1
+INa.hs                   =  6.98089580099999996e-1
+INa.j                    =  6.97990843200000044e-1
+INa.hsp                  =  4.54948552499999992e-1
+INa.jp                   =  6.97924586499999999e-1
+INaL.mL                  =  1.88261727299999989e-4
+INaL.hL                  =  5.00854885500000013e-1
+INaL.hLp                 =  2.69306535700000016e-1
+Ito.a                    =  1.00109768699999991e-3
+Ito.iF                   =  9.99554174499999948e-1
+Ito.iS                   =  5.86506173600000014e-1
+Ito.ap                   =  5.10086293400000023e-4
+Ito.iFp                  =  9.99554182300000038e-1
+Ito.iSp                  =  6.39339948199999952e-1
+ICaL.d                   = 2.34e-9
+ICaL.ff                  =  9.99999990900000024e-1
+ICaL.fs                  =  9.10241277699999962e-1
+ICaL.fcaf                =  9.99999990900000024e-1
+ICaL.fcas                =  9.99804677700000033e-1
+ICaL.jca                 =  9.99973831200000052e-1
+ICaL.ffp                 =  9.99999990900000024e-1
+ICaL.fcafp               =  9.99999990900000024e-1
+ICaL.nca                 =  2.74941404400000020e-3
+IKr.IC1                  = 0.999637
+IKr.IC2                  =  6.83207999999999982e-5
+IKr.C1                   =  1.80144999999999990e-8
+IKr.C2                   =  8.26618999999999954e-5
+IKr.O                    =  1.55510000000000007e-4
+IKr.IO                   =  5.67622999999999969e-5
+IKr.IObound              = 0
+IKr.Obound               = 0
+IKr.Cbound               = 0
+IKr.D                    = 0
+IKs.xs1                  =  2.70775802499999996e-1
+IKs.xs2                  =  1.92850342599999990e-4
+IK1.xk1                  =  9.96759759399999945e-1
+ryr.Jrelnp               = 2.5e-7
+ryr.Jrelp                = 3.12e-7
+
+[CaMK]
+CaMKa = CaMKb + CaMKt
+    in [mM]
+CaMKb = CaMKo * (1 [mM] - CaMKt) / (1 + KmCaM / intracellular_ions.cass)
+    in [mM]
+CaMKo = 0.05
+    in [1]
+dot(CaMKt) = aCaMK * CaMKb * (CaMKb + CaMKt) - bCaMK * CaMKt
+    in [mM]
+KmCaM = 0.0015
+    in [mM]
+KmCaMK = 0.15
+    in [mM]
+aCaMK = 0.05
+    in [1/mM/ms]
+bCaMK = 0.00068
+    in [mS/uF]
+
+[ICaL]
+A_1 = 4 [1/mV] * membrane.ffrt * (intracellular_ions.cass * exp(2 * membrane.vfrt) - 0.341 [m^3/mol] * extracellular.cao) / B_1
+    in [1]
+A_2 = 0.75 * membrane.ffrt * (intracellular_ions.nass * exp(membrane.vfrt) - extracellular.nao) / B_2
+    in [1]
+A_3 = 0.75 * membrane.ffrt * (intracellular_ions.kss * exp(membrane.vfrt) - extracellular.ko) / B_3
+    in [1]
+Afcaf = 0.3 + 0.6 / (1 + exp((membrane.v - 10 [mV]) / 10 [mV]))
+    in [1]
+Afcas = 1 - Afcaf
+    in [1]
+Aff = 0.6
+    in [1]
+Afs = 1 - Aff
+    in [1]
+B_1 = 2 * membrane.frt
+    in [1/mV]
+B_2 = membrane.frt
+    in [1/mV]
+B_3 = membrane.frt
+    in [1/mV]
+GCaL_rescale = 1
+ICaK = (1 - fICaLp) * PCaK * PhiCaK * d * (f * (1 - nca) + jca * fca * nca) + fICaLp * PCaKp * PhiCaK * d * (fp * (1 - nca) + jca * fcap * nca)
+    in [A/F]
+ICaL = GCaL_rescale * ((1 - fICaLp) * PCa * PhiCaL * d * (f * (1 - nca) + jca * fca * nca) + fICaLp * PCap * PhiCaL * d * (fp * (1 - nca) + jca * fcap * nca))
+    in [A/F]
+ICaNa = (1 - fICaLp) * PCaNa * PhiCaNa * d * (f * (1 - nca) + jca * fca * nca) + fICaLp * PCaNap * PhiCaNa * d * (fp * (1 - nca) + jca * fcap * nca)
+    in [A/F]
+Kmn = 0.002
+    in [mM]
+PCa = piecewise(environment.celltype == 1, PCa_b * 1.2, environment.celltype == 2, PCa_b * 2.5, PCa_b)
+    in [1]
+PCaK = 0.0003574 * PCa
+    in [1]
+PCaKp = 0.0003574 * PCap
+    in [1]
+PCaNa = 0.00125 * PCa
+    in [1]
+PCaNap = 0.00125 * PCap
+    in [1]
+PCa_b = 0.0001007
+    in [1]
+PCap = 1.1 * PCa
+    in [1]
+PhiCaK = piecewise(-1e-7 <= U_3 and U_3 <= 1e-7, A_3 * (1 - 0.5 * U_3), A_3 * U_3 / (exp(U_3) - 1))
+    in [1]
+PhiCaL = piecewise(-1e-7 <= U_1 and U_1 <= 1e-7, A_1 * (1 - 0.5 * U_1), A_1 * U_1 / (exp(U_1) - 1))
+    in [1]
+PhiCaNa = piecewise(-1e-7 <= U_2 and U_2 <= 1e-7, A_2 * (1 - 0.5 * U_2), A_2 * U_2 / (exp(U_2) - 1))
+    in [1]
+U_1 = B_1 * (membrane.v - v0)
+    in [1]
+U_2 = B_2 * (membrane.v - v0)
+    in [1]
+U_3 = B_3 * (membrane.v - v0)
+    in [1]
+anca = 1 / (k2n / km2n + (1 + Kmn / intracellular_ions.cass) ^ 4)
+    in [1]
+dot(d) = (dss - d) / td
+    in [1]
+dss = 1 / (1 + exp(-(membrane.v + 3.94 [mV]) / 4.23 [mV]))
+    in [1]
+f = Aff * ff + Afs * fs
+    in [1]
+fICaLp = 1 / (1 + CaMK.KmCaMK / CaMK.CaMKa)
+    in [1]
+fca = Afcaf * fcaf + Afcas * fcas
+    in [1]
+dot(fcaf) = (fcass - fcaf) / tfcaf
+    in [1]
+dot(fcafp) = (fcass - fcafp) / tfcafp
+    in [1]
+fcap = Afcaf * fcafp + Afcas * fcas
+    in [1]
+dot(fcas) = (fcass - fcas) / tfcas
+    in [1]
+fcass = fss
+    in [1]
+dot(ff) = (fss - ff) / tff
+    in [1]
+dot(ffp) = (fss - ffp) / tffp
+    in [1]
+fp = Aff * ffp + Afs * fs
+    in [1]
+dot(fs) = (fss - fs) / tfs
+    in [1]
+fss = 1 / (1 + exp((membrane.v + 19.58 [mV]) / 3.696 [mV]))
+    in [1]
+dot(jca) = (fcass - jca) / tjca
+    in [1]
+k2n = 1000
+    in [mS/uF]
+km2n = jca * 1 [mS/uF]
+    in [mS/uF]
+dot(nca) = anca * k2n - nca * km2n
+    in [1]
+td = 0.6 [ms] + 1 [ms] / (exp(-0.05 [1/mV] * (membrane.v + 6 [mV])) + exp(0.09 [1/mV] * (membrane.v + 14 [mV])))
+    in [ms]
+tfcaf = 7 [ms] + 1 [ms] / (0.04 * exp(-(membrane.v - 4 [mV]) / 7 [mV]) + 0.04 * exp((membrane.v - 4 [mV]) / 7 [mV]))
+    in [ms]
+tfcafp = 2.5 * tfcaf
+    in [ms]
+tfcas = 100 [ms] + 1 [ms] / (0.00012 * exp(-membrane.v / 3 [mV]) + 0.00012 * exp(membrane.v / 7 [mV]))
+    in [ms]
+tff = 7 [ms] + 1 [ms] / (0.0045 * exp(-(membrane.v + 20 [mV]) / 10 [mV]) + 0.0045 * exp((membrane.v + 20 [mV]) / 10 [mV]))
+    in [ms]
+tffp = 2.5 * tff
+    in [ms]
+tfs = 1000 [ms] + 1 [ms] / (3.5e-5 * exp(-(membrane.v + 5 [mV]) / 4 [mV]) + 3.5e-5 * exp((membrane.v + 5 [mV]) / 6 [mV]))
+    in [ms]
+tjca = 75 [ms]
+    in [ms]
+v0 = 0 [mV]
+    in [mV]
+
+[ICab]
+A = PCab * 4 * membrane.ffrt * (intracellular_ions.cai * exp(2 * membrane.vfrt) - 0.341 * extracellular.cao) / B
+    in [A/F]
+B = 2 * membrane.frt
+    in [1/mV]
+ICab = piecewise(-1e-7 <= U and U <= 1e-7, A * (1 - 0.5 * U), A * U / (exp(U) - 1))
+    in [A/F]
+PCab = 2.5e-8
+    in [mS/uF]
+U = B * (membrane.v - v0)
+    in [1]
+v0 = 0 [mV]
+    in [mV]
+
+[IK1]
+GK1 = piecewise(environment.celltype == 1, GK1_b * 1.2, environment.celltype == 2, GK1_b * 1.3, GK1_b)
+    in [mS/uF]
+GK1_b =  3.23978399999999778e-1
+    in [mS/uF]
+IK1 = GK1 * sqrt(extracellular.ko) * rk1 * xk1 * (membrane.v - reversal_potentials.EK)
+    in [A/F]
+rk1 = 1 / (1 + exp((membrane.v + 105.8 [mV] - 2.6 [g*m^5/s^3/A/mol] * extracellular.ko) / 9.493 [mV]))
+    in [ms]
+txk1 = 122.2 [ms] / (exp(-(membrane.v + 127.2 [mV]) / 20.36 [mV]) + exp((membrane.v + 236.8 [mV]) / 69.33 [mV]))
+    in [ms]
+dot(xk1) = (xk1ss - xk1) / txk1
+    in [1]
+xk1ss = 1 / (1 + exp(-(membrane.v + 2.5538 [g*m^5/s^3/A/mol] * extracellular.ko + 144.59 [mV]) / (1.5692 [g*m^5/s^3/A/mol] * extracellular.ko + 3.8115 [mV])))
+    in [1]
+
+[IKb]
+GKb = piecewise(environment.celltype == 1, GKb_b * 0.6, GKb_b)
+    in [mS/uF]
+GKb_b = 0.003
+    in [mS/uF]
+IKb = GKb * xkb * (membrane.v - reversal_potentials.EK)
+    in [A/F]
+xkb = 1 / (1 + exp(-(membrane.v - 14.48 [mV]) / 18.34 [mV]))
+    in [1]
+
+[IKr]
+A1 = 0.0264
+    in [mS/uF]
+A11 = 0.0007868
+    in [mS/uF]
+A2 = 4.986e-6
+    in [mS/uF]
+A21 = 5.455e-6
+    in [mS/uF]
+A3 = 0.001214
+    in [mS/uF]
+A31 = 0.005509
+    in [mS/uF]
+A4 = 1.854e-5
+    in [mS/uF]
+A41 = 0.001416
+    in [mS/uF]
+A51 = 0.4492
+    in [mS/uF]
+A52 = 0.3181
+    in [mS/uF]
+A53 = 0.149
+    in [mS/uF]
+A61 = 0.01241
+    in [mS/uF]
+A62 = 0.3226
+    in [mS/uF]
+A63 = 0.008978
+    in [mS/uF]
+B1 = 4.631e-5
+    in [1/mV]
+B11 = 1.535e-8
+    in [1/mV]
+B2 = -0.004226
+    in [1/mV]
+B21 = -0.1688
+    in [1/mV]
+B3 = 0.008516
+    in [1/mV]
+B31 = 7.771e-9
+    in [1/mV]
+B4 = -0.04641
+    in [1/mV]
+B41 = -0.02877
+    in [1/mV]
+B51 = 0.008595
+    in [1/mV]
+B52 = 3.613e-8
+    in [1/mV]
+B53 = 0.004668
+    in [1/mV]
+B61 = 0.1725
+    in [1/mV]
+B62 = -0.0006575
+    in [1/mV]
+B63 = -0.02215
+    in [1/mV]
+dot(C1) = -(A1 * exp(B1 * membrane.v) * C1 * exp((Temp - 20) * log(q1) / 10) - A2 * exp(B2 * membrane.v) * C2 * exp((Temp - 20) * log(q2) / 10)) - (A51 * exp(B51 * membrane.v) * C1 * exp((Temp - 20) * log(q51) / 10) - A61 * exp(B61 * membrane.v) * IC1 * exp((Temp - 20) * log(q61) / 10))
+    in [1]
+dot(C2) = A1 * exp(B1 * membrane.v) * C1 * exp((Temp - 20) * log(q1) / 10) - A2 * exp(B2 * membrane.v) * C2 * exp((Temp - 20) * log(q2) / 10) - (A31 * exp(B31 * membrane.v) * C2 * exp((Temp - 20) * log(q31) / 10) - A41 * exp(B41 * membrane.v) * O * exp((Temp - 20) * log(q41) / 10)) - (A52 * exp(B52 * membrane.v) * C2 * exp((Temp - 20) * log(q52) / 10) - A62 * exp(B62 * membrane.v) * IC2 * exp((Temp - 20) * log(q62) / 10))
+    in [1]
+dot(Cbound) = -(Kt / (1 + exp(-(membrane.v - Vhalf) / 6.789 [mV])) * Cbound - Kt * Obound) - (Kt / (1 + exp(-(membrane.v - Vhalf) / 6.789 [mV])) * Cbound - Kt * IObound)
+    in [1]
+dot(D) = 0
+    in [1]
+GKr = piecewise(environment.celltype == 1, GKr_b * 1.3, environment.celltype == 2, GKr_b * 0.8, GKr_b)
+    in [mS/uF]
+GKr_b =  4.65854545454545618e-2
+    in [mS/uF]
+GKr_rescale = 1
+dot(IC1) = -(A11 * exp(B11 * membrane.v) * IC1 * exp((Temp - 20) * log(q11) / 10) - A21 * exp(B21 * membrane.v) * IC2 * exp((Temp - 20) * log(q21) / 10)) + A51 * exp(B51 * membrane.v) * C1 * exp((Temp - 20) * log(q51) / 10) - A61 * exp(B61 * membrane.v) * IC1 * exp((Temp - 20) * log(q61) / 10)
+    in [1]
+dot(IC2) = A11 * exp(B11 * membrane.v) * IC1 * exp((Temp - 20) * log(q11) / 10) - A21 * exp(B21 * membrane.v) * IC2 * exp((Temp - 20) * log(q21) / 10) - (A3 * exp(B3 * membrane.v) * IC2 * exp((Temp - 20) * log(q3) / 10) - A4 * exp(B4 * membrane.v) * IO * exp((Temp - 20) * log(q4) / 10)) + A52 * exp(B52 * membrane.v) * C2 * exp((Temp - 20) * log(q52) / 10) - A62 * exp(B62 * membrane.v) * IC2 * exp((Temp - 20) * log(q62) / 10)
+    in [1]
+IKr = GKr_rescale * GKr * sqrt(extracellular.ko / 5.4 [mM]) * O * (membrane.v - reversal_potentials.EK)
+    in [A/F]
+dot(IO) = A3 * exp(B3 * membrane.v) * IC2 * exp((Temp - 20) * log(q3) / 10) - A4 * exp(B4 * membrane.v) * IO * exp((Temp - 20) * log(q4) / 10) + A53 * exp(B53 * membrane.v) * O * exp((Temp - 20) * log(q53) / 10) - A63 * exp(B63 * membrane.v) * IO * exp((Temp - 20) * log(q63) / 10) - (Kmax * Ku * exp(n * log(D)) / (exp(n * log(D)) + halfmax) * IO - Ku * A53 * exp(B53 * membrane.v) * exp((Temp - 20) * log(q53) / 10) / (A63 * exp(B63 * membrane.v) * exp((Temp - 20) * log(q63) / 10)) * IObound)
+    in [1]
+dot(IObound) = Kmax * Ku * exp(n * log(D)) / (exp(n * log(D)) + halfmax) * IO - Ku * A53 * exp(B53 * membrane.v) * exp((Temp - 20) * log(q53) / 10) / (A63 * exp(B63 * membrane.v) * exp((Temp - 20) * log(q63) / 10)) * IObound + Kt / (1 + exp(-(membrane.v - Vhalf) / 6.789 [mV])) * Cbound - Kt * IObound
+    in [1]
+Kmax = 0
+    in [1]
+Kt = 0
+    in [mS/uF]
+Ku = 0
+    in [mS/uF]
+dot(O) = A31 * exp(B31 * membrane.v) * C2 * exp((Temp - 20) * log(q31) / 10) - A41 * exp(B41 * membrane.v) * O * exp((Temp - 20) * log(q41) / 10) - (A53 * exp(B53 * membrane.v) * O * exp((Temp - 20) * log(q53) / 10) - A63 * exp(B63 * membrane.v) * IO * exp((Temp - 20) * log(q63) / 10)) - (Kmax * Ku * exp(n * log(D)) / (exp(n * log(D)) + halfmax) * O - Ku * Obound)
+    in [1]
+dot(Obound) = Kmax * Ku * exp(n * log(D)) / (exp(n * log(D)) + halfmax) * O - Ku * Obound + Kt / (1 + exp(-(membrane.v - Vhalf) / 6.789 [mV])) * Cbound - Kt * Obound
+    in [1]
+Temp = 37
+    in [1]
+Vhalf = 1
+    in [mV]
+halfmax = 1
+    in [1]
+n = 1
+    in [1]
+q1 = 4.843
+    in [1]
+q11 = 4.942
+    in [1]
+q2 = 4.23
+    in [1]
+q21 = 4.156
+    in [1]
+q3 = 4.962
+    in [1]
+q31 = 4.22
+    in [1]
+q4 = 3.769
+    in [1]
+q41 = 1.459
+    in [1]
+q51 = 5
+    in [1]
+q52 = 4.663
+    in [1]
+q53 = 2.412
+    in [1]
+q61 = 5.568
+    in [1]
+q62 = 5
+    in [1]
+q63 = 5.682
+    in [1]
+
+[IKs]
+GKs = piecewise(environment.celltype == 1, GKs_b * 1.4, GKs_b)
+    in [mS/uF]
+GKs_b =  6.35800000000000080e-3
+    in [mS/uF]
+IKs = GKs * KsCa * xs1 * xs2 * (membrane.v - reversal_potentials.EKs)
+    in [A/F]
+KsCa = 1 + 0.6 / (1 + (3.8e-5 [mM] / intracellular_ions.cai) ^ 1.4)
+    in [1]
+txs1 = txs1_max + 1 [ms] / (0.0002326 * exp((membrane.v + 48.28 [mV]) / 17.8 [mV]) + 0.001292 * exp(-(membrane.v + 210 [mV]) / 230 [mV]))
+    in [ms]
+txs1_max = 817.3
+    in [ms]
+txs2 = 1 [ms] / (0.01 * exp((membrane.v - 50 [mV]) / 20 [mV]) + 0.0193 * exp(-(membrane.v + 66.54 [mV]) / 31 [mV]))
+    in [ms]
+dot(xs1) = (xs1ss - xs1) / txs1
+    in [1]
+xs1ss = 1 / (1 + exp(-(membrane.v + 11.6 [mV]) / 8.932 [mV]))
+    in [1]
+dot(xs2) = (xs2ss - xs2) / txs2
+    in [1]
+xs2ss = xs1ss
+    in [1]
+
+[INa]
+Ahf = 0.99
+    in [1]
+Ahs = 1 - Ahf
+    in [1]
+GNa = 75
+    in [mS/uF]
+INa = GNa * (membrane.v - reversal_potentials.ENa) * m ^ 3 * ((1 - fINap) * h * j + fINap * hp * jp)
+    in [A/F]
+fINap = 1 / (1 + CaMK.KmCaMK / CaMK.CaMKa)
+    in [1]
+h = Ahf * hf + Ahs * hs
+    in [1]
+dot(hf) = (hss - hf) / thf
+    in [1]
+hp = Ahf * hf + Ahs * hsp
+    in [1]
+dot(hs) = (hss - hs) / ths
+    in [1]
+dot(hsp) = (hssp - hsp) / thsp
+    in [1]
+hss = 1 / (1 + exp((membrane.v + hssV1 - shift_INa_inact) / hssV2))
+    in [1]
+hssV1 = 82.9
+    in [mV]
+hssV2 = 6.086
+    in [mV]
+hssp = 1 / (1 + exp((membrane.v + 89.1 [mV] - shift_INa_inact) / 6.086 [mV]))
+    in [1]
+dot(j) = (jss - j) / tj
+    in [1]
+dot(jp) = (jss - jp) / tjp
+    in [1]
+jss = hss
+    in [1]
+dot(m) = (mss - m) / tm
+    in [1]
+mss = 1 / (1 + exp(-(membrane.v + mssV1) / mssV2))
+    in [1]
+mssV1 = 39.57
+    in [mV]
+mssV2 = 9.871
+    in [mV]
+mtD1 = 6.765
+    in [1]
+mtD2 = 8.552
+    in [1]
+mtV1 = 11.64
+    in [mV]
+mtV2 = 34.77
+    in [mV]
+mtV3 = 77.42
+    in [mV]
+mtV4 = 5.955
+    in [mV]
+shift_INa_inact = 0
+    in [mV]
+thf = 1 [ms] / (1.432e-5 * exp(-(membrane.v + 1.196 [mV] - shift_INa_inact) / 6.285 [mV]) + 6.149 * exp((membrane.v + 0.5096 [mV] - shift_INa_inact) / 20.27 [mV]))
+    in [ms]
+ths = 1 [ms] / (0.009794 * exp(-(membrane.v + 17.95 [mV] - shift_INa_inact) / 28.05 [mV]) + 0.3343 * exp((membrane.v + 5.73 [mV] - shift_INa_inact) / 56.66 [mV]))
+    in [ms]
+thsp = 3 * ths
+    in [ms]
+tj = 2.038 [ms] + 1 [ms] / (0.02136 * exp(-(membrane.v + 100.6 [mV] - shift_INa_inact) / 8.281 [mV]) + 0.3052 * exp((membrane.v + 0.9941 [mV] - shift_INa_inact) / 38.45 [mV]))
+    in [ms]
+tjp = 1.46 * tj
+    in [ms]
+tm = 1 [ms] / (mtD1 * exp((membrane.v + mtV1) / mtV2) + mtD2 * exp(-(membrane.v + mtV3) / mtV4))
+    in [ms]
+
+[INaCa_i]
+E1_i = x1_i / (x1_i + x2_i + x3_i + x4_i)
+    in [1]
+E1_ss = x1_ss / (x1_ss + x2_ss + x3_ss + x4_ss)
+    in [1]
+E2_i = x2_i / (x1_i + x2_i + x3_i + x4_i)
+    in [1]
+E2_ss = x2_ss / (x1_ss + x2_ss + x3_ss + x4_ss)
+    in [1]
+E3_i = x3_i / (x1_i + x2_i + x3_i + x4_i)
+    in [1]
+E3_ss = x3_ss / (x1_ss + x2_ss + x3_ss + x4_ss)
+    in [1]
+E4_i = x4_i / (x1_i + x2_i + x3_i + x4_i)
+    in [1]
+E4_ss = x4_ss / (x1_ss + x2_ss + x3_ss + x4_ss)
+    in [1]
+Gncx = piecewise(environment.celltype == 1, Gncx_b * 1.1, environment.celltype == 2, Gncx_b * 1.4, Gncx_b)
+    in [mS/uF]
+Gncx_b = 0.0008
+    in [mS/uF]
+INaCa_i = 0.8 * Gncx * allo_i * (physical_constants.zna * JncxNa_i + physical_constants.zca * JncxCa_i)
+    in [A/F]
+INaCa_ss = 0.2 * Gncx * allo_ss * (physical_constants.zna * JncxNa_ss + physical_constants.zca * JncxCa_ss)
+    in [A/F]
+JncxCa_i = E2_i * k2_i - E1_i * k1_i
+    in [mM/ms]
+JncxCa_ss = E2_ss * k2_ss - E1_ss * k1_ss
+    in [mM/ms]
+JncxNa_i = 3 * (E4_i * k7_i - E1_i * k8_i) + E3_i * k4pp_i - E2_i * k3pp_i
+    in [mM/ms]
+JncxNa_ss = 3 * (E4_ss * k7_ss - E1_ss * k8_ss) + E3_ss * k4pp_ss - E2_ss * k3pp_ss
+    in [mM/ms]
+KmCaAct = 0.00015
+    in [mM]
+allo_i = 1 / (1 + (KmCaAct / intracellular_ions.cai) ^ 2)
+    in [1]
+allo_ss = 1 / (1 + (KmCaAct / intracellular_ions.cass) ^ 2)
+    in [1]
+h10_i = kasymm + 1 + extracellular.nao / kna1 * (1 + extracellular.nao / kna2)
+    in [1]
+h10_ss = kasymm + 1 + extracellular.nao / kna1 * (1 + extracellular.nao / kna2)
+    in [1]
+h11_i = extracellular.nao * extracellular.nao / (h10_i * kna1 * kna2)
+    in [1]
+h11_ss = extracellular.nao * extracellular.nao / (h10_ss * kna1 * kna2)
+    in [1]
+h12_i = 1 / h10_i
+    in [1]
+h12_ss = 1 / h10_ss
+    in [1]
+h1_i = 1 + intracellular_ions.nai / kna3 * (1 + hna)
+    in [1]
+h1_ss = 1 + intracellular_ions.nass / kna3 * (1 + hna)
+    in [1]
+h2_i = intracellular_ions.nai * hna / (kna3 * h1_i)
+    in [1]
+h2_ss = intracellular_ions.nass * hna / (kna3 * h1_ss)
+    in [1]
+h3_i = 1 / h1_i
+    in [1]
+h3_ss = 1 / h1_ss
+    in [1]
+h4_i = 1 + intracellular_ions.nai / kna1 * (1 + intracellular_ions.nai / kna2)
+    in [1]
+h4_ss = 1 + intracellular_ions.nass / kna1 * (1 + intracellular_ions.nass / kna2)
+    in [1]
+h5_i = intracellular_ions.nai * intracellular_ions.nai / (h4_i * kna1 * kna2)
+    in [1]
+h5_ss = intracellular_ions.nass * intracellular_ions.nass / (h4_ss * kna1 * kna2)
+    in [1]
+h6_i = 1 / h4_i
+    in [1]
+h6_ss = 1 / h4_ss
+    in [1]
+h7_i = 1 + extracellular.nao / kna3 * (1 + 1 / hna)
+    in [1]
+h7_ss = 1 + extracellular.nao / kna3 * (1 + 1 / hna)
+    in [1]
+h8_i = extracellular.nao / (kna3 * hna * h7_i)
+    in [1]
+h8_ss = extracellular.nao / (kna3 * hna * h7_ss)
+    in [1]
+h9_i = 1 / h7_i
+    in [1]
+h9_ss = 1 / h7_ss
+    in [1]
+hca = exp(qca * membrane.v * physical_constants.F / (physical_constants.R * physical_constants.T))
+    in [1]
+hna = exp(qna * membrane.v * physical_constants.F / (physical_constants.R * physical_constants.T))
+    in [1]
+k1_i = h12_i * extracellular.cao * kcaon
+    in [1]
+k1_ss = h12_ss * extracellular.cao * kcaon
+    in [1]
+k2_i = kcaoff
+    in [1]
+k2_ss = kcaoff
+    in [1]
+k3_i = k3p_i + k3pp_i
+    in [1]
+k3_ss = k3p_ss + k3pp_ss
+    in [1]
+k3p_i = h9_i * wca
+    in [1]
+k3p_ss = h9_ss * wca
+    in [1]
+k3pp_i = h8_i * wnaca
+    in [1]
+k3pp_ss = h8_ss * wnaca
+    in [1]
+k4_i = k4p_i + k4pp_i
+    in [1]
+k4_ss = k4p_ss + k4pp_ss
+    in [1]
+k4p_i = h3_i * wca / hca
+    in [1]
+k4p_ss = h3_ss * wca / hca
+    in [1]
+k4pp_i = h2_i * wnaca
+    in [1]
+k4pp_ss = h2_ss * wnaca
+    in [1]
+k5_i = kcaoff
+    in [1]
+k5_ss = kcaoff
+    in [1]
+k6_i = h6_i * intracellular_ions.cai * kcaon
+    in [1]
+k6_ss = h6_ss * intracellular_ions.cass * kcaon
+    in [1]
+k7_i = h5_i * h2_i * wna
+    in [1]
+k7_ss = h5_ss * h2_ss * wna
+    in [1]
+k8_i = h8_i * h11_i * wna
+    in [1]
+k8_ss = h8_ss * h11_ss * wna
+    in [1]
+kasymm = 12.5
+    in [1]
+kcaoff = 5000
+    in [mS/uF]
+kcaon = 1500000
+    in [mS/uF]
+kna1 = 15
+    in [mS/uF]
+kna2 = 5
+    in [mS/uF]
+kna3 = 88.12
+    in [mS/uF]
+qca = 0.167
+    in [1]
+qna = 0.5224
+    in [1]
+wca = 60000
+    in [1]
+wna = 60000
+    in [1]
+wnaca = 5000
+    in [1]
+x1_i = k2_i * k4_i * (k7_i + k6_i) + k5_i * k7_i * (k2_i + k3_i)
+    in [1]
+x1_ss = k2_ss * k4_ss * (k7_ss + k6_ss) + k5_ss * k7_ss * (k2_ss + k3_ss)
+    in [1]
+x2_i = k1_i * k7_i * (k4_i + k5_i) + k4_i * k6_i * (k1_i + k8_i)
+    in [1]
+x2_ss = k1_ss * k7_ss * (k4_ss + k5_ss) + k4_ss * k6_ss * (k1_ss + k8_ss)
+    in [1]
+x3_i = k1_i * k3_i * (k7_i + k6_i) + k8_i * k6_i * (k2_i + k3_i)
+    in [1]
+x3_ss = k1_ss * k3_ss * (k7_ss + k6_ss) + k8_ss * k6_ss * (k2_ss + k3_ss)
+    in [1]
+x4_i = k2_i * k8_i * (k4_i + k5_i) + k3_i * k5_i * (k1_i + k8_i)
+    in [1]
+x4_ss = k2_ss * k8_ss * (k4_ss + k5_ss) + k3_ss * k5_ss * (k1_ss + k8_ss)
+    in [1]
+
+[INaK]
+E1 = x1 / (x1 + x2 + x3 + x4)
+    in [1]
+E2 = x2 / (x1 + x2 + x3 + x4)
+    in [1]
+E3 = x3 / (x1 + x2 + x3 + x4)
+    in [1]
+E4 = x4 / (x1 + x2 + x3 + x4)
+    in [1]
+H = 1e-7
+    in [mM]
+INaK = Pnak * (physical_constants.zna * JnakNa + physical_constants.zk * JnakK)
+    in [A/F]
+JnakK = 2 * (E4 * b1 - E3 * a1)
+    in [mM/ms]
+JnakNa = 3 * (E1 * a3 - E2 * b3)
+    in [mM/ms]
+Khp = 1.698e-7
+    in [mM]
+Kki = 0.5
+    in [mS/uF]
+Kko = 0.3582
+    in [mS/uF]
+Kmgatp = 1.698e-7
+    in [mM]
+Knai = Knai0 * exp(delta * membrane.v * physical_constants.F / (3 * physical_constants.R * physical_constants.T))
+    in [mM]
+Knai0 = 9.073
+    in [mM]
+Knao = Knao0 * exp((1 - delta) * membrane.v * physical_constants.F / (3 * physical_constants.R * physical_constants.T))
+    in [mM]
+Knao0 = 27.78
+    in [mM]
+Knap = 224
+    in [mM]
+Kxkur = 292
+    in [mM]
+MgADP = 0.05
+    in [mM]
+MgATP = 9.8
+    in [mM]
+P = eP / (1 + H / Khp + intracellular_ions.nai / Knap + intracellular_ions.ki / Kxkur)
+    in [1]
+Pnak = piecewise(environment.celltype == 1, Pnak_b * 0.9, environment.celltype == 2, Pnak_b * 0.7, Pnak_b)
+    in [mS/uF]
+Pnak_b = 30
+    in [mS/uF]
+a1 = k1p * (intracellular_ions.nai / Knai) ^ 3 / ((1 + intracellular_ions.nai / Knai) ^ 3 + (1 + intracellular_ions.ki / Kki) ^ 2 - 1)
+    in [1]
+a2 = k2p
+    in [1]
+a3 = k3p * (extracellular.ko / Kko) ^ 2 / ((1 + extracellular.nao / Knao) ^ 3 + (1 + extracellular.ko / Kko) ^ 2 - 1)
+    in [1]
+a4 = k4p * MgATP / Kmgatp / (1 + MgATP / Kmgatp)
+    in [1]
+b1 = k1m * MgADP
+    in [1]
+b2 = k2m * (extracellular.nao / Knao) ^ 3 / ((1 + extracellular.nao / Knao) ^ 3 + (1 + extracellular.ko / Kko) ^ 2 - 1)
+    in [1]
+b3 = k3m * P * H / (1 + MgATP / Kmgatp)
+    in [1]
+b4 = k4m * (intracellular_ions.ki / Kki) ^ 2 / ((1 + intracellular_ions.nai / Knai) ^ 3 + (1 + intracellular_ions.ki / Kki) ^ 2 - 1)
+    in [1]
+delta = -0.155
+    in [mV]
+eP = 4.2
+    in [1]
+k1m = 182.4
+    in [mS/uF]
+k1p = 949.5
+    in [mS/uF]
+k2m = 39.4
+    in [mS/uF]
+k2p = 687.2
+    in [mS/uF]
+k3m = 79300
+    in [mS/uF]
+k3p = 1899
+    in [mS/uF]
+k4m = 40
+    in [mS/uF]
+k4p = 639
+    in [mS/uF]
+x1 = a4 * a1 * a2 + b2 * b4 * b3 + a2 * b4 * b3 + b3 * a1 * a2
+    in [1]
+x2 = b2 * b1 * b4 + a1 * a2 * a3 + a3 * b1 * b4 + a2 * a3 * b4
+    in [1]
+x3 = a2 * a3 * a4 + b3 * b2 * b1 + b2 * b1 * a4 + a3 * a4 * b1
+    in [1]
+x4 = b4 * b3 * b2 + a3 * a4 * a1 + b2 * a4 * a1 + b3 * b2 * a1
+    in [1]
+
+[INaL]
+GNaL = piecewise(environment.celltype == 1, GNaL_b * 0.6, GNaL_b)
+    in [mS/uF]
+GNaL_b =  1.99574999999999753e-2
+    in [mS/uF]
+INaL = GNaL * (membrane.v - reversal_potentials.ENa) * mL * ((1 - fINaLp) * hL + fINaLp * hLp)
+    in [A/F]
+fINaLp = 1 / (1 + CaMK.KmCaMK / CaMK.CaMKa)
+    in [1]
+dot(hL) = (hLss - hL) / thL
+    in [1]
+dot(hLp) = (hLssp - hLp) / thLp
+    in [1]
+hLss = 1 / (1 + exp((membrane.v + 87.61 [mV]) / 7.488 [mV]))
+    in [1]
+hLssp = 1 / (1 + exp((membrane.v + 93.81 [mV]) / 7.488 [mV]))
+    in [1]
+dot(mL) = (mLss - mL) / tmL
+    in [1]
+mLss = 1 / (1 + exp(-(membrane.v + 42.85 [mV]) / 5.264 [mV]))
+    in [1]
+thL = 200
+    in [ms]
+thLp = 3 * thL
+    in [ms]
+tmL = INa.tm
+    in [ms]
+
+[INab]
+A = PNab * membrane.ffrt * (intracellular_ions.nai * exp(membrane.vfrt) - extracellular.nao) / B
+    in [A/F]
+B = membrane.frt
+    in [1/mV]
+INab = piecewise(-1e-7 <= U and U <= 1e-7, A * (1 - 0.5 * U), A * U / (exp(U) - 1))
+    in [A/F]
+PNab = 3.75e-10
+    in [mS/uF]
+U = B * (membrane.v - v0)
+    in [1]
+v0 = 0 [mV]
+    in [mV]
+
+[IpCa]
+GpCa = 0.0005
+    in [mS/uF]
+IpCa = GpCa * intracellular_ions.cai / (KmCap + intracellular_ions.cai)
+    in [A/F]
+KmCap = 0.0005
+    in [mM]
+
+[Ito]
+AiF = 1 / (1 + exp((membrane.v - 213.6 [mV]) / 151.2 [mV]))
+    in [1]
+AiS = 1 - AiF
+    in [1]
+Gto = piecewise(environment.celltype == 1, Gto_b * 4, environment.celltype == 2, Gto_b * 4, Gto_b)
+    in [mS/uF]
+Gto_b = 0.02
+    in [mS/uF]
+Ito = Gto * (membrane.v - reversal_potentials.EK) * ((1 - fItop) * a * i + fItop * ap * ip)
+    in [A/F]
+dot(a) = (ass - a) / ta
+    in [1]
+dot(ap) = (assp - ap) / ta
+    in [1]
+ass = 1 / (1 + exp(-(membrane.v - 14.34 [mV]) / 14.82 [mV]))
+    in [1]
+assp = 1 / (1 + exp(-(membrane.v - 24.34 [mV]) / 14.82 [mV]))
+    in [1]
+delta_epi = piecewise(environment.celltype == 1, 1 - 0.95 / (1 + exp((membrane.v + 70 [mV]) / 5 [mV])), 1)
+    in [1]
+dti_develop = 1.354 + 0.0001 / (exp((membrane.v - 167.4 [mV]) / 15.89 [mV]) + exp(-(membrane.v - 12.23 [mV]) / 0.2154 [mV]))
+    in [1]
+dti_recover = 1 - 0.5 / (1 + exp((membrane.v + 70 [mV]) / 20 [mV]))
+    in [1]
+fItop = 1 / (1 + CaMK.KmCaMK / CaMK.CaMKa)
+    in [1]
+i = AiF * iF + AiS * iS
+    in [1]
+dot(iF) = (iss - iF) / tiF
+    in [1]
+dot(iFp) = (iss - iFp) / tiFp
+    in [1]
+dot(iS) = (iss - iS) / tiS
+    in [1]
+dot(iSp) = (iss - iSp) / tiSp
+    in [1]
+ip = AiF * iFp + AiS * iSp
+    in [1]
+iss = 1 / (1 + exp((membrane.v + 43.94 [mV]) / 5.711 [mV]))
+    in [1]
+ta = 1.0515 [ms] / (1 / (1.2089 * (1 + exp(-(membrane.v - 18.4099 [mV]) / 29.3814 [mV]))) + 3.5 / (1 + exp((membrane.v + 100 [mV]) / 29.3814 [mV])))
+    in [ms]
+tiF = tiF_b * delta_epi
+    in [ms]
+tiF_b = 4.562 [ms] + 1 [ms] / (0.3933 * exp(-(membrane.v + 100 [mV]) / 100 [mV]) + 0.08004 * exp((membrane.v + 50 [mV]) / 16.59 [mV]))
+    in [ms]
+tiFp = dti_develop * dti_recover * tiF
+    in [ms]
+tiS = tiS_b * delta_epi
+    in [ms]
+tiS_b = 23.62 [ms] + 1 [ms] / (0.001416 * exp(-(membrane.v + 96.52 [mV]) / 59.05 [mV]) + 1.78e-8 * exp((membrane.v + 114.1 [mV]) / 8.079 [mV]))
+    in [ms]
+tiSp = dti_develop * dti_recover * tiS
+    in [ms]
+
+[SERCA]
+Jleak = 0.0039375 [mM/ms] * intracellular_ions.cansr / 15 [mM]
+    in [mM/ms]
+Jup = Jup_b * ((1 - fJupp) * Jupnp + fJupp * Jupp - Jleak)
+    in [mM/ms]
+Jup_b = 1
+    in [1]
+Jupnp = upScale * 0.004375 * intracellular_ions.cai / (intracellular_ions.cai + 0.00092 [mM])
+    in [mM/ms]
+Jupp = upScale * 2.75 * 0.004375 * intracellular_ions.cai / (intracellular_ions.cai + 0.00092 [mM] - 0.00017 [mM])
+    in [mM/ms]
+fJupp = 1 / (1 + CaMK.KmCaMK / CaMK.CaMKa)
+    in [1]
+upScale = piecewise(environment.celltype == 1, 1.3, 1)
+    in [1]
+
+[cell_geometry]
+Acap = 2 * Ageo
+    in [cm^2]
+Ageo = 2 * 3.14 * rad * rad + 2 * 3.14 * rad * L
+    in [cm^2]
+L = 0.01
+    in [cm]
+rad = 0.0011
+    in [cm]
+vcell = 1000 [1 (0.001)] * 3.14 * rad * rad * L
+    in [uL]
+vjsr = 0.0048 * vcell
+    in [uL]
+vmyo = 0.68 * vcell
+    in [uL]
+vnsr = 0.0552 * vcell
+    in [uL]
+vss = 0.02 * vcell
+    in [uL]
+
+[diff]
+Jdiff = (intracellular_ions.cass - intracellular_ions.cai) / 0.2
+    in [mM/ms]
+JdiffK = (intracellular_ions.kss - intracellular_ions.ki) / 2
+    in [mM/ms]
+JdiffNa = (intracellular_ions.nass - intracellular_ions.nai) / 2
+    in [mM/ms]
+
+[environment]
+celltype = 0
+    in [1]
+pace = 0 bind pace
+time = 0 bind time
+    in [ms]
+
+[extracellular]
+cao = 1.8
+    in [mM]
+ko = 5.4
+    in [mM]
+nao = 140
+    in [mM]
+
+[intracellular_ions]
+BSLmax = 1.124
+    in [mM]
+BSRmax = 0.047
+    in [mM]
+Bcai = 1 / (1 + cmdnmax * kmcmdn / (kmcmdn + cai) ^ 2 + trpnmax * kmtrpn / (kmtrpn + cai) ^ 2)
+    in [1]
+Bcajsr = 1 / (1 + csqnmax * kmcsqn / (kmcsqn + cajsr) ^ 2)
+    in [1]
+Bcass = 1 / (1 + BSRmax * KmBSR / (KmBSR + cass) ^ 2 + BSLmax * KmBSL / (KmBSL + cass) ^ 2)
+    in [1]
+KmBSL = 0.0087
+    in [mM]
+KmBSR = 0.00087
+    in [mM]
+dot(cai) = Bcai * (-(IpCa.IpCa + ICab.ICab - 2 * INaCa_i.INaCa_i) * cm * cell_geometry.Acap / (2 * physical_constants.F * cell_geometry.vmyo) - SERCA.Jup * cell_geometry.vnsr / cell_geometry.vmyo + diff.Jdiff * cell_geometry.vss / cell_geometry.vmyo)
+    in [mM]
+dot(cajsr) = Bcajsr * (trans_flux.Jtr - ryr.Jrel)
+    in [mM]
+dot(cansr) = SERCA.Jup - trans_flux.Jtr * cell_geometry.vjsr / cell_geometry.vnsr
+    in [mM]
+dot(cass) = Bcass * (-(ICaL.ICaL - 2 * INaCa_i.INaCa_ss) * cm * cell_geometry.Acap / (2 * physical_constants.F * cell_geometry.vss) + ryr.Jrel * cell_geometry.vjsr / cell_geometry.vss - diff.Jdiff)
+    in [mM]
+cm = 1
+    in [uF/cm^2]
+cmdnmax = piecewise(environment.celltype == 1, cmdnmax_b * 1.3, cmdnmax_b)
+    in [mM]
+cmdnmax_b = 0.05
+    in [mM]
+csqnmax = 10
+    in [mM]
+dot(ki) = -(Ito.Ito + IKr.IKr + IKs.IKs + IK1.IK1 + IKb.IKb + stimulus_protocol.Istim - 2 * INaK.INaK) * cm * cell_geometry.Acap / (physical_constants.F * cell_geometry.vmyo) + diff.JdiffK * cell_geometry.vss / cell_geometry.vmyo
+    in [mM]
+kmcmdn = 0.00238
+    in [mM]
+kmcsqn = 0.8
+    in [mM]
+kmtrpn = 0.0005
+    in [mM]
+dot(kss) = -ICaL.ICaK * cm * cell_geometry.Acap / (physical_constants.F * cell_geometry.vss) - diff.JdiffK
+    in [mM]
+dot(nai) = -(INa.INa + INaL.INaL + 3 * INaCa_i.INaCa_i + 3 * INaK.INaK + INab.INab) * cell_geometry.Acap * cm / (physical_constants.F * cell_geometry.vmyo) + diff.JdiffNa * cell_geometry.vss / cell_geometry.vmyo
+    in [mM]
+dot(nass) = -(ICaL.ICaNa + 3 * INaCa_i.INaCa_ss) * cm * cell_geometry.Acap / (physical_constants.F * cell_geometry.vss) - diff.JdiffNa
+    in [mM]
+trpnmax = 0.07
+    in [mM]
+
+[membrane]
+ffrt = physical_constants.F * frt
+    in [s^4*A^2/g/m^2/mol]
+frt = physical_constants.F / (physical_constants.R * physical_constants.T)
+    in [1/mV]
+dot(v) = -(INa.INa + INaL.INaL + Ito.Ito + ICaL.ICaL + ICaL.ICaNa + ICaL.ICaK + IKr.IKr + IKs.IKs + IK1.IK1 + INaCa_i.INaCa_i + INaCa_i.INaCa_ss + INaK.INaK + INab.INab + IKb.IKb + IpCa.IpCa + ICab.ICab + stimulus_protocol.Istim)
+    in [mV]
+vfrt = v * frt
+    in [1]
+
+[physical_constants]
+F = 96485
+    in [C/mol]
+R = 8314
+    in [mJ/mol/K]
+T = 310
+    in [K]
+zca = 2
+    in [1]
+zk = 1
+    in [1]
+zna = 1
+    in [1]
+
+[reversal_potentials]
+EK = physical_constants.R * physical_constants.T / physical_constants.F * log(extracellular.ko / intracellular_ions.ki)
+    in [mV]
+EKs = physical_constants.R * physical_constants.T / physical_constants.F * log((extracellular.ko + PKNa * extracellular.nao) / (intracellular_ions.ki + PKNa * intracellular_ions.nai))
+    in [mV]
+ENa = physical_constants.R * physical_constants.T / physical_constants.F * log(extracellular.nao / intracellular_ions.nai)
+    in [mV]
+PKNa = 0.01833
+    in [1]
+
+[ryr]
+Jrel = Jrel_scaling_factor * ((1 - fJrelp) * Jrelnp + fJrelp * Jrelp)
+    in [mM/ms]
+Jrel_inf = piecewise(environment.celltype == 2, Jrel_inf_temp * 1.7, Jrel_inf_temp)
+    in [1]
+Jrel_inf_temp = a_rel * -ICaL.ICaL / (1 [A/F] + 1 [A/F] * (1.5 [mM] / intracellular_ions.cajsr) ^ 8)
+    in [1]
+Jrel_infp = piecewise(environment.celltype == 2, Jrel_temp * 1.7, Jrel_temp)
+    in [1]
+Jrel_scaling_factor = 1
+    in [1]
+Jrel_temp = a_relp * -ICaL.ICaL / (1 + (1.5 [mM] / intracellular_ions.cajsr) ^ 8)
+    in [1]
+dot(Jrelnp) = (Jrel_inf - Jrelnp) / tau_rel
+    in [1]
+dot(Jrelp) = (Jrel_infp - Jrelp) / tau_relp
+    in [1]
+a_rel = 0.5 * bt
+    in [ms]
+a_relp = 0.5 * btp
+    in [ms]
+bt = 4.75
+    in [ms]
+btp = 1.25 * bt
+    in [ms]
+fJrelp = 1 / (1 + CaMK.KmCaMK / CaMK.CaMKa)
+    in [1]
+tau_rel = piecewise(tau_rel_temp < 0.001 [ms], 0.001 [ms], tau_rel_temp)
+    in [ms]
+tau_rel_temp = bt / (1 + 0.0123 [mM] / intracellular_ions.cajsr)
+    in [ms]
+tau_relp = piecewise(tau_relp_temp < 0.001 [ms], 0.001 [ms], tau_relp_temp)
+    in [ms]
+tau_relp_temp = btp / (1 + 0.0123 [mM] / intracellular_ions.cajsr)
+    in [ms]
+
+[stimulus_protocol]
+Istim = i_Stim_Amplitude * environment.pace
+    in [A/F]
+i_Stim_Amplitude = -50
+    in [A/F]
+
+[trans_flux]
+Jtr = (intracellular_ions.cansr - intracellular_ions.cajsr) / 100 [ms]
+    in [mM/ms]
+

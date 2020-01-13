@@ -2,3 +2,4 @@ pytest
 pandas
 scipy
 flake8
+coverage
