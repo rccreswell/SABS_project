@@ -28,5 +28,6 @@ install:
 
 script:
     - pytest
+    - python -m flake8
 
 cache: pip
