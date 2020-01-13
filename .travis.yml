@@ -24,10 +24,14 @@ install:
   - pip install myokit
   - wget https://github.com/scipy/scipy/archive/master.zip -O /tmp/scipy-master.zip
   - unzip -q /tmp/scipy-master.zip -d /home/travis/scipy-master/
-  - pip install /home/travis/scipy-master/scipy-master/
+#  - pip install /home/travis/scipy-master/scipy-master/
 
 script:
     - pytest
-    - python -m flake8
+    - coverager run -m pytest
+#    - python -m flake8
+
+after_success:
+  - codecov
 
 cache: pip
