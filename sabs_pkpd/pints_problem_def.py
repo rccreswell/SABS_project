@@ -180,7 +180,7 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
                 axes[i, j].axis('off')
             else:
                 # Lower triangle: Pairwise plot
-                plot_kde_2d(j, i, mcmc_chains, explor_iter, ax=axes[i, j], chain_index=chain_index)
+                plot_kde_2d(j, i, mcmc_chains, ax=axes[i, j], chain_index=chain_index)
                 if expected_value is not None:
                     axes[i, j].axhline(expected_value[i], c='g')
                     axes[i, j].axvline(expected_value[j], c='g')
@@ -230,7 +230,7 @@ def hist_1d(x, ax):
     return None
 
 
-def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
+def plot_kde_2d(i, j, mcmc_chains, ax, chain_index):
     """
     Returns the 2D distribution of parameter j versus parameter i
     :param i: int

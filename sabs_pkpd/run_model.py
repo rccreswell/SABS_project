@@ -21,8 +21,6 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
         used to generate the experimental data.
     """
 
-    # This function is meant for comparison of simulation conditions to data, or to be called by the PINTS optimisation tool
-
     # Allocate memory for the output
     output = []
 
@@ -32,7 +30,9 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
     # Run the model solving for all experiment conditions
     for k in range(0, len(set(data_exp.exp_conds))):
-        s.set_state(sabs_pkpd.constants.default_state)
+        if sabs_pkpd.constants.default_state is not None:
+            s.set_state(sabs_pkpd.constants.default_state)
+
         # reset timer
         s.set_time(0)
 
@@ -81,6 +81,10 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
         List of shape (len(experimental conidition values), time_samples). It contains the model output in the given
         conditions at the time points used to generate the experimental data.
     """
+    if sabs_pkpd.constants.default_state is None:
+        print('No default state was provided in sabs_pkpd.constants.default_state. Simulating with initial conditions' +
+              ' provided with the .mmt model...')
+
     if time_samples is not None:
         if time_samples[-1] > time_max :
             raise ValueError('The time samples have to be within the range (0 , time_max)')
@@ -99,8 +103,8 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     # In case the user wants some parameter to vary between simulations
     if exp_cond_param_values is not None:
         for k in range(0, len(exp_cond_param_values)):
-
-            s.set_state(sabs_pkpd.constants.default_state)
+            if sabs_pkpd.constants.default_state is not None:
+                s.set_state(sabs_pkpd.constants.default_state)
             # reset timer
             s.set_time(0)
 
@@ -120,7 +124,8 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
             # Convert output in concentration
             output.append(list(a[read_out]))
     else:
-        s.set_state(sabs_pkpd.constants.default_state)
+        if sabs_pkpd.constants.default_state is not None:
+            s.set_state(sabs_pkpd.constants.default_state)
         # reset timer
         s.set_time(0)
 

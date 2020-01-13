@@ -4,7 +4,7 @@ n = 2
 
 s = []
 
-default_state = []
+default_state = None
 
 data_exp = sabs_pkpd.load_data.Data_exp([], [], [], [])
 
