@@ -17,6 +17,7 @@ before_install:
 
 install:
   - pip install -r requirements.txt
+  - pip install codecov
   - pip install -e .
   - wget https://github.com/pints-team/pints/archive/master.zip -O /tmp/pints-master.zip
   - unzip -q /tmp/pints-master.zip -d /home/travis/pints-master/
@@ -24,9 +25,13 @@ install:
   - pip install myokit
   - wget https://github.com/scipy/scipy/archive/master.zip -O /tmp/scipy-master.zip
   - unzip -q /tmp/scipy-master.zip -d /home/travis/scipy-master/
-  - pip install /home/travis/scipy-master/scipy-master/
+#  - pip install /home/travis/scipy-master/scipy-master/
 
 script:
     - pytest
+    - coverage run -m pytest
+    - python -m flake8
+# after_success:
+    - codecov
 
 cache: pip
