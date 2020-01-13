@@ -17,6 +17,7 @@ before_install:
 
 install:
   - pip install -r requirements.txt
+  - pip install codecov
   - pip install -e .
   - wget https://github.com/pints-team/pints/archive/master.zip -O /tmp/pints-master.zip
   - unzip -q /tmp/pints-master.zip -d /home/travis/pints-master/
