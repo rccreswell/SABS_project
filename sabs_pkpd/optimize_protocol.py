@@ -28,6 +28,7 @@ import pints.plot
 from multiprocessing import Pool
 import os
 
+
 class ProtocolOptimizer:
     """Handles optimization of the protocol for parameter inference.
     """
@@ -84,7 +85,6 @@ class ProtocolOptimizer:
         else:
             self.true_model_params = self.model_params.copy()
 
-
     def run_original_protocol(self):
         """Save the initial protocol parameter values and resulting posteriors.
 
@@ -101,7 +101,6 @@ class ProtocolOptimizer:
         self.original_data = self.data.copy()
         self.original_posterior = self.posterior.copy()
 
-
     def objective(self, protocol_params):
         """Evaluate the protocol optimization objective function.
 
@@ -115,8 +114,8 @@ class ProtocolOptimizer:
         float
             The value of the objective function
         """
-        # If a matrix of protocol params is supplied, evaluate each one sequentially
-        # and return a list of objectives
+        # If a matrix of protocol params is supplied, evaluate each one
+        # sequentially and return a list of objectives
 
         # if type(protocol_params) is np.ndarray:
         #     if protocol_params.ndim == 2:
@@ -128,13 +127,13 @@ class ProtocolOptimizer:
         if type(protocol_params) is np.ndarray:
             if protocol_params.ndim == 2:
                 pool = Pool(os.cpu_count())
-                all_objectives = pool.map(self.objective, [p for p in protocol_params])
+                all_objectives = pool.map(self.objective,
+                                          [p for p in protocol_params])
 
                 pool.close()
                 pool.join()
 
                 return np.array(all_objectives)
-
 
         # Get the protocol as a function of t
         protocol = self.protocol_form(*protocol_params)
@@ -142,7 +141,8 @@ class ProtocolOptimizer:
         # Get output(t) as a function of each model variable
         partials = []
         for i, param in enumerate(self.model_params):
-            partial = lambda x: self.simulator(
+            def partial(x):
+                return self.simulator(
                 *[p if j != i else x for j, p in enumerate(self.model_params)],
                 protocol,
                 self.times,
@@ -163,7 +163,7 @@ class ProtocolOptimizer:
         J = np.zeros((len(derivatives), len(derivatives)))
         for i, d1 in enumerate(derivatives):
             for j, d2 in enumerate(derivatives):
-                J[i,j] = np.sum(d1 * d2)
+                J[i, j] = np.sum(d1 * d2)
 
         true_sigma = 0.1
         J = 1/true_sigma**2 * J
@@ -180,21 +180,22 @@ class ProtocolOptimizer:
             # Singular matrix when all zeros, so changing the parameters has no
             # effect on the trajectory. Treat this as a bad objective??
             J_inv = np.diag([1e10] * len(self.model_params))
-        F = np.sum([J_inv[i,i] / self.model_params[i] \
+        F = np.sum([J_inv[i, i] / self.model_params[i]
                     for i in range(len(self.model_params))])
 
-        # Try regularizing the objective??? Could help avoid exploding, if it makes sense.
+        # Try regularizing the objective??? Could help avoid exploding, if it
+        # makes sense.
         F += 0.001 * np.sum(np.array(protocol_params)**2)
 
         return F
-
 
     def optimize_protocol(self):
         """Optimize the protocol parameters to maximize the Fisher objective.
         """
         import pyswarms as ps
 
-        objective = lambda protocol_params : self.objective(protocol_params)
+        def objective(protocol_params):
+            return self.objective(protocol_params)
 
         num_particles = 25
         options = {'c1': 0.9, 'c2': 0.2, 'w':0.9}
@@ -204,17 +205,20 @@ class ProtocolOptimizer:
         # at randomly generated points about it
         init_pos = [self.protocol_params]
         for _ in range(num_particles-1):
-            init_pos.append(np.random.normal(self.protocol_params, np.abs(self.protocol_params)*5))
+            init_pos.append(np.random.normal(self.protocol_params,
+                                             np.abs(self.protocol_params)*5))
         init_pos = np.array(init_pos)
 
-        optimizer = ps.single.GlobalBestPSO(n_particles=num_particles, dimensions=dim, options=options, init_pos=init_pos)
+        optimizer = ps.single.GlobalBestPSO(n_particles=num_particles,
+                                            dimensions=dim,
+                                            options=options,
+                                            init_pos=init_pos)
         cost, pos = optimizer.optimize(objective, iters=100)
         print(cost)
         print(pos)
         protocol = pos
 
         self.protocol_params = protocol
-
 
         # Other optimizers to try...
 
@@ -240,7 +244,6 @@ class ProtocolOptimizer:
         # print(res)
         # exit()
 
-
     def infer_model_parameters(self):
         """Infer posteriors of the model parameters given the current protocol.
         """
@@ -256,7 +259,6 @@ class ProtocolOptimizer:
         self.data = values
         self.posterior = chains
 
-
     def update_model_parameters(self):
         """Set the model parameters to the current posterior medians.
 
@@ -266,12 +268,11 @@ class ProtocolOptimizer:
         burnin = self.num_mcmc_iterations // 2
 
         for i in range(len(self.model_params)):
-            posterior = self.posterior[0,:,i][burnin:]
+            posterior = self.posterior[0, :, i][burnin:]
             self.model_params[i] = np.median(posterior)
 
         print('reset to:')
         print(self.model_params)
-
 
     def plot(self):
         """Make a plot of the original and optimized protocols.
@@ -284,32 +285,32 @@ class ProtocolOptimizer:
         fig, axes = plt.subplots(2, n_cols, sharex='col', sharey='col')
 
         # Initial protocol
-        axes[0,0].plot(self.times,
+        axes[0, 0].plot(self.times,
                 self.protocol_form(*self.original_protocol_params)(self.times))
-        axes[0,0].set_title('initial protocol')
+        axes[0, 0].set_title('initial protocol')
 
         axes[0,1].plot(self.times, self.original_data)
         axes[0,1].set_title('data from initial protocol')
 
         for i, model_param in enumerate(self.model_params):
             true_value = self.true_model_params[i]
-            axes[0,i+2].hist(self.original_posterior[0,:,i][burnin:], alpha=0.8)
-            axes[0,i+2].axvline(true_value, zorder=-10, color='mediumseagreen')
-            axes[0,i+2].set_title('parameter {}'.format(i+1))
+            axes[0, i+2].hist(self.original_posterior[0,:,i][burnin:], alpha=0.8)
+            axes[0, i+2].axvline(true_value, zorder=-10, color='mediumseagreen')
+            axes[0, i+2].set_title('parameter {}'.format(i+1))
 
         # Optimized protocol
-        axes[1,0].plot(self.times,
+        axes[1, 0].plot(self.times,
                         self.protocol_form(*self.protocol_params)(self.times))
-        axes[1,0].set_title('optimized protocol')
+        axes[1, 0].set_title('optimized protocol')
 
-        axes[1,1].plot(self.times, self.data)
-        axes[1,1].set_title('data from optimized protocol')
+        axes[1, 1].plot(self.times, self.data)
+        axes[1, 1].set_title('data from optimized protocol')
 
         for i, model_param in enumerate(self.model_params):
             true_value = self.true_model_params[i]
-            axes[1,i+2].hist(self.posterior[0,:,i][burnin:], alpha=0.8)
-            axes[1,i+2].axvline(true_value, zorder=-10, color='mediumseagreen')
-            axes[1,i+2].set_title('parameter {}'.format(i+1))
+            axes[1, i+2].hist(self.posterior[0,:,i][burnin:], alpha=0.8)
+            axes[1, i+2].axvline(true_value, zorder=-10, color='mediumseagreen')
+            axes[1, i+2].set_title('parameter {}'.format(i+1))
 
         fig.set_tight_layout(True)
         plt.show()
