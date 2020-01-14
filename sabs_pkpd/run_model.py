@@ -30,6 +30,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
     # Run the model solving for all experiment conditions
     for k in range(0, len(set(data_exp.exp_conds))):
+        s.reset()
         if sabs_pkpd.constants.default_state is not None:
             s.set_state(sabs_pkpd.constants.default_state)
 
@@ -58,6 +59,8 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
 
     """
     This function returns a simulation for any desired conditions.
+    Note that s is not reloaded here, meaning that if you previously set a constant in a previous simulation, this will
+    not be changed until you either reset manually the constant's value (s.set_constant()) or reload the mmt model.
 
     :param s: Myokit.Simulation
         Myokit simulation defined by the chosen model and protocol.
@@ -113,6 +116,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     # In case the user wants some parameter to vary between simulations
     if exp_cond_param_values is not None:
         for k in range(0, len(exp_cond_param_values)):
+            s.reset()
             if sabs_pkpd.constants.default_state is not None:
                 s.set_state(sabs_pkpd.constants.default_state)
             # reset timer
@@ -134,6 +138,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
             # Convert output in concentration
             output.append(list(a[read_out]))
     else:
+        s.reset()
         if sabs_pkpd.constants.default_state is not None:
             s.set_state(sabs_pkpd.constants.default_state)
         # reset timer
