@@ -7,7 +7,7 @@ protocol) is included.
 import myokit
 import myokit.formats.cellml
 import myokit.formats
-import matplotlib.pyplot as plt
+import sabs_pkpd
 
 
 def convert_protocol(model):
@@ -127,4 +127,5 @@ def load_simulation_from_mmt(filename):
         Myokit Simulation object from the MMT file
     """
     model, prot, script = myokit.load(filename)
+    sabs_pkpd.constants.default_state = sabs_pkpd.constants.s.state()
     return myokit.Simulation(model, prot)
