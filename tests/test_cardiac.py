@@ -28,17 +28,18 @@ def compute_APD(AP, time_points=None, upstroke_time=None, repol_percentage=90, p
         AP = np.array(AP)
     elif type(AP) == np.ndarray:
         if len(np.shape(AP)) > 1:
-            raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
-                             + np.shape(AP) + ' array.')
+            raise ValueError(
+                'AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
+                + np.shape(AP) + ' array.')
     elif type(AP) != np.ndarray:
         raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Type of AP : ' + type(AP))
 
     # Define baseline as minimal voltage
     max_AP = np.max(AP)
     min_AP = np.min(AP)
-    repol_voltage = min_AP + (max_AP - min_AP)*repol_percentage
+    repol_voltage = min_AP + (max_AP - min_AP) * (100 - repol_percentage) / 100
 
-    if min_AP >= -50 or min_AP <= -120 and print_warnings == True:
+    if min_AP >= -50 or min_AP <= -120 or max_AP < -40 or max_AP > 50 and print_warnings == True:
         print('This AP may be abnormal, baseline is at ' + min_AP + ' mV. Calculating the APD anyway...')
 
     # Prepare the time series and find the upstroke time
@@ -47,8 +48,8 @@ def compute_APD(AP, time_points=None, upstroke_time=None, repol_percentage=90, p
 
     if upstroke_time is None:
         dVdt = []
-        for i in range(len(AP)-1):
-            dVdt.append((AP[i+1]-AP[i])/(time_points[i+1] - time_points[i]))
+        for i in range(len(AP) - 1):
+            dVdt.append((AP[i + 1] - AP[i]) / (time_points[i + 1] - time_points[i]))
         upstroke_index = np.where(dVdt == np.max(dVdt))[0]
 
     elif upstroke_time not in list(time_points):
@@ -60,9 +61,9 @@ def compute_APD(AP, time_points=None, upstroke_time=None, repol_percentage=90, p
     # Search for the APD.
     APD_index = np.where(AP < repol_voltage)
     found_APD = False
-    for i in range(len(APD_index)):
-        if time_points[APD_index[i]] > time_points[upstroke_index] + 20 and found_APD == False:
-            APD = time_points[APD_index[i]]
+    for i in range(len(APD_index[0])):
+        if time_points[APD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_APD == False:
+            APD = time_points[APD_index[0][i]] - time_points[upstroke_index[0]]
             found_APD = True
             break
 
@@ -71,60 +72,19 @@ def compute_APD(AP, time_points=None, upstroke_time=None, repol_percentage=90, p
 
     return APD
 
-mmt = 'C:/Users/barraly/Documents/PhD/MMT models/optimised_tentusscher_2006_pints_and_Chons_hERG.mmt'
+mmt = './tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt'
 sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(mmt)
 
 AP = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s, 1000, 'membrane.V', pre_run=150000, time_samples=np.linspace(0, 1000, 1001))
 AP = AP[0]
+APD90 = compute_APD(AP)
+expected_APD90 = 262
+verif1 = (APD90 == expected_APD90)
 
-time_points=None
-upstroke_time=None
-repol_percentage=90
-print_warnings=True
+AP = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s, 1000, 'membrane.V', pre_run=150000, fixed_params_annot=['ical.scale_cal'], fixed_params_values=[0.5] ,time_samples=np.linspace(0, 1000, 1001))
+AP = AP[0]
+APD90 = compute_APD(AP)
+expected_APD90 = 234
+verif2 = (APD90 == expected_APD90)
 
-if type(AP) == list:
-    AP = np.array(AP)
-elif type(AP) == np.ndarray:
-    if len(np.shape(AP)) > 1:
-        raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
-                         + np.shape(AP) + ' array.')
-elif type(AP) != np.ndarray:
-    raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Type of AP : ' + type(AP))
-
-# Define baseline as minimal voltage
-max_AP = np.max(AP)
-min_AP = np.min(AP)
-repol_voltage = min_AP + (max_AP - min_AP) * (100-repol_percentage)/100
-
-if min_AP >= -50 or min_AP <= -120 and print_warnings == True:
-    print('This AP may be abnormal, baseline is at ' + min_AP + ' mV. Calculating the APD anyway...')
-
-# Prepare the time series and find the upstroke time
-if time_points is None:
-    time_points = np.linspace(0, len(AP) - 1, len(AP))
-
-if upstroke_time is None:
-    dVdt = []
-    for i in range(len(AP) - 1):
-        dVdt.append((AP[i + 1] - AP[i]) / (time_points[i + 1] - time_points[i]))
-    upstroke_index = np.where(dVdt == np.max(dVdt))[0]
-
-elif upstroke_time not in list(time_points):
-    upstroke_index = np.where(time_points > upstroke_time)[0]
-
-else:
-    upstroke_index = np.where(time_points == upstroke_time)[0]
-
-# Search for the APD.
-APD_index = np.where(AP < repol_voltage)
-found_APD = False
-for i in range(len(APD_index)):
-    if time_points[APD_index[i][0]] > time_points[upstroke_index[0]] + 20 and found_APD == False:
-        APD = time_points[APD_index[i]]
-        found_APD = True
-        break
-
-if found_APD == False:
-    APD = 0
-
-print(APD)
+print(APD90)
