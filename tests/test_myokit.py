@@ -1,5 +1,6 @@
 import myokit
 
+
 def test_myokit_import():
     """Test that Myokit can be loaded.
 
