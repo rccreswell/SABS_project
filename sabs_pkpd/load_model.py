@@ -114,7 +114,7 @@ def load_model_from_cellml(cellml_filename, mmt_filename):
 
 
 def load_simulation_from_mmt(filename):
-    """Load a model into Myokit from MMT file format.
+    """Load a model into Myokit from MMT file format. Saves the default state to sabs_pkpd.constants.default_state.
 
     Parameters
     ----------
@@ -127,5 +127,7 @@ def load_simulation_from_mmt(filename):
         Myokit Simulation object from the MMT file
     """
     model, prot, script = myokit.load(filename)
-    sabs_pkpd.constants.default_state = sabs_pkpd.constants.s.state()
-    return myokit.Simulation(model, prot)
+    s = myokit.Simulation(model, prot)
+    sabs_pkpd.constants.default_state = s.state()
+
+    return s
