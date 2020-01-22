@@ -38,7 +38,7 @@ def compute_APD(AP, time_points=None, upstroke_time=None, repol_percentage=90, p
     min_AP = np.min(AP)
     repol_voltage = min_AP + (max_AP - min_AP) * (100 - repol_percentage) / 100
 
-    if min_AP >= -50 or min_AP <= -120 or max_AP < -40 or max_AP > 50 and print_warnings == True:
+    if (min_AP >= -50 or min_AP <= -120 or max_AP < -40 or max_AP > 50) and print_warnings == True:
         print('This AP may be abnormal, baseline is at ' + min_AP + ' mV. Calculating the APD anyway...')
 
     # Define time_points if not provided. It is assumed that the model is paced at 1 Hz

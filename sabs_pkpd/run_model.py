@@ -134,7 +134,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
             s.pre(pre_run)
 
             # Run the simulation with starting parameters
-            a = s.run(time_max*1.001, log_times=time_samples)
+            a = s.run(time_max*1.000001, log_times=time_samples)
             # Convert output in concentration
             output.append(list(a[read_out]))
     else:
