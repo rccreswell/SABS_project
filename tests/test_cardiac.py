@@ -49,3 +49,50 @@ def test_compute_APD():
 
     return None
 
+
+def test_compute_calcium_transient_duration():
+    mmt = './tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt'
+    sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(mmt)
+
+    Cai = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
+                                             1000,
+                                             'calcium.Ca_i',
+                                             pre_run=150000,
+                                             fixed_params_annot=['ical.scale_cal'],
+                                             fixed_params_values=[0.5],
+                                             time_samples=np.linspace(0, 1000, 1001))
+    Cai = Cai[0]
+    CaiD90 = sabs_pkpd.cardiac.compute_calcium_transient_duration(Cai)
+    expected_CaiD90 = 418
+    CaiD50 = sabs_pkpd.cardiac.compute_calcium_transient_duration(Cai, repol_percentage=50)
+    expected_CaiD50 = 168
+    assert (CaiD90 == expected_CaiD90)
+    assert (CaiD50 == expected_CaiD50)
+
+    Cai = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
+                                             1000,
+                                             'calcium.Ca_i',
+                                             pre_run=150000,
+                                             fixed_params_annot=['ical.scale_cal'],
+                                             fixed_params_values=[1])
+    Cai = Cai[0]
+    CaiD90 = sabs_pkpd.cardiac.compute_calcium_transient_duration(Cai)
+    expected_CaiD90 = 384
+    assert (np.isclose(CaiD90, expected_CaiD90, atol=2))
+
+    times = np.hstack((np.linspace(0, 250, 1001), np.linspace(251, 1000, 250)))
+    Cai = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
+                                             1000,
+                                             'calcium.Ca_i',
+                                             pre_run=150000,
+                                             time_samples=times)
+    Cai = Cai[0]
+    CaiD90 = sabs_pkpd.cardiac.compute_calcium_transient_duration(Cai, time_points=times)
+    expected_CaiD90 = 382
+    assert (np.isclose(CaiD90, expected_CaiD90, atol=2))
+
+    CaiD90 = sabs_pkpd.cardiac.compute_calcium_transient_duration(Cai, time_points=times, upstroke_time=50)
+    expected_CaiD90 = 389.5
+    assert (np.isclose(CaiD90, expected_CaiD90, atol=2))
+
+    return None
