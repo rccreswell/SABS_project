@@ -134,6 +134,28 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     return chains
 
+
+def plot_distribution_parameters(mcmc_chains, bound_min, bound_max, chain_index=0, fig_size=(15,15), explor_iter=1000):
+    if chain_index > len(mcmc_chains)-1:
+        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) + '. Only ' +
+                         str(len(mcmc_chains)) + ' chains in this MCMC output.')
+    n_columns = 4
+    n_rows = 1 + len(mcmc_chains[0,0])//4
+
+    fig, axes = plt.subplots(n_rows, n_columns, figsize=fig_size)
+
+    for i in range(len(mcmc_chains[0,0])-1):
+        ax = axes[i//4, i%4]
+        hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=ax)
+        ax.set_title(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot[i])
+        ax.set_xlim((bound_min[i], bound_max[i]))
+
+
+    plt.show()
+
+    return fig, axes
+
+
 def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000, bound_max = None, bound_min = None):
     """
     Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
@@ -151,8 +173,8 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
     :return: None
     """
     if chain_index > len(mcmc_chains)-1:
-        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + chain_index + '. Only ' +
-                         len(mcmc_chains) + ' chains in this MCMC output.')
+        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) + '. Only ' +
+                         str(len(mcmc_chains)) + ' chains in this MCMC output.')
 
     sabs_pkpd.constants.n = len(mcmc_chains[0][0,:])-1
     n_param = sabs_pkpd.constants.n
@@ -180,7 +202,7 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
                 axes[i, j].axis('off')
             else:
                 # Lower triangle: Pairwise plot
-                plot_kde_2d(j, i, mcmc_chains, explor_iter, ax=axes[i, j], chain_index=chain_index)
+                plot_kde_2d(j, i, mcmc_chains, ax=axes[i, j], chain_index=chain_index)
                 if expected_value is not None:
                     axes[i, j].axhline(expected_value[i], c='g')
                     axes[i, j].axvline(expected_value[j], c='g')
@@ -230,7 +252,7 @@ def hist_1d(x, ax):
     return None
 
 
-def plot_kde_2d(i, j, mcmc_chains, explor_iter, ax, chain_index):
+def plot_kde_2d(i, j, mcmc_chains, ax, chain_index):
     """
     Returns the 2D distribution of parameter j versus parameter i
     :param i: int

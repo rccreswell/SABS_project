@@ -21,8 +21,6 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
         used to generate the experimental data.
     """
 
-    # This function is meant for comparison of simulation conditions to data, or to be called by the PINTS optimisation tool
-
     # Allocate memory for the output
     output = []
 
@@ -32,7 +30,10 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
 
     # Run the model solving for all experiment conditions
     for k in range(0, len(set(data_exp.exp_conds))):
-        s.set_state(sabs_pkpd.constants.default_state)
+        s.reset()
+        if sabs_pkpd.constants.default_state is not None:
+            s.set_state(sabs_pkpd.constants.default_state)
+
         # reset timer
         s.set_time(0)
 
@@ -47,7 +48,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(data_exp.times[k][-1]*1.001, log_times=data_exp.times[k])
+        a = s.run(data_exp.times[k][-1]*1.00001, log_times=data_exp.times[k])
         # Convert output in concentration
         output.append(list(a[data_exp.fitting_instructions.sim_output_param_annot]))
 
@@ -58,29 +59,45 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
 
     """
     This function returns a simulation for any desired conditions.
+    Note that s is not reloaded here, meaning that if you previously set a constant in a previous simulation, this will
+    not be changed until you either reset manually the constant's value (s.set_constant()) or reload the mmt model.
+
     :param s: Myokit.Simulation
         Myokit simulation defined by the chosen model and protocol.
+
     :param time_max: int
         Maximal time for which the model is run
+
     :param read_out: str
         MMT model annotation of the variable read out as output from the model simulation.
+
     :param exp_cond_param_annot: str
         MMT model annotation of the experimental condition varying when generating the data.
+
     :param exp_cond_param_values: list
         List of values for the experimental condition in which the model should be run. The model solving is looped over
         the experimental condition values (1 run per value).
+
     :param fixed_params_annot: list of str
         List of the MMT model annotations of the constants set for the simulation.
+
     :param fixed_params_values: list
         List of values for the constants set for the simulation.
+
     :param pre_run: int
         Defines the time for which the model is run without returning output. Useful for reaching (quasi-) steady-state
+
     :param time_samples: list
         time points for which the model output is returned.
+
     :return: output : list
         List of shape (len(experimental conidition values), time_samples). It contains the model output in the given
         conditions at the time points used to generate the experimental data.
     """
+    if sabs_pkpd.constants.default_state is None:
+        print('No default state was provided in sabs_pkpd.constants.default_state. Simulating with initial conditions' +
+              ' provided with the .mmt model...')
+
     if time_samples is not None:
         if time_samples[-1] > time_max :
             raise ValueError('The time samples have to be within the range (0 , time_max)')
@@ -99,8 +116,9 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     # In case the user wants some parameter to vary between simulations
     if exp_cond_param_values is not None:
         for k in range(0, len(exp_cond_param_values)):
-
-            s.set_state(sabs_pkpd.constants.default_state)
+            s.reset()
+            if sabs_pkpd.constants.default_state is not None:
+                s.set_state(sabs_pkpd.constants.default_state)
             # reset timer
             s.set_time(0)
 
@@ -116,11 +134,13 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
             s.pre(pre_run)
 
             # Run the simulation with starting parameters
-            a = s.run(time_max*1.001, log_times=time_samples)
+            a = s.run(time_max*1.000001, log_times=time_samples)
             # Convert output in concentration
             output.append(list(a[read_out]))
     else:
-        s.set_state(sabs_pkpd.constants.default_state)
+        s.reset()
+        if sabs_pkpd.constants.default_state is not None:
+            s.set_state(sabs_pkpd.constants.default_state)
         # reset timer
         s.set_time(0)
 
@@ -133,7 +153,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(time_max * 1.001, log_times=time_samples)
+        a = s.run(time_max * 1.00001, log_times=time_samples)
         # Convert output in concentration
         output.append(list(a[read_out]))
 
@@ -199,3 +219,4 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
         plt.legend()
 
     return 0
+
