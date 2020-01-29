@@ -66,8 +66,8 @@ def test_compute_calcium_transient_duration():
     expected_CaiD90 = 418
     CaiD50 = sabs_pkpd.cardiac.compute_calcium_transient_duration(Cai, repol_percentage=50)
     expected_CaiD50 = 168
-    assert (CaiD90 == expected_CaiD90)
-    assert (CaiD50 == expected_CaiD50)
+    assert (np.isclose(CaiD90, expected_CaiD90, atol=1))
+    assert (np.isclose(CaiD50, expected_CaiD50, atol=1))
 
     Cai = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
                                              1000,
