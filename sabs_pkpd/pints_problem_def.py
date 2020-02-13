@@ -19,7 +19,7 @@ class MyModel(pints.ForwardModel):
         return out
 
 
-def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
+def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints_method = pints.XNES):
     """
     Infers parameters using PINTS library pnits.optimise() function, using method pints.XNES,and rectangular boundaries.
 
@@ -51,14 +51,14 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high):
     problem = pints.SingleOutputProblem(model = MyModel(), times = np.linspace(0,1,len(fit_values)), values = fit_values)
     boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
     error_measure = pints.SumOfSquaresError(problem)
-    found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints.XNES)
+    found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints_method)
     print(data_exp.fitting_instructions.fitted_params_annot)
     print(found_parameters)
     return found_parameters, found_value
 
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior = None, mmt_model_filename = None,
-                                chain_filename = None, pdf_filename = None, log_likelihood='UnknownNoiseLogLikelihood', method = 'AdaptiveCovarianceMCMC'):
+                                chain_filename = None, pdf_filename = None, log_likelihood='UnknownNoiseLogLikelihood', method = 'HaarioBardenetACMC'):
     """
     Runs a MCMC routine for the selected model
 
