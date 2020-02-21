@@ -134,7 +134,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     method = eval('pints.' + method)
 
     # Create mcmc routine
-    mcmc = pints.MCMCSampling(log_posterior, len(starting_point), starting_point, method=method, sigma0=sigma0)
+    mcmc = pints.MCMCController(log_posterior, len(starting_point), starting_point, method=method, sigma0=sigma0)
 
     # Add stopping criterion
     mcmc.set_max_iterations(max_iter)
