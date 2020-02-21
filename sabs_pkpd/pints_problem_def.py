@@ -57,8 +57,9 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
     return found_parameters, found_value
 
 
-def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior = None, mmt_model_filename = None,
-                                chain_filename = None, pdf_filename = None, log_likelihood='UnknownNoiseLogLikelihood', method = 'HaarioBardenetACMC'):
+def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior=None,
+                                mmt_model_filename=None, chain_filename = None, pdf_filename=None,
+                                log_likelihood='UnknownNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None):
     """
     Runs a MCMC routine for the selected model
 
@@ -66,18 +67,35 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
         List of numpy.array. List of starting values for the MCMC for the optimisation parameters. Must have the same
         length as data_exp.fitting_parms_annot + 1 (for Noise). len(starting_point) defines the amount of MCMC chains.
 
+    :param max_iter:
+        int. Maximal iterations for the whole MCMC. Should be higher than adapt_start.
+
+    :param adapt_start:
+        int. Iterations before starting the adapting phase of the MCMC.
+
     :param log_prior: pints.log_priors
         Type of prior. If not specified, pints.UniformLogPrior
 
     :param mmt_model_filename: str
         location of the mmt model to run if different from the one loaded previously. It will replace the
-        sabs_pkpd.constants.s myokit.Simulation() already present
+        sabs_pkpd.constants.s myokit.Simulation() already present.
+
+    :param chain_filename:
+        str. Location of the CSV file where the chains will be written. If not provided, the chains are not saved in CSV
+
+    :param pdf_filename:
+        str. Location of the CSV file where the log_likelihood will be written. If not provided, it will not be saved
+        in CSV.
 
     :param log_likelihood: pints.LogLikelihood
-        Type of log likelihood. If not specified, pints.UnknownNoiseLogLikelihood
+        Type of log likelihood. If not specified, pints.UnknownNoiseLogLikelihood.
 
-    :param method: pints.method
-        method of optimisation. If not specified, pints.AdaptiveCovarianceMCMC.
+    :param method: pints.method:
+        method of optimisation. If not specified, pints.HaarioBardenetACMC.
+
+    :param sigma0:
+        sigma0 for the desired MCMC algorithm. If not provided, sigma0 will be computed automatically by the algorithm.
+        See https://pints.readthedocs.io/en/latest/mcmc_samplers/running.html for documentation.
 
     :return: chains
         The chain for the MCMC routine.
@@ -105,7 +123,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     fit_values = np.concatenate(sabs_pkpd.constants.data_exp.values)
 
-    problem = pints.SingleOutputProblem(model, times=np.linspace(0,1,len(fit_values)), values=fit_values)
+    problem = pints.SingleOutputProblem(model, times=np.linspace(0, 1, len(fit_values)), values=fit_values)
 
     # Create a log-likelihood function (adds an extra parameter!)
     log_likelihood = eval('pints.'+ log_likelihood + '(problem)')
@@ -116,11 +134,15 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     method = eval('pints.' + method)
 
     # Create mcmc routine
-    mcmc = pints.MCMCSampling(log_posterior, len(starting_point), starting_point, method=method)
+    mcmc = pints.MCMCController(log_posterior, len(starting_point), starting_point, method=method, sigma0=sigma0)
+
     # Add stopping criterion
     mcmc.set_max_iterations(max_iter)
     # Start adapting after adapt_start iterations
     mcmc.set_initial_phase_iterations(adapt_start)
+    if adapt_start > max_iter:
+        raise ValueError('The maximum number of iterations should be higher than the adapting phase length. Got ' +
+                         str(max_iter) + ' maximum iterations, ' + str(adapt_start) + ' iterations in adapting phase')
 
     if chain_filename is not None:
         mcmc.set_chain_filename(chain_filename)
@@ -137,8 +159,8 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
 def plot_distribution_parameters(mcmc_chains, bound_min, bound_max, chain_index=0, fig_size=(15,15), explor_iter=1000):
     if chain_index > len(mcmc_chains)-1:
-        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) + '. Only ' +
-                         str(len(mcmc_chains)) + ' chains in this MCMC output.')
+        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) +
+                         '. Only ' + str(len(mcmc_chains)) + ' chains in this MCMC output.')
     n_columns = 4
     n_rows = 1 + len(mcmc_chains[0,0])//4
 
@@ -150,13 +172,13 @@ def plot_distribution_parameters(mcmc_chains, bound_min, bound_max, chain_index=
         ax.set_title(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot[i])
         ax.set_xlim((bound_min[i], bound_max[i]))
 
-
     plt.show()
 
     return fig, axes
 
 
-def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000, bound_max = None, bound_min = None):
+def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000,
+                          bound_max = None, bound_min = None):
     """
     Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
     couple of parameters to eventually identify linear relationships
@@ -173,10 +195,10 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
     :return: None
     """
     if chain_index > len(mcmc_chains)-1:
-        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) + '. Only ' +
-                         str(len(mcmc_chains)) + ' chains in this MCMC output.')
+        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) +
+                         '. Only ' + str(len(mcmc_chains)) + ' chains in this MCMC output.')
 
-    sabs_pkpd.constants.n = len(mcmc_chains[0][0,:])-1
+    sabs_pkpd.constants.n = len(mcmc_chains[0][0, :])-1
     n_param = sabs_pkpd.constants.n
 
     start_parameter = mcmc_chains[0][0, :]
@@ -195,14 +217,14 @@ def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_s
                 if bound_min is not None:
                     axes[i, j].axvline(bound_min[i], c='r')
                 axes[i, j].axvline(start_parameter[i], c='b')
-                hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=axes[i, j])
+                hist_1d(mcmc_chains[chain_index][:explor_iter, i], ax=axes[i, j])
 
             elif i < j:
                 # Upper triangle: No plot
                 axes[i, j].axis('off')
             else:
                 # Lower triangle: Pairwise plot
-                plot_kde_2d(j, i, mcmc_chains, ax=axes[i, j], chain_index=chain_index)
+                plot_kde_2d(j, i, mcmc_chains[:, :explor_iter, :], ax=axes[i, j], chain_index=chain_index)
                 if expected_value is not None:
                     axes[i, j].axhline(expected_value[i], c='g')
                     axes[i, j].axvline(expected_value[j], c='g')
@@ -306,7 +328,8 @@ def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, pa
     Plots the convergence of the MCMC chains, with boundaries and expected values.
 
     :param mcmc_chains:
-    list. List of length number of chains, each chain having a size (number of iterations, number of parameters + 1 for Noise)
+    list. List of length number of chains, each chain having a shape:
+        (number of iterations, number of parameters + 1 for Noise)
 
     :param expected_values:
     list. List containing the expected values of all of the parameters fitted during MCMC.
@@ -316,6 +339,9 @@ def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, pa
 
     :param bound_min:
     Minimal values allowed for each parameter
+
+    :param parameters_annotations:
+    List of strings. Names of the model parameters fitted (with noise being the last parameter) during MCMC
 
     :return: (fig, axes)
     """
@@ -327,9 +353,8 @@ def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, pa
                          str(len(bound_min)) + ' , Length of upper boundaries: ' + str(len(bound_max)))
 
     if n_params != len(expected_values):
-        raise ValueError(
-            'The expected values must have the same length as the MCMC parameters. (Make sure a value is provided for noise)')
-
+        raise ValueError('The expected values must have the same length as the MCMC parameters.' +
+                         ' (Make sure a value is provided for noise)')
 
     fig_size = (12, 5 * (n_params // 2 + n_params % 2))
 
