@@ -19,7 +19,7 @@ class MyModel(pints.ForwardModel):
         return out
 
 
-def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints_method = pints.XNES):
+def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints_method = pints.XNES, parallel=False):
     """
     Infers parameters using PINTS library pnits.optimise() function, using method pints.XNES,and rectangular boundaries.
 
@@ -51,7 +51,9 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
     problem = pints.SingleOutputProblem(model = MyModel(), times = np.linspace(0,1,len(fit_values)), values = fit_values)
     boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
     error_measure = pints.SumOfSquaresError(problem)
-    found_parameters, found_value = pints.optimise(error_measure, initial_point, boundaries=boundaries, method=pints_method)
+    optimiser = pints.OptimisationController(error_measure, initial_point, boundaries=boundaries, method=pints_method)
+    optimiser.set_parallel(parallel=parallel)
+    found_parameters, found_value = optimiser.run()
     print(data_exp.fitting_instructions.fitted_params_annot)
     print(found_parameters)
     return found_parameters, found_value
@@ -59,7 +61,8 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior=None,
                                 mmt_model_filename=None, chain_filename = None, pdf_filename=None,
-                                log_likelihood='UnknownNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None):
+                                log_likelihood='UnknownNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
+                                parallel=False):
     """
     Runs a MCMC routine for the selected model
 
@@ -96,6 +99,9 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
     :param sigma0:
         sigma0 for the desired MCMC algorithm. If not provided, sigma0 will be computed automatically by the algorithm.
         See https://pints.readthedocs.io/en/latest/mcmc_samplers/running.html for documentation.
+
+    :param parallel:
+    Boolean. Enables or not the parallelisation of the MCMC among the available CPUs. False as default.
 
     :return: chains
         The chain for the MCMC routine.
@@ -135,6 +141,9 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     # Create mcmc routine
     mcmc = pints.MCMCController(log_posterior, len(starting_point), starting_point, method=method, sigma0=sigma0)
+
+    # Allow parallelisation of computation when provided by user
+    mcmc.set_parallel(parallel)
 
     # Add stopping criterion
     mcmc.set_max_iterations(max_iter)
