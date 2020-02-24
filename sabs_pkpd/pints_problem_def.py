@@ -36,13 +36,16 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
     """
 
     if len(initial_point) != len(data_exp.fitting_instructions.fitted_params_annot):
-        raise ValueError('The initial point should have the same length as the fitted parameters annotations (defined in data_exp.fitting_instructions')
+        raise ValueError('The initial point should have the same length as the fitted parameters annotations' +
+                         '(defined in data_exp.fitting_instructions')
 
     if len(boundaries_low) != len(data_exp.fitting_instructions.fitted_params_annot):
-        raise ValueError('The lower boundaries should have the same length as the fitted parameters annotations (defined in data_exp.fitting_instructions')
+        raise ValueError('The lower boundaries should have the same length as the fitted parameters annotations' +
+                         '(defined in data_exp.fitting_instructions')
 
     if len(boundaries_high) != len(data_exp.fitting_instructions.fitted_params_annot):
-        raise ValueError('The higher boundaries should have the same length as the fitted parameters annotations (defined in data_exp.fitting_instructions')
+        raise ValueError('The higher boundaries should have the same length as the fitted parameters annotations' +
+                         '(defined in data_exp.fitting_instructions')
 
     fit_values = np.concatenate(data_exp.values)
 
