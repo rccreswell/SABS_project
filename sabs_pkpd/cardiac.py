@@ -29,9 +29,9 @@ def compute_APD(AP, time_points=None, upstroke_time=None, repol_percentage=90, p
         if len(np.shape(AP)) > 1:
             raise ValueError(
                 'AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
-                + np.shape(AP) + ' array.')
+                + str(np.shape(AP)) + ' array.')
     elif type(AP) != np.ndarray:
-        raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Type of AP : ' + type(AP))
+        raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Type of AP : ' + str(type(AP)))
 
     # Define baseline as minimal voltage
     max_AP = np.max(AP)
@@ -103,9 +103,9 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time=None
         if len(np.shape(Cai)) > 1:
             raise ValueError(
                 'AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
-                + np.shape(Cai) + ' array.')
+                + str(np.shape(Cai)) + ' array.')
     elif type(Cai) != np.ndarray:
-        raise ValueError('Cai should be provided either as a 1-D list or as a numpy array. Type of Cai : ' + type(Cai))
+        raise ValueError('Cai should be provided either as a 1-D list or as a numpy array. Type of Cai : ' + str(type(Cai)))
 
     # Define baseline as minimal voltage
     max_Cai = np.max(Cai)
@@ -113,7 +113,7 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time=None
     repol_voltage = min_Cai + (max_Cai - min_Cai) * (100 - repol_percentage) / 100
 
     if (min_Cai <= 0 or min_Cai > 0.01 or max_Cai > 0.01) and print_warnings == True:
-        print('This Cai may be abnormal, baseline is at ' + min_Cai + ' mV. Calculating the CaiD anyway...')
+        print('This Cai may be abnormal, baseline is at ' + str(min_Cai) + ' mV. Calculating the CaiD anyway...')
 
     # Define time_points if not provided. It is assumed that the model is paced at 1 Hz
     if time_points is None:
