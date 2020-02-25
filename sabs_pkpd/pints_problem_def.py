@@ -14,23 +14,24 @@ class MyModel(pints.ForwardModel):
 
     def simulate(self, parameters, times):
         sabs_pkpd.constants.n = len(parameters)
-        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp, pre_run = sabs_pkpd.constants.pre_run)
+        out = sabs_pkpd.run_model.simulate_data(parameters, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp,
+                                                pre_run=sabs_pkpd.constants.pre_run)
         out = np.concatenate(out)
         return out
 
 
-def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints_method = pints.XNES, parallel=False):
+def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints_method=pints.XNES, parallel=False):
     """
     Infers parameters using PINTS library pnits.optimise() function, using method pints.XNES,and rectangular boundaries.
 
     :param initial_point: list
         Starting point for optimisation. It has to match the length of fitting parameters annotations.
     :param data_exp: Data_exp
-        Contains the data that the model is fitted too. See documentation for sabs_pkpd.load_data for further information.
+        Contains the data that the model is fitted too. See documentation for sabs_pkpd.load_data for further info
     :param boundaries_low: list
-        List of lower boundaries for the fitted parameters. It has to match the length of fitting parameters annotations.
+        List of lower boundaries for the fitted parameters. It has to match the length of fitting parameters annotations
     :param boundaries_high: list
-        List of lower boundaries for the fitted parameters. It has to match the length of fitting parameters annotations.
+        List of lower boundaries for the fitted parameters. It has to match the length of fitting parameters annotations
     :return: found_parameters : numpy.array
         List of parameters values after optimisation routine.
     """
@@ -51,7 +52,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
 
     sabs_pkpd.constants.n = len(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)
 
-    problem = pints.SingleOutputProblem(model = MyModel(), times = np.linspace(0,1,len(fit_values)), values = fit_values)
+    problem = pints.SingleOutputProblem(model=MyModel(), times=np.linspace(0, 1, len(fit_values)), values=fit_values)
     boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
     error_measure = pints.SumOfSquaresError(problem)
     optimiser = pints.OptimisationController(error_measure, initial_point, boundaries=boundaries, method=pints_method)

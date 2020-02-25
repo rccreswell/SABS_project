@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
+def simulate_data(fitted_params_values, s, data_exp, pre_run=0):
     """
     This function runs the model in the same conditions (and with the same time sampling) as the experimental data
     loaded in data_exp.
@@ -13,12 +13,12 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
     :param s: Myokit.Simulation
         Myokit simulation defined by the chosen model and protocol.
     :param data_exp: Data_exp
-        Contains the data that the model is fitted too. See documentation for sabs_pkpd.load_data for further information.
+        Contains the data that the model is fitted too. See documentation for sabs_pkpd.load_data for further info
     :param pre_run: int
         Defines the time for which the model is run without returning output. Useful for reaching (quasi-) steady-state
     :return: output : list
-        List of the same shape as data_exp.times. It contains the model output in the given conditions at the time points
-        used to generate the experimental data.
+        List of the same shape as data_exp.times. It contains the model output in the given conditions at the time
+        points used to generate the experimental data.
     """
 
     # Allocate memory for the output
@@ -55,7 +55,8 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run = 0):
     return output
 
 
-def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp_cond_param_values = None, fixed_params_annot = None, fixed_params_values = None, pre_run = 0, time_samples = None):
+def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_cond_param_values=None,
+                   fixed_params_annot=None, fixed_params_values=None, pre_run=0, time_samples=None):
 
     """
     This function returns a simulation for any desired conditions.
@@ -160,7 +161,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot = None, exp
     return output
 
 
-def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, pre_run = 0, figsize = (20,20)):
+def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, pre_run=0, figsize=(20,20)):
     """
     This function plots the experimental data and the output of the model for parameters rescaled as precised by the user
 
