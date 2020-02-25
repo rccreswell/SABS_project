@@ -65,7 +65,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000, log_prior=None,
                                 mmt_model_filename=None, chain_filename = None, pdf_filename=None,
-                                log_likelihood='UnknownNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
+                                log_likelihood='GaussianNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
                                 parallel=False):
     """
     Runs a MCMC routine for the selected model
