@@ -12,12 +12,13 @@ def test_simulate_data():
 
     sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file('./tests/test resources/load_data_test.csv')
 
-    fitted_params_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
-    fitted_params_values = [0.1, 0.1]
+    fitted_params_annot = ['constants.unknown_cst', 'constants.unknown_cst2', 'comp1.y']
+    fitted_params_values = [0.1, 0.1, 0]
     sim_output_param_annot = 'comp1.y'
     exp_cond_param_annot = 'constants.T'
 
-    sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitted_params_annot, exp_cond_param_annot, sim_output_param_annot)
+    sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitted_params_annot, exp_cond_param_annot,
+                                                          sim_output_param_annot)
 
     out = sabs_pkpd.run_model.simulate_data(fitted_params_values, sabs_pkpd.constants.s, sabs_pkpd.constants.data_exp)
     diff = np.array(out) - np.array([[0.0, 0.01975, 0.09404, 0.17718, 0.42628, 0.58526, 0.79111, 0.99642],
@@ -45,4 +46,3 @@ def test_quick_simulate():
 
     diff = np.array(test2[0]) - np.array([0.0, 0.019504, 0.08836, 0.15683, 0.30589, 0.35623, 0.37456, 0.37037])
     assert np.linalg.norm(diff) < 0.0001
-

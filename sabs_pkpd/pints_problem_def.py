@@ -19,6 +19,64 @@ class MyModel(pints.ForwardModel):
         out = np.concatenate(out)
         return out
 
+def parameter_is_state(param_annot, myokit_simulation):
+    """"
+    Returns whether the variable param_annot is a state variable of the myokit.Simulation provided as argument
+
+    :param param_annot:
+    str. name of the argument as provided in the MMT model
+
+    :param myokit_simulation:
+    myokit.Simulation. Simulation in which to look for the variable.
+
+    :return is_state:
+    bool. Returns True if the variable param_annot is a state variable, False otherwise.
+    """
+    # Analyse the clamped_param_annot to find component name and variable name
+    i = param_annot.index('.')
+    component_name = param_annot[0:i]
+    variable_name = param_annot[i + 1:]
+
+    # Load the simulation model to explore its variables
+    m = myokit_simulation._model
+    component = m.get(component_name, class_filter=myokit.Component)
+
+    variable_found = False
+    is_state = False
+
+    for variable in component.variables():
+        if variable.name() == variable_name:
+            if variable.is_state() == True:
+                is_state = True
+            variable_found = True
+
+    if variable_found == False:
+        raise ValueError('The variable ' + param_annot + ' could not be found in the model.')
+
+    return is_state
+
+
+def find_index_of_state(param_annot, myokit_simulation):
+    """
+    Returns the index of the state vector corresponding to param_annot
+
+    :param param_annot:
+    str. name of the argument as provided in the MMT model
+
+    :param myokit_simulation:
+    myokit.Simulation. Simulation in which to look for the variable.
+
+    :return:
+    int. Returns the index of the state variable. None if the variable could not be found.
+    """
+    index = None
+    for i in range(len(myokit_simulation._model._state)):
+        if myokit_simulation._model._state[i]._component._name + '.' + myokit_simulation._model._state[i]._name ==\
+                param_annot:
+            index = i
+
+    return index
+
 
 def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints_method=pints.XNES, parallel=False):
     """
@@ -133,7 +191,7 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
 
     fit_values = np.concatenate(sabs_pkpd.constants.data_exp.values)
 
-    problem = pints.SingleOutputProblem(model, times=np.linspace(0, 1, len(fit_values)), values=fit_values)
+    problem = pints.SingleOutputProblem(model=model, times=np.linspace(0, 1, len(fit_values)), values=fit_values)
 
     # Create a log-likelihood function (adds an extra parameter!)
     log_likelihood = eval('pints.'+ log_likelihood + '(problem)')
