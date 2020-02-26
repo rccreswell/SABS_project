@@ -31,15 +31,29 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run=0):
     # Run the model solving for all experiment conditions
     for k in range(0, len(set(data_exp.exp_conds))):
         s.reset()
-        if sabs_pkpd.constants.default_state is not None:
-            s.set_state(sabs_pkpd.constants.default_state)
-
         # reset timer
         s.set_time(0)
 
-        # Set parameters for simulation
+        # Set initial value of state variable parameters
+        if sabs_pkpd.constants.default_state is not None:
+            state_to_set = sabs_pkpd.constants.default_state
+        else:
+            state_to_set = sabs_pkpd.constants.s.state()
+
         for i in range(0, len(data_exp.fitting_instructions.fitted_params_annot)):
-            s.set_constant(data_exp.fitting_instructions.fitted_params_annot[i], fitted_params_values[i])
+            if sabs_pkpd.pints_problem_def.parameter_is_state(data_exp.fitting_instructions.fitted_params_annot[i],
+                                                              sabs_pkpd.constants.s):
+                index = sabs_pkpd.pints_problem_def.find_index_of_state(data_exp.fitting_instructions.fitted_params_annot[i],
+                                                                        sabs_pkpd.constants.s)
+                state_to_set[index] = fitted_params_values[i]
+
+        sabs_pkpd.constants.s.set_state(state_to_set)
+
+        # Set constant parameters values.
+        for i in range(0, len(data_exp.fitting_instructions.fitted_params_annot)):
+            if not sabs_pkpd.pints_problem_def.parameter_is_state(data_exp.fitting_instructions.fitted_params_annot[i],
+                                                                  sabs_pkpd.constants.s):
+                s.set_constant(data_exp.fitting_instructions.fitted_params_annot[i], fitted_params_values[i])
 
         # set the right experimental conditions
         s.set_constant(data_exp.fitting_instructions.exp_cond_param_annot, list(data_exp.exp_conds)[k])
