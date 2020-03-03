@@ -154,9 +154,10 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=None,
     # Start adapting after adapt_start iterations
     if adapt_start is not None:
         mcmc.set_initial_phase_iterations(adapt_start)
-    if adapt_start > max_iter:
-        raise ValueError('The maximum number of iterations should be higher than the adapting phase length. Got ' +
-                         str(max_iter) + ' maximum iterations, ' + str(adapt_start) + ' iterations in adapting phase')
+        if adapt_start > max_iter:
+            raise ValueError('The maximum number of iterations should be higher than the adapting phase length. Got ' +
+                             str(max_iter) + ' maximum iterations, ' + str(adapt_start) +
+                             ' iterations in adapting phase')
 
     if chain_filename is not None:
         mcmc.set_chain_filename(chain_filename)
