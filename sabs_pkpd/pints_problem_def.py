@@ -132,8 +132,9 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=1000,
                                           np.array(maxi * 2).tolist() * len(starting_point))
 
     fit_values = np.concatenate(sabs_pkpd.constants.data_exp.values)
+    fit_times = np.concatenate(sabs_pkpd.constants.data_exp.times)
 
-    problem = pints.SingleOutputProblem(model, times=np.linspace(0, 1, len(fit_values)), values=fit_values)
+    problem = pints.SingleOutputProblem(model, times=fit_times, values=fit_values)
 
     # Create a log-likelihood function (adds an extra parameter!)
     log_likelihood = eval('pints.'+ log_likelihood + '(problem)')
