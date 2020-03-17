@@ -132,15 +132,21 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
     if exp_cond_param_values is not None:
         for k in range(0, len(exp_cond_param_values)):
             s.reset()
-            if sabs_pkpd.constants.default_state is not None:
-                s.set_state(sabs_pkpd.constants.default_state)
             # reset timer
             s.set_time(0)
 
-            # Set parameters for simulation in case specified
+            # Set initial value of state variable parameters
+            if sabs_pkpd.constants.default_state is not None:
+                state_to_set = sabs_pkpd.constants.default_state
+            else:
+                state_to_set = s.state()
             if fixed_params_annot is not None:
                 for i in range(0, len(fixed_params_annot)):
-                    s.set_constant(fixed_params_annot[i], fixed_params_values[i])
+                    if sabs_pkpd.pints_problem_def.parameter_is_state(fixed_params_annot[i], s):
+                        index = sabs_pkpd.pints_problem_def.find_index_of_state(fixed_params_annot[i], s)
+                        state_to_set[index] = fixed_params_values[i]
+
+            sabs_pkpd.constants.s.set_state(state_to_set)
 
             # set the right experimental conditions
             s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
@@ -154,15 +160,26 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
             output.append(list(a[read_out]))
     else:
         s.reset()
+
+        # Set initial value of state variable parameters
         if sabs_pkpd.constants.default_state is not None:
-            s.set_state(sabs_pkpd.constants.default_state)
+            state_to_set = sabs_pkpd.constants.default_state
+        else:
+            state_to_set = s.state()
         # reset timer
         s.set_time(0)
 
         # Set parameters for simulation
         if fixed_params_annot is not None:
             for i in range(0, len(fixed_params_annot)):
-                s.set_constant(fixed_params_annot[i], fixed_params_values[i])
+                if sabs_pkpd.pints_problem_def.parameter_is_state(fixed_params_annot[i], s):
+                    index = sabs_pkpd.pints_problem_def.find_index_of_state(fixed_params_annot[i], s)
+                    state_to_set[index] = fixed_params_values[i]
+
+        sabs_pkpd.constants.s.set_state(state_to_set)
+
+        # set the right experimental conditions
+        s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
 
         # Eventually run a pre-run to reach steady-state
         s.pre(pre_run)
