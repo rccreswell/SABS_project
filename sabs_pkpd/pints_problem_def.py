@@ -435,17 +435,30 @@ def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, pa
     fig, axes = plt.subplots(n_params // 2 + n_params % 2, 2, figsize=fig_size)
 
     for i in range(n_params):
-        row = i // 2
-        col = i % 2
-        axes[row, col].axhline(expected_values[i], c='k', LineWidth=3)
-        axes[row, col].axhline(bound_max[i], c='r', LineWidth=3)
-        axes[row, col].axhline(bound_min[i], c='r', LineWidth=3)
-        for j in range(len(mcmc_chains)):
-            axes[row, col].plot(mcmc_chains[j, :, i], label='chain ' + str(j), LineWidth=1.5)
-        axes[row, col].legend()
-        if parameters_annotations is None:
-            axes[row, col].set_title('Parameter ' + str(i))
+        if n_params > 2:
+            row = i // 2
+            col = i % 2
+            axes[row, col].axhline(expected_values[i], c='k', LineWidth=3)
+            axes[row, col].axhline(bound_max[i], c='r', LineWidth=3)
+            axes[row, col].axhline(bound_min[i], c='r', LineWidth=3)
+            for j in range(len(mcmc_chains)):
+                axes[row, col].plot(mcmc_chains[j, :, i], label='chain ' + str(j), LineWidth=1.5)
+            axes[row, col].legend()
+            if parameters_annotations is None:
+                axes[row, col].set_title('Parameter ' + str(i))
+            else:
+                axes[row, col].set_title(parameters_annotations[i])
         else:
-            axes[row, col].set_title(parameters_annotations[i])
+            col = i % 2
+            axes[col].axhline(expected_values[i], c='k', LineWidth=3)
+            axes[col].axhline(bound_max[i], c='r', LineWidth=3)
+            axes[col].axhline(bound_min[i], c='r', LineWidth=3)
+            for j in range(len(mcmc_chains)):
+                axes[col].plot(mcmc_chains[j, :, i], label='chain ' + str(j), LineWidth=1.5)
+            axes[col].legend()
+            if parameters_annotations is None:
+                axes[col].set_title('Parameter ' + str(i))
+            else:
+                axes[col].set_title(parameters_annotations[i])
 
     return fig, axes
