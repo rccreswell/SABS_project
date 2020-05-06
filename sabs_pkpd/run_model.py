@@ -180,7 +180,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
                 else:
                     s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
-        sabs_pkpd.constants.s.set_state(state_to_set)
+        s.set_state(state_to_set)
 
         # set the right experimental conditions
         s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
