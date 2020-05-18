@@ -118,9 +118,9 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
             raise ValueError('The time samples have to be within the range (0 , time_max)')
 
     if fixed_params_values is not None and fixed_params_annot is not None:
-            if len(fixed_params_annot) != len(fixed_params_values):
-                raise ValueError('The parameters clamped for the simulation must have the same length for names' +
-                                 ' and values')
+        if len(fixed_params_annot) != len(fixed_params_values):
+            raise ValueError('The parameters clamped for the simulation must have the same length for names' +
+                             ' and values')
 
     if time_samples is None:
         time_samples = np.linspace(0, time_max, 100)
@@ -195,9 +195,10 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
     return output
 
 
-def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, pre_run=0, figsize=(20,20)):
+def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, data_exp, s, pre_run=0, figsize=(20, 20)):
     """
-    This function plots the experimental data and the output of the model for parameters rescaled as precised by the user
+    This function plots the experimental data and the output of the model for parameters rescaled as precised by the
+    user
 
     :param plotting_parameters_annot:
     List of strings. Model annotations for the parameters the user wants to rescale for the plotting
@@ -251,7 +252,7 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
 
         # Use sim_data to generate the model output corresponding to the data
         sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values,
-                                  fixed_params_annot, fixed_params_values, time_samples = time_samples, pre_run=pre_run)
+                                  fixed_params_annot, fixed_params_values, time_samples=time_samples, pre_run=pre_run)
 
         plt.plot(time_samples, sim_data[0], label='Simulated values')
         plt.plot(time_samples, data_exp.values[i], label='Experimental data')
@@ -261,4 +262,3 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
         plt.legend()
 
     return 0
-
