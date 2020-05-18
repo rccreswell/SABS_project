@@ -106,7 +106,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
         time points for which the model output is returned.
 
     :return: output : list
-        List of shape (len(experimental conidition values), time_samples). It contains the model output in the given
+        List of shape (len(experimental condition values), time_samples). It contains the model output in the given
         conditions at the time points used to generate the experimental data.
     """
     if sabs_pkpd.constants.default_state is None:
@@ -114,15 +114,16 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
               ' provided with the .mmt model...')
 
     if time_samples is not None:
-        if time_samples[-1] > time_max :
+        if time_samples[-1] > time_max:
             raise ValueError('The time samples have to be within the range (0 , time_max)')
 
     if fixed_params_values is not None and fixed_params_annot is not None:
             if len(fixed_params_annot) != len(fixed_params_values):
-                raise ValueError('The parameters clamped for the simulation must have the same length for names and values')
+                raise ValueError('The parameters clamped for the simulation must have the same length for names' +
+                                 ' and values')
 
     if time_samples is None:
-        time_samples = np.linspace(0,time_max, 100)
+        time_samples = np.linspace(0, time_max, 100)
 
     # Prepare variable for the output
     output = []
@@ -180,10 +181,8 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
                 else:
                     s.set_constant(fixed_params_annot[i], fixed_params_values[i])
 
+        # Set the state to the value corresponding to the eventual clamp or exp condition
         s.set_state(state_to_set)
-
-        # set the right experimental conditions
-        s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
 
         # Eventually run a pre-run to reach steady-state
         s.pre(pre_run)
@@ -212,18 +211,23 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
     :param s:
     myokit.Simulation. myokit object used to run the model.
 
+    :param pre_run:
+    Length of pre-run to apply to the model to reach steady-state
+
     :param figsize:
     Tuple. Defines the size of the figure for the plots. If not specified, it is (20, 20)
 
     :return: None
 
     """
+    # Retrieve conditions in which to reproduce data
     print('Running the model with pre_run : ' + str(pre_run))
     read_out = data_exp.fitting_instructions.sim_output_param_annot
     exp_cond_param_annot = data_exp.fitting_instructions.exp_cond_param_annot
     fixed_params_annot = list(plotting_parameters_annot)
     fixed_params_annot.append(exp_cond_param_annot)
 
+    # Produce one plot per experimental condition used to generate the data
     number_of_plots = len(data_exp.exp_conds)
 
     if number_of_plots == 1:
@@ -233,11 +237,11 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
         number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
         fig1, axes = plt.subplots(number_of_rows, 2, figsize=figsize)
 
-
     for i in range(0, number_of_plots):
         if number_of_plots > 1:
             plt.subplot(number_of_rows, 2, i+1)
 
+        # Retrieve simulation parameters from the provided data in data_exp
         time_max = data_exp.times[i][-1]
         time_samples = data_exp.times[i]
 
@@ -245,7 +249,9 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
         exp_cond_param_values = [data_exp.exp_conds[i]]
         fixed_params_values.append(data_exp.exp_conds[i])
 
-        sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples = time_samples, pre_run=pre_run)
+        # Use sim_data to generate the model output corresponding to the data
+        sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values,
+                                  fixed_params_annot, fixed_params_values, time_samples = time_samples, pre_run=pre_run)
 
         plt.plot(time_samples, sim_data[0], label='Simulated values')
         plt.plot(time_samples, data_exp.values[i], label='Experimental data')
