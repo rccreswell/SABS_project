@@ -1,4 +1,5 @@
 pytest
+myokit
 pandas
 scipy
 flake8
