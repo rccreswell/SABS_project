@@ -47,6 +47,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run=0):
                                                                         sabs_pkpd.constants.s)
                 state_to_set[index] = fitted_params_values[i]
 
+        # Set the value of the initial state to what it should be
         sabs_pkpd.constants.s.set_state(state_to_set)
 
         # Set constant parameters values.
@@ -63,6 +64,7 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run=0):
 
         # Run the simulation with starting parameters
         a = s.run(data_exp.times[k][-1]*1.00001, log_times=data_exp.times[k])
+
         # Convert output in concentration
         output.append(list(a[data_exp.fitting_instructions.sim_output_param_annot]))
 
@@ -250,10 +252,11 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
         exp_cond_param_values = [data_exp.exp_conds[i]]
         fixed_params_values.append(data_exp.exp_conds[i])
 
-        # Use sim_data to generate the model output corresponding to the data
+        # Use quick_simulate to generate the model output corresponding to the data
         sim_data = quick_simulate(s, time_max, read_out,  exp_cond_param_annot, exp_cond_param_values,
                                   fixed_params_annot, fixed_params_values, time_samples=time_samples, pre_run=pre_run)
 
+        # Plot the results
         plt.plot(time_samples, sim_data[0], label='Simulated values')
         plt.plot(time_samples, data_exp.values[i], label='Experimental data')
         plt.title('Experimental conditions : ' + exp_cond_param_annot + ' = ' + str(exp_cond_param_values))
