@@ -65,6 +65,14 @@ def test_MCMC_inference_model_params():
     assert abs(mean_param0 - 1) < 0.1
     assert abs(mean_param1 - 1) < 0.1
 
+    sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [0.1, 0.1], [2, 2],
+                                                             chain_index=0,
+                                                             fig_size=(15, 15),
+                                                             explor_iter=1000)
+
+    return None
+
+
 def test_parameter_is_state():
     param_annot = 'comp1.x'
     myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
@@ -77,3 +85,5 @@ def test_find_index_of_state():
     param_annot = 'comp1.x'
     myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
     assert sabs_pkpd.pints_problem_def.find_index_of_state(param_annot, myokit_simulation) == 1
+
+def test_plot_distribution_parameters():
