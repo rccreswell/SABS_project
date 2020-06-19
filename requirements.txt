@@ -4,3 +4,4 @@ pandas
 scipy
 flake8
 coverage
+numdifftools
