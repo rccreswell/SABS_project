@@ -57,3 +57,21 @@ def test_quick_simulate():
 
     diff = np.array(test3[0]) - np.array([0.0, 0.019504, 0.08836, 0.15683, 0.30589, 0.35623, 0.37456, 0.37037])
     assert np.linalg.norm(diff) < 0.0001
+
+def test_plot_model_vs_data():
+    # Load the simulation from the model
+    s = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
+
+    # Load the data to plot
+    a = sabs_pkpd.load_data.load_data_file('./tests/test resources/load_data_test.csv')
+
+    a.Add_fitting_instructions(fitted_params_annot='', exp_cond_param_annot='T',sim_output_param_annot='comp1.y')
+
+    # Run the function plot_model_vs_data
+    sabs_pkpd.run_model.plot_model_vs_data(plotting_parameters_annot='constants.T',
+                                           plotting_parameters_values=[37],
+                                           data_exp=a,
+                                           s=s,
+                                           pre_run=0.0001)
+
+    return None
