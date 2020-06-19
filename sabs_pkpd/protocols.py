@@ -11,6 +11,36 @@ import myokit
 import sabs_pkpd
 from operator import itemgetter
 
+def one_step_protocol(amplitude, duration):
+    return lambda times: np.array(((times > 1.0) & (times < 1.0 + duration)))\
+                                    .astype(float) * amplitude
+
+
+def sine_wave_protocol(amplitude, frequency):
+    return lambda times: amplitude * np.sin(frequency * times)
+
+
+def five_event_protocol(d1, d2, d3, d4, d5, a1, a2, a3, a4, a5):
+    def f(t):
+        if type(t) is float or type(t) is np.float64:
+            t = np.array([t])
+
+        baseline = np.zeros(len(t))
+        l1 = np.ones(len(t)) * a1
+        l2 = np.ones(len(t)) * a2
+        l3 = np.ones(len(t)) * a3
+        l4 = np.ones(len(t)) * a4
+        l5 = np.ones(len(t)) * a5
+
+        return baseline + \
+            (l1 * ((t > 1) & (t < 1+d1))) + \
+            (l2 * ((t > 1+d1) & (t < 1+d1+d2))) + \
+            (l3 * ((t > 1+d1+d2) & (t < 1+d1+d2+d3))) + \
+            (l4 * ((t > 1+d1+d2+d3) & (t < 1+d1+d2+d3+d4))) + \
+            (l5 * ((t > 1+d1+d2+d3+d4) & (t < 1+d1+d2+d3+d4+d5)))
+
+    return f
+
 class Protocol:
     """Class for any protocol.
 
@@ -365,7 +395,7 @@ def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baselin
 
     return np.vstack((times, values))
 
-  
+
 def MyokitProtocolFromTimeSeries(durations, amplitudes):
     """
     Translates a time series of events to a Myokit Protocol.
@@ -432,7 +462,7 @@ def TimeSeriesFromSteps(start_times_list, duration_list, amplitude_list, baselin
 
     return np.vstack((times, values))
 
-  
+
 def MyokitProtocolFromTimeSeries(durations, amplitudes):
     """
     Translates a time series of events to a Myokit Protocol.
