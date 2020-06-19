@@ -246,22 +246,24 @@ def plot_distribution_parameters(mcmc_chains: list, bound_min: list, bound_max: 
     for the plot of the i-th parameter.
 
     :param chain_index:
-
+    int. Index of the chain for which the parameters distribution is plotted.
 
     :param fig_size:
-    tuple. Defines the size of the figure to plot the distributions. (15, 15) if not specified by the user.
+    tuple. Defines the size of the figure on which the distribution of parameters is plotted. (15, 15) if not specified
+    by the user.
 
     :param explor_iter:
+    int. Length of the exploratory phase, which is excluded when plotting the distribution of parameters.
 
-
-    :return:
+    :return: fig, axes
+    The matplotlib.pyplot.fig and -.axes corresponding to the desired figure.
     """
     if chain_index > len(mcmc_chains)-1:
         raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) +
                          '. Only ' + str(len(mcmc_chains)) + ' chains in this MCMC output.')
     # Compute the amount of graphs, given the amount of chains
     n_columns = 4
-    n_rows = 1 + len(mcmc_chains[0,0])//4
+    n_rows = 1 + len(mcmc_chains[0, 0])//4
 
     # Generate the subplots
     fig, axes = plt.subplots(n_rows, n_columns, figsize=fig_size)
@@ -276,6 +278,30 @@ def plot_distribution_parameters(mcmc_chains: list, bound_min: list, bound_max: 
     plt.show()
 
     return fig, axes
+
+
+def hist_1d(x, ax):
+    """
+    Creates a 1d histogram and an estimate of the PDF using KDE.
+    :param x : list
+    PDF list that we want to plot as an histogram
+
+    :param ax :matplotlib.axes._subplots.AxesSubplot
+    Axes of the figure that we want to plot the histogram on
+
+    :returns None
+    """
+    xmin = np.min(x)
+    xmax = np.max(x)
+    x1 = np.linspace(xmin, xmax, 100)
+    x2 = np.linspace(xmin, xmax, 50)
+
+    hist = ax.hist(x, bins=x2, density=True)
+    kernel = stats.gaussian_kde(x)
+    f = kernel(x1)
+    ax.plot(x1, f)
+
+    return None
 
 
 def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, parameters_annotations=None):
