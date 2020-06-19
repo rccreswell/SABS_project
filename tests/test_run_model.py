@@ -65,11 +65,14 @@ def test_plot_model_vs_data():
     # Load the data to plot
     a = sabs_pkpd.load_data.load_data_file('./tests/test resources/load_data_test.csv')
 
-    a.Add_fitting_instructions(fitted_params_annot='', exp_cond_param_annot='T',sim_output_param_annot='comp1.y')
+    # Configure the fitting instructions
+    a.Add_fitting_instructions(fitted_params_annot='constants.unknown_cst',
+                               exp_cond_param_annot='constants.T',
+                               sim_output_param_annot='comp1.y')
 
-    # Run the function plot_model_vs_data
-    sabs_pkpd.run_model.plot_model_vs_data(plotting_parameters_annot='constants.T',
-                                           plotting_parameters_values=[37],
+    # Run the function plot_model_vs_data to compare the model's outputs with the experimental data
+    sabs_pkpd.run_model.plot_model_vs_data(plotting_parameters_annot=['constants.unknown_cst'],
+                                           plotting_parameters_values=[1],
                                            data_exp=a,
                                            s=s,
                                            pre_run=0.0001)

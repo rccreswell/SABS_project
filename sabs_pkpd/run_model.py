@@ -119,7 +119,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
         if time_samples[-1] > time_max:
             raise ValueError('The time samples have to be within the range (0 , time_max)')
 
-    if fixed_params_values is not None and fixed_params_annot is not None:
+    if fixed_params_values is not None or fixed_params_annot is not None:
         if len(fixed_params_annot) != len(fixed_params_values):
             raise ValueError('The parameters clamped for the simulation must have the same length for names' +
                              ' and values')
