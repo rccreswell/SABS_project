@@ -42,7 +42,18 @@ def test_quick_simulate():
     diff = np.array(test1[0])[0:12] - expected_value
     assert np.linalg.norm(diff) < 0.003
 
-    test2 = sabs_pkpd.run_model.quick_simulate(s, time_max, 'comp1.y', time_samples=time_samples, fixed_params_annot=changed_params_names, fixed_params_values=changed_params_values)
+    test2 = sabs_pkpd.run_model.quick_simulate(s, time_max, 'comp1.y', time_samples=time_samples,
+                                               fixed_params_annot=changed_params_names,
+                                               fixed_params_values=changed_params_values)
 
     diff = np.array(test2[0]) - np.array([0.0, 0.019504, 0.08836, 0.15683, 0.30589, 0.35623, 0.37456, 0.37037])
+    assert np.linalg.norm(diff) < 0.0001
+
+    test3 = sabs_pkpd.run_model.quick_simulate(s,time_max, 'comp1.y', time_samples=time_samples,
+                                               fixed_params_annot=changed_params_names,
+                                               fixed_params_values=changed_params_values,
+                                               exp_cond_param_annot='comp1.y',
+                                               exp_cond_param_values=[0])
+
+    diff = np.array(test3[0]) - np.array([0.0, 0.019504, 0.08836, 0.15683, 0.30589, 0.35623, 0.37456, 0.37037])
     assert np.linalg.norm(diff) < 0.0001
