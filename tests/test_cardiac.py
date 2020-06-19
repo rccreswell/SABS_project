@@ -2,8 +2,9 @@ import numpy as np
 import sabs_pkpd
 import pytest
 
+
 def test_inputs():
-    AP = np.array([[0, 1, 2, 3], [4, 5, 6]])
+    AP = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
     with pytest.raises(ValueError):
         sabs_pkpd.cardiac.compute_APD(AP)
 
@@ -11,6 +12,7 @@ def test_inputs():
         sabs_pkpd.cardiac.compute_calcium_transient_duration(AP)
 
     return None
+
 
 def test_compute_APD():
     mmt = './tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt'
