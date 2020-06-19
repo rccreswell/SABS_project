@@ -11,6 +11,21 @@ def test_inputs():
     with pytest.raises(ValueError):
         sabs_pkpd.cardiac.compute_calcium_transient_duration(AP)
 
+    AP = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
+                                            1000,
+                                            'membrane.V',
+                                            pre_run=150000,
+                                            fixed_params_annot=['ical.scale_cal'],
+                                            fixed_params_values=[0.5],
+                                            time_samples=np.linspace(0, 1000, 1001))
+
+    time_points = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
+    with pytest.raises(ValueError):
+        sabs_pkpd.cardiac.compute_APD(AP, time_points)
+
+    with pytest.raises(ValueError):
+        sabs_pkpd.cardiac.compute_calcium_transient_duration(AP, time_points)
+
     return None
 
 
