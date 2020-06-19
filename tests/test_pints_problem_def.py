@@ -85,5 +85,3 @@ def test_find_index_of_state():
     param_annot = 'comp1.x'
     myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
     assert sabs_pkpd.pints_problem_def.find_index_of_state(param_annot, myokit_simulation) == 1
-
-def test_plot_distribution_parameters():
