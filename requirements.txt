@@ -5,3 +5,4 @@ scipy
 flake8
 coverage
 numdifftools
+pyswarms
