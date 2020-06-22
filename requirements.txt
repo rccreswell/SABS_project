@@ -6,4 +6,4 @@ flake8
 coverage
 numdifftools
 pyswarms
-yaml
+pyyaml
