@@ -70,7 +70,7 @@ def test_MCMC_inference_model_params():
                                                       expected_values=[1,1],
                                                       bound_max=[2, 2],
                                                       bound_min=[0.1, 0.1],
-                                                      parameters_annotations=fitting_param_annot)
+                                                      parameters_annotations=fitting_param_annot + ['Noise'])
 
     sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [0.1, 0.1], [2, 2],
                                                              chain_index=0,
