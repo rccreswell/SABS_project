@@ -119,8 +119,17 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
         if time_samples[-1] > time_max:
             raise ValueError('The time samples have to be within the range (0 , time_max)')
 
-    if fixed_params_values is not None and fixed_params_annot is not None:
+    if fixed_params_values is not None or fixed_params_annot is not None:
         if len(fixed_params_annot) != len(fixed_params_values):
+            raise ValueError('The parameters clamped for the simulation must have the same length for names' +
+                             ' and values')
+
+    if exp_cond_param_values is not None or exp_cond_param_annot is not None:
+        if (type(exp_cond_param_values) != list and type(exp_cond_param_values) != np.ndarray) or \
+                type(exp_cond_param_annot) != str:
+            raise ValueError('The experimental conditions must be provided as a list or numpy.ndarray, and the ' +
+                             'parameter annotation must be a string matching with the variable name in the MMT model')
+        elif len(fixed_params_annot) != len(fixed_params_values):
             raise ValueError('The parameters clamped for the simulation must have the same length for names' +
                              ' and values')
 

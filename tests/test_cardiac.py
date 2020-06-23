@@ -1,5 +1,26 @@
 import numpy as np
 import sabs_pkpd
+import pytest
+
+
+def test_inputs():
+    AP = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
+    with pytest.raises(ValueError):
+        sabs_pkpd.cardiac.compute_APD(AP)
+
+    with pytest.raises(ValueError):
+        sabs_pkpd.cardiac.compute_calcium_transient_duration(AP)
+
+    AP = np.array([0, 1, 2, 3])
+
+    time_points = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
+    with pytest.raises(ValueError):
+        sabs_pkpd.cardiac.compute_APD(AP, time_points)
+
+    with pytest.raises(ValueError):
+        sabs_pkpd.cardiac.compute_calcium_transient_duration(AP, time_points)
+
+    return None
 
 
 def test_compute_APD():
