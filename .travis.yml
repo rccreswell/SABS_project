@@ -29,7 +29,8 @@ install:
 
 script:
     - pytest
-#    - coverage run -m pytest
+    - coverage run -m pytest
+    - codecov
 #    - python -m flake8
 # after_success:
 #    - codecov
