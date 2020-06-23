@@ -67,7 +67,7 @@ def test_MCMC_inference_model_params():
 
     # Test the plot functions to make sure no error is returned
     sabs_pkpd.pints_problem_def.plot_MCMC_convergence(chains,
-                                                      expected_values=[1,1],
+                                                      expected_values=[1, 1, 0.1],
                                                       bound_max=[2, 2, 1],
                                                       bound_min=[0.1, 0.1, 0],
                                                       parameters_annotations=fitting_param_annot + ['Noise'])
