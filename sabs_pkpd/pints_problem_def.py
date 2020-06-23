@@ -270,7 +270,10 @@ def plot_distribution_parameters(mcmc_chains: list, bound_min: list, bound_max: 
 
     # Loop over the subplots
     for i in range(len(mcmc_chains[0][0])-1):
-        ax = axes[i//4, i % 4]
+        if n_rows == 1:
+            ax = axes[i]
+        else:
+            ax = axes[i//4, i % 4]
         hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=ax)
         ax.set_title(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot[i])
         ax.set_xlim((bound_min[i], bound_max[i]))
