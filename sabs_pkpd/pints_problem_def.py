@@ -124,7 +124,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=None, log_prior=None,
                                 mmt_model_filename=None, chain_filename = None, pdf_filename=None,
-                                log_likelihood='UnknownNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
+                                log_likelihood='GaussianLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
                                 parallel=False):
     """
     Runs a MCMC routine for the selected model
@@ -269,8 +269,8 @@ def plot_distribution_parameters(mcmc_chains: list, bound_min: list, bound_max: 
     fig, axes = plt.subplots(n_rows, n_columns, figsize=fig_size)
 
     # Loop over the subplots
-    for i in range(len(mcmc_chains[0,0])-1):
-        ax = axes[i//4, i%4]
+    for i in range(len(mcmc_chains[0][0])-1):
+        ax = axes[i//4, i % 4]
         hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=ax)
         ax.set_title(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot[i])
         ax.set_xlim((bound_min[i], bound_max[i]))

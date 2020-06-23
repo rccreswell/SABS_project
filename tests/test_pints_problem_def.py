@@ -65,10 +65,17 @@ def test_MCMC_inference_model_params():
     assert abs(mean_param0 - 1) < 0.1
     assert abs(mean_param1 - 1) < 0.1
 
+    # Test the plot functions to make sure no error is returned
+    sabs_pkpd.pints_problem_def.plot_MCMC_convergence(chains,
+                                                      expected_values=[1,1],
+                                                      bound_max=[2, 2],
+                                                      bound_min=[0.1, 0.1],
+                                                      parameters_annotations=['comp1.x', 'comp1.y'])
+
     sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [0.1, 0.1], [2, 2],
                                                              chain_index=0,
                                                              fig_size=(15, 15),
-                                                             explor_iter=1000)
+                                                             explor_iter=0)
 
     return None
 
