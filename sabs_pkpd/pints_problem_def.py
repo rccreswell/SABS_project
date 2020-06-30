@@ -47,11 +47,11 @@ def parameter_is_state(param_annot, myokit_simulation):
 
     for variable in component.variables():
         if variable.name() == variable_name:
-            if variable.is_state() == True:
+            if variable.is_state():
                 is_state = True
             variable_found = True
 
-    if variable_found == False:
+    if not variable_found:
         raise ValueError('The variable ' + param_annot + ' could not be found in the model.')
 
     return is_state
@@ -303,8 +303,6 @@ def hist_1d(x, ax):
     kernel = stats.gaussian_kde(x)
     f = kernel(x1)
     ax.plot(x1, f)
-
-    return None
 
 
 def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, parameters_annotations=None):
