@@ -12,7 +12,10 @@ The file should be organised following the template:
 
 Note : the rows do not need to be sorted. While loading the data table, the table will be sorted with increasing experimental conditions (in a first time), and with increasing times (in a second time), thus resulting in a data structure similar to the one above.
 
-# Architecture of the loaded data
+For running the MCMC routine, you can also use synthetic data, that you can generate by using sabs_pkpd.run_model.quick_simulate().
+
+
+# Architecture of the data loaded from a CSV
 
 The data is loaded as a data_exp structure. <strong>data_exp</strong> is a structure with entries:
   - <strong>times</strong> is a list of all loaded experiments, with all time points for each ;
@@ -26,7 +29,7 @@ The data is loaded as a data_exp structure. <strong>data_exp</strong> is a struc
 
 # Use of the simulation and inference tools included in this package.
 
-Check the example.py file for the example code. If you want to run it, please change the directories to the directories of the 
+Check the example.py file for the example code. If you want to run it, please change the directories to the directories of your choice. 
 
 ##  Importing the necessary libraries:
 
