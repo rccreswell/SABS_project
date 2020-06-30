@@ -65,6 +65,21 @@ def test_MCMC_inference_model_params():
     assert abs(mean_param0 - 1) < 0.1
     assert abs(mean_param1 - 1) < 0.1
 
+    # Test the plot functions to make sure no error is returned
+    sabs_pkpd.pints_problem_def.plot_MCMC_convergence(chains,
+                                                      expected_values=[1, 1, 0.1],
+                                                      bound_max=[2, 2, 1],
+                                                      bound_min=[0.1, 0.1, 0],
+                                                      parameters_annotations=fitting_param_annot + ['Noise'])
+
+    sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [0.1, 0.1, 0], [2, 2, 1],
+                                                             chain_index=0,
+                                                             fig_size=(15, 15),
+                                                             explor_iter=0)
+
+    return None
+
+
 def test_parameter_is_state():
     param_annot = 'comp1.x'
     myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')

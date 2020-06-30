@@ -47,11 +47,11 @@ def parameter_is_state(param_annot, myokit_simulation):
 
     for variable in component.variables():
         if variable.name() == variable_name:
-            if variable.is_state():
+            if variable.is_state() == True:
                 is_state = True
             variable_found = True
 
-    if not variable_found:
+    if variable_found == False:
         raise ValueError('The variable ' + param_annot + ' could not be found in the model.')
 
     return is_state
@@ -124,7 +124,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
 
 def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=None, log_prior=None,
                                 mmt_model_filename=None, chain_filename = None, pdf_filename=None,
-                                log_likelihood='UnknownNoiseLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
+                                log_likelihood='GaussianLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
                                 parallel=False):
     """
     Runs a MCMC routine for the selected model
@@ -231,17 +231,49 @@ def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=None,
     return chains
 
 
-def plot_distribution_parameters(mcmc_chains, bound_min, bound_max, chain_index=0, fig_size=(15,15), explor_iter=1000):
+def plot_distribution_parameters(mcmc_chains: list, bound_min: list, bound_max: list, chain_index: int = 0,
+                                 fig_size=(15,15), explor_iter:int =1000):
+    """
+    :param mcmc_chains:
+    list. The list containing the MCMC chains obtained after running the MCMC routine. chain[i] returns the i-th chain.
+
+    :param bound_min:
+    list. List of length the amount of parameters sampled during the MCMC routine. bound_min[i] is the minimum boundary
+    for the plot of the i-th parameter.
+
+    :param bound_max:
+    list. List of length the amount of parameters sampled during the MCMC routine. bound_max[i] is the maximum boundary
+    for the plot of the i-th parameter.
+
+    :param chain_index:
+    int. Index of the chain for which the parameters distribution is plotted.
+
+    :param fig_size:
+    tuple. Defines the size of the figure on which the distribution of parameters is plotted. (15, 15) if not specified
+    by the user.
+
+    :param explor_iter:
+    int. Length of the exploratory phase, which is excluded when plotting the distribution of parameters.
+
+    :return: fig, axes
+    The matplotlib.pyplot.fig and -.axes corresponding to the desired figure.
+    """
     if chain_index > len(mcmc_chains)-1:
         raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) +
                          '. Only ' + str(len(mcmc_chains)) + ' chains in this MCMC output.')
+    # Compute the amount of graphs, given the amount of chains
     n_columns = 4
-    n_rows = 1 + len(mcmc_chains[0,0])//4
+    n_rows = 1 + len(mcmc_chains[0, 0])//4
 
+    # Generate the subplots
     fig, axes = plt.subplots(n_rows, n_columns, figsize=fig_size)
 
-    for i in range(len(mcmc_chains[0,0])-1):
-        ax = axes[i//4, i%4]
+    # Loop over the subplots
+    for i in range(len(mcmc_chains[0][0])-1):
+        if n_rows == 1:
+            ax = axes[i]
+        else:
+            ax = axes[i//4, i % 4]
         hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=ax)
         ax.set_title(sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot[i])
         ax.set_xlim((bound_min[i], bound_max[i]))
@@ -256,8 +288,10 @@ def hist_1d(x, ax):
     Creates a 1d histogram and an estimate of the PDF using KDE.
     :param x : list
     PDF list that we want to plot as an histogram
+
     :param ax :matplotlib.axes._subplots.AxesSubplot
     Axes of the figure that we want to plot the histogram on
+
     :returns None
     """
     xmin = np.min(x)
@@ -269,6 +303,8 @@ def hist_1d(x, ax):
     kernel = stats.gaussian_kde(x)
     f = kernel(x1)
     ax.plot(x1, f)
+
+    return None
 
 
 def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, parameters_annotations=None):

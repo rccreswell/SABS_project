@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 """
 # Prepare the data for example problem
-filename = 'C:/Users/yanral/Documents/Software Development/Examples/Example loading CellML model/tentusscher_2006_pints_and_Chons_hERG.mmt'
+filename = './model.mmt'
 sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(filename)
 
 fitting_param_annot = ['ikr.scale_kr', 'ical.scale_cal']
