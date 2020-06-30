@@ -47,11 +47,11 @@ def parameter_is_state(param_annot, myokit_simulation):
 
     for variable in component.variables():
         if variable.name() == variable_name:
-            if variable.is_state() == True:
+            if variable.is_state():
                 is_state = True
             variable_found = True
 
-    if variable_found == False:
+    if not variable_found:
         raise ValueError('The variable ' + param_annot + ' could not be found in the model.')
 
     return is_state
@@ -251,81 +251,6 @@ def plot_distribution_parameters(mcmc_chains, bound_min, bound_max, chain_index=
     return fig, axes
 
 
-def plot_distribution_map(mcmc_chains, expected_value=None, chain_index=0, fig_size=(15,15), explor_iter = 1000,
-                          bound_max = None, bound_min = None):
-    """
-    Plots a figure with histograms of distribution of all parameters used for MCMC, as well as 2D distributions of each
-    couple of parameters to eventually identify linear relationships
-    :param mcmc_chains: list
-    List of length number of chains, each chain having a size (number of iterations, number of parameters + 1 for Noise)
-    :param expected_value: list
-    List of length number of parameters used for MCMC routine. If specified, it adds green lines for the expected
-    value of each parameter
-    :param chain_index: int
-    Index of the chain for which the parameters distribution map has to be plotted. If not specified, the first chain is
-    considered
-    :param fig_size: tuple
-    Defines the size of the figure for the plot
-    :return: None
-    """
-    if chain_index > len(mcmc_chains)-1:
-        raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) +
-                         '. Only ' + str(len(mcmc_chains)) + ' chains in this MCMC output.')
-
-    sabs_pkpd.constants.n = len(mcmc_chains[0][0, :])-1
-    n_param = sabs_pkpd.constants.n
-
-    start_parameter = mcmc_chains[0][0, :]
-    fig, axes = plt.subplots(n_param, n_param, figsize=fig_size)
-
-    for i in range(n_param):
-        for j in range(n_param):
-
-            # Create subplot
-            if i == j:
-                # Plot the diagonal
-                if expected_value is not None:
-                    axes[i, j].axvline(expected_value[i], c='g')
-                if bound_max is not None:
-                    axes[i, j].axvline(bound_max[i], c='r')
-                if bound_min is not None:
-                    axes[i, j].axvline(bound_min[i], c='r')
-                axes[i, j].axvline(start_parameter[i], c='b')
-                hist_1d(mcmc_chains[chain_index][:explor_iter, i], ax=axes[i, j])
-
-            elif i < j:
-                # Upper triangle: No plot
-                axes[i, j].axis('off')
-            else:
-                # Lower triangle: Pairwise plot
-                plot_kde_2d(j, i, mcmc_chains[:, :explor_iter, :], ax=axes[i, j], chain_index=chain_index)
-                if expected_value is not None:
-                    axes[i, j].axhline(expected_value[i], c='g')
-                    axes[i, j].axvline(expected_value[j], c='g')
-                axes[i, j].axhline(start_parameter[i], c='b')
-                axes[i, j].axvline(start_parameter[j], c='b')
-
-            # Adjust the tick labels
-            if i < n_param - 1:
-                # Only show x tick labels for the last row
-                axes[i, j].set_xticklabels([])
-            else:
-                # Rotation the x tick labels to fit in the plot
-                for tl in axes[i, j].get_xticklabels():
-                    tl.set_rotation(45)
-            if j > 0:
-                # Only show y tick labels for the first column
-                axes[i, j].set_yticklabels([])
-
-        # Add labels to the subplots at the edges
-        axes[i, 0].set_ylabel('parameter %d' % (i + 1))
-        axes[-1, i].set_xlabel('parameter %d' % (i + 1))
-
-    plt.show()
-
-    return None
-
-
 def hist_1d(x, ax):
     """
     Creates a 1d histogram and an estimate of the PDF using KDE.
@@ -344,57 +269,6 @@ def hist_1d(x, ax):
     kernel = stats.gaussian_kde(x)
     f = kernel(x1)
     ax.plot(x1, f)
-
-    return None
-
-
-def plot_kde_2d(i, j, mcmc_chains, ax, chain_index):
-    """
-    Returns the 2D distribution of parameter j versus parameter i
-    :param i: int
-    Index of the first parameter for the distriubtion 2D map
-    :param j: int
-    Index of the second parameter for the distribution 2D map
-    :param mcmc_chains: list
-    List of length number of chains, each chain having a size (number of iterations, number of parameters + 1 for Noise)
-    :param ax :matplotlib.axes._subplots.AxesSubplot
-    Axes of the figure that we want to plot the histogram on
-    :param chain_index: int
-    Index of the chain for which the parameters distribution map has to be plotted. If not specified, the first chain is
-    considered
-    :return: None
-    """
-    ax.set_xlabel('parameter ' + str(i))
-    ax.set_ylabel('parameter '+ str(j))
-    x = mcmc_chains[chain_index][:, i]
-    y = mcmc_chains[chain_index][:, j]
-
-    # Get minimum and maximum values
-    xmin, xmax = np.min(x), np.max(x)
-    ymin, ymax = np.min(y), np.max(y)
-
-    # Plot values
-    values = np.vstack([x, y])
-    ax.set_xlim(xmin, xmax)
-    ax.set_ylim(ymin, ymax)
-    ax.imshow(np.rot90(values), cmap=plt.cm.Blues, extent=[xmin, xmax, ymin, ymax])
-
-    # Create grid
-    xx, yy = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
-    positions = np.vstack([xx.ravel(), yy.ravel()])
-
-    # Get kernel density estimate and plot contours
-    kernel = stats.gaussian_kde(values)
-    f = np.reshape(kernel(positions).T, xx.shape)
-    ax.contourf(xx, yy, f, cmap='Blues')
-    ax.contour(xx, yy, f, colors='k')
-
-    # Fix aspect ratio, see: https://stackoverflow.com/questions/7965743
-    im = ax.get_images()
-    extent = im[0].get_extent()
-    ax.set_aspect(abs((extent[1] - extent[0]) / (extent[3] - extent[2])))
-
-    return None
 
 
 def plot_MCMC_convergence(mcmc_chains, expected_values, bound_max, bound_min, parameters_annotations=None):
