@@ -42,7 +42,7 @@ def compute_APD(AP, time_points=None, upstroke_time: float = None, repol_percent
     if time_points is not None:
         if isinstance(time_points, list):
             time_points = np.array(time_points)
-        elif isinstance(time_points, np.ndarray):
+        if isinstance(time_points, np.ndarray):
             if len(np.shape(time_points)) > 1:
                 raise ValueError(
                     'time_points should be provided either as a 1-D list or as a numpy array. Here, it was provided as '
@@ -82,7 +82,7 @@ def compute_APD(AP, time_points=None, upstroke_time: float = None, repol_percent
     APD_index = np.where(AP < repol_voltage)
     found_APD = False
     for i in range(len(APD_index[0])):
-        if not (time_points[APD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_APD):
+        if time_points[APD_index[0][i]] > time_points[upstroke_index[0]] + 20 and not found_APD:
             APD = time_points[APD_index[0][i]] - time_points[upstroke_index[0]]
             found_APD = True
             break
@@ -176,7 +176,7 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time: flo
     CaiD_index = np.where(Cai < repol_voltage)
     found_CaiD = False
     for i in range(len(CaiD_index[0])):
-        if not(time_points[CaiD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_CaiD):
+        if time_points[CaiD_index[0][i]] > time_points[upstroke_index[0]] + 20 and not found_CaiD:
             CaiD = time_points[CaiD_index[0][i]] - time_points[upstroke_index[0]]
             found_CaiD = True
             break
