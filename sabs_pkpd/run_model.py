@@ -125,11 +125,11 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
                              ' and values')
 
     if exp_cond_param_values is not None or exp_cond_param_annot is not None:
-        if (type(exp_cond_param_values) != list and type(exp_cond_param_values) != np.ndarray) or \
-                type(exp_cond_param_annot) != str:
+        if (not isinstance(exp_cond_param_values, list) and not isinstance(exp_cond_param_values, np.ndarray)) or \
+                not isinstance(exp_cond_param_annot, str):
             raise ValueError('The experimental conditions must be provided as a list or numpy.ndarray, and the ' +
                              'parameter annotation must be a string matching with the variable name in the MMT model')
-        elif len(fixed_params_annot) != len(fixed_params_values):
+        if len(fixed_params_annot) != len(fixed_params_values):
             raise ValueError('The parameters clamped for the simulation must have the same length for names' +
                              ' and values')
 
@@ -142,7 +142,7 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
     # Run the model solving for all experiment conditions
     # In case the user wants some parameter to vary between simulations
     if exp_cond_param_values is not None:
-        for k in range(0, len(exp_cond_param_values)):
+        for k, exp_val in enumerate(exp_cond_param_values):
             s.reset()
             # reset timer
             s.set_time(0)
@@ -153,17 +153,17 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
             else:
                 state_to_set = s.state()
             if fixed_params_annot is not None:
-                for i in range(0, len(fixed_params_annot)):
-                    if sabs_pkpd.pints_problem_def.parameter_is_state(fixed_params_annot[i], s):
-                        index = sabs_pkpd.pints_problem_def.find_index_of_state(fixed_params_annot[i], s)
+                for i, annot in enumerate(fixed_params_annot):
+                    if sabs_pkpd.pints_problem_def.parameter_is_state(annot, s):
+                        index = sabs_pkpd.pints_problem_def.find_index_of_state(annot, s)
                         state_to_set[index] = fixed_params_values[i]
                     else:
-                        s.set_constant(fixed_params_annot[i], fixed_params_values[i])
+                        s.set_constant(annot, fixed_params_values[i])
 
             s.set_state(state_to_set)
 
             # set the right experimental conditions
-            s.set_constant(exp_cond_param_annot, exp_cond_param_values[k])
+            s.set_constant(exp_cond_param_annot, exp_val)
 
             # Eventually run a pre-run to reach steady-state
             s.pre(pre_run)
@@ -185,12 +185,12 @@ def quick_simulate(s, time_max, read_out: str,  exp_cond_param_annot=None, exp_c
 
         # Set parameters for simulation
         if fixed_params_annot is not None:
-            for i in range(0, len(fixed_params_annot)):
-                if sabs_pkpd.pints_problem_def.parameter_is_state(fixed_params_annot[i], s):
-                    index = sabs_pkpd.pints_problem_def.find_index_of_state(fixed_params_annot[i], s)
+            for i, annot in enumerate(fixed_params_annot):
+                if sabs_pkpd.pints_problem_def.parameter_is_state(annot, s):
+                    index = sabs_pkpd.pints_problem_def.find_index_of_state(annot, s)
                     state_to_set[index] = fixed_params_values[i]
                 else:
-                    s.set_constant(fixed_params_annot[i], fixed_params_values[i])
+                    s.set_constant(annot, fixed_params_values[i])
 
         # Set the state to the value corresponding to the eventual clamp or exp condition
         s.set_state(state_to_set)
