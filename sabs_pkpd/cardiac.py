@@ -29,25 +29,25 @@ def compute_APD(AP, time_points=None, upstroke_time: float = None, repol_percent
     The upstroke will be computed as the point with the maximal dV/dt if not provided.
     """
     # Verify that the inputs are provided as they should
-    if type(AP) == list:
+    if isinstance(AP, list):
         AP = np.array(AP)
-    elif type(AP) == np.ndarray:
+    elif isinstance(AP, np.ndarray):
         if len(np.shape(AP)) > 1:
             raise ValueError(
                 'AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
                 + str(np.shape(AP)) + ' array.')
-    elif type(AP) != np.ndarray:
+    elif not isinstance(AP, np.ndarray):
         raise ValueError('AP should be provided either as a 1-D list or as a numpy array. Type of AP : ' + str(type(AP)))
 
     if time_points is not None:
-        if type(time_points) == list:
+        if isinstance(time_points, list):
             time_points = np.array(time_points)
-        elif type(time_points) == np.ndarray:
+        elif isinstance(time_points, np.ndarray):
             if len(np.shape(time_points)) > 1:
                 raise ValueError(
-                    'time_points should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
-                    + str(np.shape(time_points)) + ' array.')
-        elif type(time_points) != np.ndarray:
+                    'time_points should be provided either as a 1-D list or as a numpy array. Here, it was provided as '
+                    + str(np.shape(time_points)) + 'an array.')
+        elif not isinstance(time_points, np.ndarray):
             raise ValueError('time_points should be provided either as a 1-D list or as a numpy array. Type of AP : ' +
                              str(type(time_points)))
 
@@ -57,7 +57,7 @@ def compute_APD(AP, time_points=None, upstroke_time: float = None, repol_percent
     repol_voltage = min_AP + (max_AP - min_AP) * (100 - repol_percentage) / 100
 
     # Print warnings if set to True and if unusual AP characteristics
-    if (min_AP >= -50 or min_AP <= -120 or max_AP < -40 or max_AP > 50) and print_warnings == True:
+    if (min_AP >= -50 or min_AP <= -120 or max_AP < -40 or max_AP > 50) and print_warnings:
         print('This AP may be abnormal, baseline is at ' + min_AP + ' mV. Calculating the APD anyway...')
 
     # Define time_points if not provided. It is assumed that the model is paced at 1 Hz
@@ -82,13 +82,13 @@ def compute_APD(AP, time_points=None, upstroke_time: float = None, repol_percent
     APD_index = np.where(AP < repol_voltage)
     found_APD = False
     for i in range(len(APD_index[0])):
-        if time_points[APD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_APD == False:
+        if not (time_points[APD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_APD):
             APD = time_points[APD_index[0][i]] - time_points[upstroke_index[0]]
             found_APD = True
             break
 
     # In case the cell does not repolarise, put APDxx to 0
-    if found_APD == False:
+    if not found_APD:
         APD = 0
 
     return APD
@@ -123,25 +123,25 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time: flo
     The upstroke will be computed as the point with the maximal dV/dt if not provided.
     """
     # Verify that the inputs are provided as they should
-    if type(Cai) == list:
+    if isinstance(Cai, list):
         Cai = np.array(Cai)
-    elif type(Cai) == np.ndarray:
+    elif isinstance(Cai, np.ndarray):
         if len(np.shape(Cai)) > 1:
             raise ValueError(
                 'AP should be provided either as a 1-D list or as a numpy array. Here, it was provided as a'
                 + str(np.shape(Cai)) + ' array.')
-    elif type(Cai) != np.ndarray:
+    elif not isinstance(Cai, np.ndarray):
         raise ValueError('Cai should be provided either as a 1-D list or as a numpy array. Type of Cai : ' + str(type(Cai)))
 
     if time_points is not None:
-        if type(time_points) == list:
+        if isinstance(time_points, list):
             time_points = np.array(time_points)
-        elif type(time_points) == np.ndarray:
+        elif isinstance(time_points, np.ndarray):
             if len(np.shape(time_points)) > 1:
                 raise ValueError(
                     'time_points should be provided either as a 1-D list or as a numpy array. Here, it was provided' +
                     ' as a ' + str(np.shape(time_points)) + ' array.')
-        elif type(time_points) != np.ndarray:
+        elif not isinstance(time_points, np.ndarray):
             raise ValueError('time_points should be provided either as a 1-D list or as a numpy array. Type of AP : ' +
                              str(type(time_points)))
 
@@ -151,7 +151,7 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time: flo
     repol_voltage = min_Cai + (max_Cai - min_Cai) * (100 - repol_percentage) / 100
 
     # Print warnings if set to True and if unusual AP characteristics
-    if (min_Cai <= 0 or min_Cai > 0.01 or max_Cai > 0.01) and print_warnings == True:
+    if (min_Cai <= 0 or min_Cai > 0.01 or max_Cai > 0.01) and print_warnings:
         print('This Cai may be abnormal, baseline is at ' + str(min_Cai) + ' mV. Calculating the CaiD anyway...')
 
     # Define time_points if not provided. It is assumed that the model is paced at 1 Hz
@@ -176,13 +176,13 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time: flo
     CaiD_index = np.where(Cai < repol_voltage)
     found_CaiD = False
     for i in range(len(CaiD_index[0])):
-        if time_points[CaiD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_CaiD == False:
+        if not(time_points[CaiD_index[0][i]] > time_points[upstroke_index[0]] + 20 and found_CaiD):
             CaiD = time_points[CaiD_index[0][i]] - time_points[upstroke_index[0]]
             found_CaiD = True
             break
 
     # In case the cell does not repolarise, put APDxx to 0
-    if found_CaiD == False:
+    if not found_CaiD:
         CaiD = 0
 
     return CaiD
