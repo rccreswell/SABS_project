@@ -1,0 +1,181 @@
+[[model]]
+author: Cellml converter
+desc: """
+    Beeler-Reuter Mammalian Ventricular Model 1977
+    Catherine
+    Lloyd
+    Bioengineering Institute, University of Auckland
+    Model Status
+    This model
+    has been curated by Penny Noble using Flavio Fenton's Java code as a
+    reference (See http://thevirtualheart.org/ for Java applet rendering of
+    model - Java code is available from Dr Fenton.) An artificial stimulus
+    component has been added this model to allow it to reproduce the action
+    potential simulation shown in Figure 4 of the publication. The model is
+    known to run and integrate in the PCEnv and COR CellML environments. A
+    PCEnv session file is also associated with this model.
+    ValidateCellML
+    detects unit inconsistency within this model.
+    Model Structure
+    In contrast
+    to the earlier Purkinje fibre ionic current models of
+    D. Noble (1962)
+    and
+    R.E. McAllister, D. Noble and R.W. Tsien (1975)
+    , the G.W. Beeler and H.
+    Reuter 1977 model was developed to describe the mammalian ventricular
+    action potential.  Not all the ionic currents of the Purkinje fibre model
+    are present in ventricular tissue; therefore, this model is simpler than
+    the MNT model.  The total ionic flux is divided into only four discrete,
+    individual ionic currents (see
+    below).  The main additional feature of the
+    Beeler-Reuter ionic current model is a representation of the intracellular
+    calcium ion concentration.
+    The complete original paper reference is cited
+    below:
+    Reconstruction of the action potential of ventricular myocardial
+    fibres, Beeler, G.W. and Reuter, H. 1977
+    Journal of Physiology
+    , 268,
+    177-210.
+    PubMed ID: 874889
+    cell diagram of the Beeler-Reuter model showing
+    ionic currents across the cell surface membrane
+    A schematic diagram
+    describing the current flows across the cell membrane that are captured in
+    the BR model.
+    the cellml rendering of the Beeler-Reuter model
+    The network
+    defined in the CellML description of the Beeler-Reuter model. A key
+    describing the significance of the shapes of the components and the colours
+    of the connections between them is in the
+    notation guide
+    .  For simplicity,
+    not all the variables are shown.
+    The membrane physically contains the
+    currents as indicated by the blue arrows in
+    . The currents act
+    independently and are not connected to each other. Several of the channels
+    encapsulate
+    and
+    contain further components which represent activation and
+    inactivation gates. The addition of an encapsulation relationship informs
+    modellers and processing software that the gates are important parts of the
+    current model. It also prevents any other components that aren't also
+    encapsulated by the parent component from connecting to its gates,
+    effectively hiding them from the rest of the model.
+    The breakdown of the
+    model into components and the definition of encapsulation and containment
+    relationships between them is somewhat arbitrary. When considering how a
+    model should be broken into components, modellers are encouraged to
+    consider which parts of a model might be re-used and how the physiological
+    elements of the system being modelled are naturally bounded. Containment
+    relationships should be used to provide simple rendering information for
+    processing software (ideally, this will correspond to the layout of the
+    physical system), and encapsulation should be used to group sets of
+    components into sub-models.
+    """
+name: beeler_reuter_1977_version06
+# Initial values
+membrane.V                                = -84.624
+sodium_current_m_gate.m                   = 0.011
+sodium_current_h_gate.h                   = 0.988
+sodium_current_j_gate.j                   = 0.975
+slow_inward_current.Cai                   = 0.0001
+slow_inward_current_d_gate.d              = 0.003
+slow_inward_current_f_gate.f              = 0.994
+time_dependent_outward_current_x1_gate.x1 = 0.0001
+
+[environment]
+time = 0 bind time
+    in [ms]
+
+[membrane]
+C = 0.01
+    in [uF/mm^2]
+dot(V) = (stimulus_protocol.Istim - (sodium_current.i_Na + slow_inward_current.i_s + time_dependent_outward_current.i_x1 + time_independent_outward_current.i_K1)) / C
+    in [mV]
+
+[slow_inward_current]
+dot(Cai) = -0.01 [1/mm] * i_s / 1 [C/mol] + 0.07 [mS/uF] * (0.0001 [mM] - Cai)
+    in [mM]
+E_s = -82.3 [mV] - 13.0287 [mV] * log(Cai * 0.001 [m^3/mol])
+    in [mV]
+g_s = 0.0009
+    in [mS/mm^2]
+i_s = g_s * slow_inward_current_d_gate.d * slow_inward_current_f_gate.f * (membrane.V - E_s)
+    in [A/m^2]
+
+[slow_inward_current_d_gate]
+alpha_d = 0.095 [mS/uF] * exp(-(membrane.V - 5 [mV]) / 100 [mV]) / (1 + exp(-(membrane.V - 5 [mV]) / 13.89 [mV]))
+    in [mS/uF]
+beta_d = 0.07 [mS/uF] * exp(-(membrane.V + 44 [mV]) / 59 [mV]) / (1 + exp((membrane.V + 44 [mV]) / 20 [mV]))
+    in [mS/uF]
+dot(d) = alpha_d * (1 - d) - beta_d * d
+    in [1]
+
+[slow_inward_current_f_gate]
+alpha_f = 0.012 [mS/uF] * exp(-(membrane.V + 28 [mV]) / 125 [mV]) / (1 + exp((membrane.V + 28 [mV]) / 6.67 [mV]))
+    in [mS/uF]
+beta_f = 0.0065 [mS/uF] * exp(-(membrane.V + 30 [mV]) / 50 [mV]) / (1 + exp(-(membrane.V + 30 [mV]) / 5 [mV]))
+    in [mS/uF]
+dot(f) = alpha_f * (1 - f) - beta_f * f
+    in [1]
+
+[sodium_current]
+E_Na = 50
+    in [mV]
+g_Na = 0.04
+    in [mS/mm^2]
+g_Nac = 3e-5
+    in [mS/mm^2]
+i_Na = (g_Na * sodium_current_m_gate.m ^ 3 * sodium_current_h_gate.h * sodium_current_j_gate.j + g_Nac) * (membrane.V - E_Na)
+    in [A/m^2]
+
+[sodium_current_h_gate]
+alpha_h = 0.126 [mS/uF] * exp(-0.25 [1/mV] * (membrane.V + 77 [mV]))
+    in [mS/uF]
+beta_h = 1.7 [mS/uF] / (exp(-0.082 [1/mV] * (membrane.V + 22.5 [mV])) + 1)
+    in [mS/uF]
+dot(h) = alpha_h * (1 - h) - beta_h * h
+    in [1]
+
+[sodium_current_j_gate]
+alpha_j = 0.055 [mS/uF] * exp(-0.25 [1/mV] * (membrane.V + 78 [mV])) / (exp(-0.2 [1/mV] * (membrane.V + 78 [mV])) + 1)
+    in [mS/uF]
+beta_j = 0.3 [mS/uF] / (exp(-0.1 [1/mV] * (membrane.V + 32 [mV])) + 1)
+    in [mS/uF]
+dot(j) = alpha_j * (1 - j) - beta_j * j
+    in [1]
+
+[sodium_current_m_gate]
+alpha_m = -1 [1/mV/ms] * (membrane.V + 47 [mV]) / (exp(-0.1 [1/mV] * (membrane.V + 47 [mV])) - 1)
+    in [mS/uF]
+beta_m = 40 [mS/uF] * exp(-0.056 [1/mV] * (membrane.V + 72 [mV]))
+    in [mS/uF]
+dot(m) = alpha_m * (1 - m) - beta_m * m
+    in [1]
+
+[stimulus_protocol]
+Istim = level * IstimAmplitude
+    in [A/m^2]
+IstimAmplitude = 0.5
+    in [A/m^2]
+level = 0 bind pace
+
+[time_dependent_outward_current]
+i_x1 = time_dependent_outward_current_x1_gate.x1 * 0.008 [A/m^2] * (exp(0.04 [1/mV] * (membrane.V + 77 [mV])) - 1) / exp(0.04 [1/mV] * (membrane.V + 35 [mV]))
+    in [A/m^2]
+
+[time_dependent_outward_current_x1_gate]
+alpha_x1 = 0.0005 [mS/uF] * exp((membrane.V + 50 [mV]) / 12.1 [mV]) / (1 + exp((membrane.V + 50 [mV]) / 17.5 [mV]))
+    in [mS/uF]
+beta_x1 = 0.0013 [mS/uF] * exp(-(membrane.V + 20 [mV]) / 16.67 [mV]) / (1 + exp(-(membrane.V + 20 [mV]) / 25 [mV]))
+    in [mS/uF]
+dot(x1) = alpha_x1 * (1 - x1) - beta_x1 * x1
+    in [1]
+
+[time_independent_outward_current]
+i_K1 = 0.0035 [A/m^2] * (4 * (exp(0.04 [1/mV] * (membrane.V + 85 [mV])) - 1) / (exp(0.08 [1/mV] * (membrane.V + 53 [mV])) + exp(0.04 [1/mV] * (membrane.V + 53 [mV]))) + 0.2 [1/mV] * (membrane.V + 23 [mV]) / (1 - exp(-0.04 [1/mV] * (membrane.V + 23 [mV]))))
+    in [A/m^2]
+

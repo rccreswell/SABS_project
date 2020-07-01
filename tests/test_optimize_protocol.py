@@ -186,7 +186,3 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    # test_init_optimizer()
-    # test_run_mcmc()
-    # test_optimize_protocol()
-    # test_infer_model_params()
