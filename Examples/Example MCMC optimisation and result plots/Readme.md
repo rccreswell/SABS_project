@@ -94,7 +94,7 @@ sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitting_param_annot,exp_co
 ```
 The data generated is plotted on the Figure below:
 
-![synth_data](synthetic data.png)
+![synth_data](./synthetic data.png)
 ## Set up the MCMC routine
 
 # Set a starting point for the MCMC routine
