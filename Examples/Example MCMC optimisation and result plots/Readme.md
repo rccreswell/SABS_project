@@ -79,9 +79,10 @@ Noise_sigma=0.006 # variance of normally distributed noise to add to the data
 values = values + Noise_sigma*np.random.randn(len(values[0]))
 ```
 
-The data is then uploaded to a Data_exp object in the ```sabs_pkpd.constants```.
+The data and fitting instructions are then uploaded to a Data_exp object in the ```sabs_pkpd.constants```.
 
-# Load the synthetic data to constants.data_exp using the class Data_exp
+```python
+# # Load the synthetic data to constants.data_exp using the class Data_exp
 sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.Data_exp(times, values, exp_nums_list, exp_conds_list)
 
 # Set the fitting information
@@ -90,16 +91,13 @@ exp_cond_annot = 'constants.T'
 readout = 'comp1.x'
 # Save the fitting information to the data_exp object
 sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitting_param_annot,exp_cond_annot, readout)
+```
+The data generated is plotted on the Figure below:
+
+![synth data](./synthetic data.png)
 
 
-# Visualisation of the synthetic data
-plt.figure(figsize = (10, 10))
-plt.plot(sabs_pkpd.constants.data_exp.times[0], sabs_pkpd.constants.data_exp.values[0])
-plt.xlabel('Time', Fontsize = 22)
-plt.ylabel('comp1.x', Fontsize = 22)
-plt.title('Synthetic data for the illustration example of running a MCMC' +
-           ' routine using the SABS package')
-plt.show()
+## Set up the MCMC routine
 
 # Set a starting point for the MCMC routine
 starting_point = [np.array([4, 2, 0.005]), np.array([5, 3, 0.005]), np.array([6, 4, 0.004])]
