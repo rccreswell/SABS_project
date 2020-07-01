@@ -32,7 +32,7 @@ def test_infer_params():
     assert np.linalg.norm(diff) < 0.01
 
 
-def test_MCMC_inference_model_params():
+def test_MCMC_routine():
     # Set the model annotations for the MCMC routine
     fitting_param_annot = ['ikr.scale_kr', 'ical.scale_cal']
     exp_cond_annot = 'phys.T'
@@ -57,7 +57,7 @@ def test_MCMC_inference_model_params():
         set_to_test[i] = np.random.uniform(low=0.7, high=1.5, size=None) * RealValue[i]
     starting_point = [np.array(list(set_to_test) + [Noise_sigma])]
 
-    chains = sabs_pkpd.pints_problem_def.MCMC_inference_model_params(starting_point, max_iter=3000)
+    chains = sabs_pkpd.pints_problem_def.MCMC_routine(starting_point, max_iter=3000)
 
     mean_param0 = np.mean(chains[0][:,0])
     mean_param1 = np.mean(chains[0][:,1])

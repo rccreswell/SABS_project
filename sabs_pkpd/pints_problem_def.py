@@ -122,7 +122,7 @@ def infer_params(initial_point, data_exp, boundaries_low, boundaries_high, pints
     return found_parameters, found_value
 
 
-def MCMC_inference_model_params(starting_point, max_iter=4000, adapt_start=None, log_prior=None,
+def MCMC_routine(starting_point, max_iter=4000, adapt_start=None, log_prior=None,
                                 mmt_model_filename=None, chain_filename = None, pdf_filename=None,
                                 log_likelihood='GaussianLogLikelihood', method='HaarioBardenetACMC', sigma0=None,
                                 parallel=False):
@@ -262,7 +262,10 @@ def plot_distribution_parameters(mcmc_chains: list, bound_min: list, bound_max: 
         raise ValueError('This MCMC output does not have enough chains to reach for chain no. ' + str(chain_index) +
                          '. Only ' + str(len(mcmc_chains)) + ' chains in this MCMC output.')
     # Compute the amount of graphs, given the amount of chains
-    n_columns = 4
+    if len(mcmc_chains[0, 0]) < 4:
+        n_columns = len(mcmc_chains[0, 0])
+    else:
+        n_columns = 4
     n_rows = 1 + len(mcmc_chains[0, 0])//4
 
     # Generate the subplots
