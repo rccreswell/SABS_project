@@ -29,55 +29,115 @@ The data is loaded as a data_exp structure. <strong>data_exp</strong> is a struc
 
 # Use of the simulation and inference tools included in this package.
 
-Check the example.py file for the example code. If you want to run it, please change the directories to the directories of your choice. 
+Check the example.py file for the example code. If you want to run it, please change the directories to the directories of your choice. In the present example, data will be synthetic data generated using the present package.
 
 ##  Importing the necessary libraries:
 
 ```python
 import sabs_pkpd
+import numpy as np
+import matplotlib.pyplot as plt
 ```
 
-## Setting up the parameters for simulation and fitting
+## Prepare the data for example problem
+
+The model is loaded. Note that it is necessary to load it into sabs_pkpd.constants.s. Indeed, the object ```sabs_pkpd.pints_problem_def.MyModel``` needs to have a fixed variable to be used properly during fitting or MCMC sampling.
+
 ```python
+filename = './model.mmt'
+sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(filename)
+```
+
+The fitting instructions are then set up, and the synthetic data is generated.
+
+```python
+fitting_param_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
+
+# Set the parameters values to generate the synthetic data
+# This will be called the "true" values of these parameters
+true_values = [5, 3]
+for i, annot in enumerate(fitting_param_annot):
+    sabs_pkpd.constants.s.set_constant(annot, true_values[i])
+    
+# Enter to constants.n the amount of fitted parameters
 sabs_pkpd.constants.n = 2
-sabs_pkpd.constants.s = sabs_pkpd.run_model.set_myokit_simulation('./tests/test resources/pints_problem_def_test.mmt')
-```
-Set up the constants n and s:
-  - <strong>n</strong> is the number of parameters fitted
-  - <strong>s</strong> is the myokit model loaded for myokit.simulation. Please make sure when entering the filename that the subdirectory key is / not \
 
-For a better comprehension of the example, please refer to the .mmt model in the /tests/test resources/ directory.
-
-## Loading experimental data and setting up the instructions for fitting
-```python
-fit_param_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
+# Set up the simulation to generate the synthetic data
+time_max = 0.1
+times = [np.linspace(0, time_max, 100)]
+exp_nums_list = [1]
+exp_conds_list = [37]
 exp_cond_annot = 'constants.T'
-model_output_annot = 'comp1.y'
-sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file('./tests/test resources/load_data_test.csv')
-sabs_pkpd.constants.data_exp.Add_fitting_instructions(fit_param_annot, exp_cond_annot, model_output_annot)
-```
-Here is an example of how to load a data. Refer to the section above for the structure of the .csv file loaded. Here, we decide to fit the parameters 'constants.unknown_cst' and 'constants.unknown_cst2' of the .mmt model previously loaded. 
-In this toy example, we consider the case where two measurements were done at 'constants.T' = 20 and 37.
-We consider also that the data measured in the csv file is modelled as 'comp1.y'.
+readout = 'comp1.x'
 
-## Parameter inference instructions
-```python
-initial_point = [0.5, 0.3]
-boundaries_low = [0, 0]
-boundaries_high = [1, 1]
-```
-Here, the initial point is set as ``` 'constants.unknown_cst' = 0.5``` and ```'constants.unknown_cst2' = 0.3``` . 
-The parameters are allowed to vary here from 0 to 1.
+# Run the simulation to generate synthetic data
+val = sabs_pkpd.constants.s.run(time_max*1.001, log_times = times[0])
 
-## Call of the inference function
-```python
-inferred_params = sabs_pkpd.pints_problem_def.infer_params(initial_point, sabs_pkpd.constants.data_exp, boundaries_low, boundaries_high)
+# Retrieve the output and add noise on top of it
+values = [val[readout]]
+Noise_sigma=0.006 # variance of normally distributed noise to add to the data
+values = values + Noise_sigma*np.random.randn(len(values[0]))
 ```
-This returns ```inferred_params``` as a ```numpy.array``` of the optimised parameters. In this toy problem, the data was generated with parameters ``` 'constants.unknown_cst' = 0.1``` and ```'constants.unknown_cst2' = 0.1``` . 
 
-## Plot the model with optimised parameters against experimental data
-```python
-sabs_pkpd.run_model.plot_model_vs_data(['constants.unknown_cst', 'constants.unknown_cst2'], inferred_params, sabs_pkpd.constants.data_exp, sabs_pkpd.constants.s)
+The data is then uploaded to a Data_exp object in the ```sabs_pkpd.constants```.
+
+# Load the synthetic data to constants.data_exp using the class Data_exp
+sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.Data_exp(times, values, exp_nums_list, exp_conds_list)
+
+# Set the fitting information
+fitting_param_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
+exp_cond_annot = 'constants.T'
+readout = 'comp1.x'
+# Save the fitting information to the data_exp object
+sabs_pkpd.constants.data_exp.Add_fitting_instructions(fitting_param_annot,exp_cond_annot, readout)
+
+
+# Visualisation of the synthetic data
+plt.figure(figsize = (10, 10))
+plt.plot(sabs_pkpd.constants.data_exp.times[0], sabs_pkpd.constants.data_exp.values[0])
+plt.xlabel('Time', Fontsize = 22)
+plt.ylabel('comp1.x', Fontsize = 22)
+plt.title('Synthetic data for the illustration example of running a MCMC' +
+           ' routine using the SABS package')
+plt.show()
+
+# Set a starting point for the MCMC routine
+starting_point = [np.array([4, 2, 0.005]), np.array([5, 3, 0.005]), np.array([6, 4, 0.004])]
+
+# Launch the MCMC routine
+chains = sabs_pkpd.pints_problem_def.MCMC_routine(starting_point, max_iter=5000)
+
+# Plot the evolution of the chains during the MCMC sampling
+fig, axes = sabs_pkpd.pints_problem_def.plot_MCMC_convergence(mcmc_chains=chains, expected_values = true_values+[0.006], bound_max = [12, 8, 0.01], bound_min = [2, 1.5, 0.002])
+
+# Plot the distributions of the values taken by the chains
+fig2, axes2 = sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [2, 1.5, 0.002], [12, 8, 0.01], chain_index = 1)
+
+# Compare the data with the output of the model, using the starting point's 
+# parameter values and the chain's median parameter values
+plt.figure()
+
+# Compare the data with the output of the model using the starting point's
+# parameters values, and the chain's median parameter values
+model = sabs_pkpd.pints_problem_def.MyModel()
+plt.plot(sabs_pkpd.constants.data_exp.times[0], 
+         sabs_pkpd.constants.data_exp.values[0], 
+         label='values to fit')
+
+plt.plot(sabs_pkpd.constants.data_exp.times[0], 
+         model.simulate(starting_point[0][:-1], 
+                        sabs_pkpd.constants.data_exp.times[0]),
+         label='Starting point')
+         
+plt.plot(sabs_pkpd.constants.data_exp.times[0], 
+         model.simulate(np.median(chains[0], axis = 0)[:-1],
+                        sabs_pkpd.constants.data_exp.times[0]),
+         label='Chain 0 median')
+plt.legend()
+plt.show()
+
 ```
+
+
 The output is presented in the figure below:
 ![Sim_vs_exp](./Example_plot_exp_vs_sim.png)
