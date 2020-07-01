@@ -123,12 +123,19 @@ fig, axes = sabs_pkpd.pints_problem_def.plot_MCMC_convergence(mcmc_chains=chains
 
 This returns plots like the one below for our example problem:
 
-![synth_data]()
+![evolution](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20MCMC%20optimisation%20and%20result%20plots/chains%20evolution.png?token=ANSJY5YMAJWACDTURUFAAEC7AWJF4)
 
-
+```python
 # Plot the distributions of the values taken by the chains
 fig2, axes2 = sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [2, 1.5, 0.002], [12, 8, 0.01], chain_index = 1)
+```
+This returns plots like the one below for our example problem:
 
+![distribution](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20MCMC%20optimisation%20and%20result%20plots/parameters%20distribution.png?token=ANSJY5YWPAKLCIJE4EBFKFS7AWJL2)
+
+Note that in this example, the parameter 1 (constants.unknown_cst) is not identifiable, as it can visibly take pretty much any value within [2 - 12]
+
+```python
 # Compare the data with the output of the model, using the starting point's 
 # parameter values and the chain's median parameter values
 plt.figure()
@@ -152,7 +159,3 @@ plt.plot(sabs_pkpd.constants.data_exp.times[0],
 plt.legend()
 plt.show()
 ```
-
-
-The output is presented in the figure below:
-![Sim_vs_exp](./Example_plot_exp_vs_sim.png)
