@@ -1,6 +1,6 @@
 # Use of the simulation and inference tools included in this package.
 
-Check the example.py file for the example code. If you want to run it, please change the directories to the directories of your choice. In the present example, data will be synthetic data generated using the present package.
+Check the example_MCMC.py file for the example code. If you want to run it, please change the directories to the directories of your choice. In the present example, data will be synthetic data generated using the present package.
 
 ##  Importing the necessary libraries:
 
@@ -106,6 +106,11 @@ This returns plots like the one below for our example problem:
 
 Note that in this example, the parameter 1 (constants.unknown_cst) is not identifiable, as it can visibly take pretty much any value within [2 - 12]
 
+
+## Compare the model outputs with data
+
+This little script is to show how you can compare the outputs of the model with your data. Note that in the example, we are using ```sabs_pkpd.pints_problem_def.MyModel()``` which was configured when running the ```MCMC_routine()``` function. It can be used to reproduce the data, by entering as inputs the parameters values (excluding the noise), and the sampling time points.
+
 ```python
 # Compare the data with the output of the model, using the starting point's 
 # parameter values and the chain's median parameter values
@@ -130,3 +135,7 @@ plt.plot(sabs_pkpd.constants.data_exp.times[0],
 plt.legend()
 plt.show()
 ```
+
+The plot of comparison between data and model output can be found just below:
+
+![comparison](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20MCMC%20optimisation%20and%20result%20plots/comparison%20to%20data.png?token=ANSJY56ST6BUYB4QL6PEQEK7AWJ6K)
