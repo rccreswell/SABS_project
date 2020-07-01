@@ -14,8 +14,6 @@ import matplotlib.pyplot as plt
 # Load the model
 filename = './model.mmt'
 sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(filename)
-sabs_pkpd.constants.default_state = sabs_pkpd.constants.s.state()
-sabs_pkpd.constants.s.set_tolerance(abs_tol = 1e-10, rel_tol = 1e-10)
 
 # Define the model parameters that will be fitted
 fitting_param_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
@@ -26,9 +24,6 @@ true_values = [5, 3]
 for i, annot in enumerate(fitting_param_annot):
     sabs_pkpd.constants.s.set_constant(annot, true_values[i])
     
-# Enter to constants.n the amount of fitted parameters
-sabs_pkpd.constants.n = 2
-
 # Set up the simulation to generate the synthetic data
 time_max = 0.1
 times = [np.linspace(0, time_max, 100)]
