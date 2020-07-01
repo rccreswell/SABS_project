@@ -40,9 +40,9 @@ def convert_protocol(model):
     pacing_parameters = {}
     for equation in equations:
 
-        if equation.lhs.pystr() in ['IstimStart',
-                                    'IstimPeriod',
-                                    'IstimPulseDuration']:
+        if equation.lhs.pystr() in ['stimulus_protocol_IstimStart',
+                                    'stimulus_protocol_IstimPeriod',
+                                    'stimulus_protocol_IstimPulseDuration']:
             pacing_parameters[equation.lhs.pystr()] = equation.rhs
         if equation.lhs.pystr() == 'IstimAmplitude':
             amplitude = equation.rhs
@@ -72,9 +72,9 @@ def convert_protocol(model):
     # Write the protocol in Myokit format
     new_protocol = myokit.Protocol()
     new_protocol.schedule(1.0,
-                          pacing_parameters['IstimStart'],
-                          pacing_parameters['IstimPulseDuration'],
-                          period=pacing_parameters['IstimPeriod'],
+                          pacing_parameters['stimulus_protocol_IstimStart'],
+                          pacing_parameters['stimulus_protocol_IstimPulseDuration'],
+                          period=pacing_parameters['stimulus_protocol_IstimPeriod'],
                           multiplier=0)
 
     return model, new_protocol
