@@ -98,16 +98,33 @@ The data generated is plotted on the Figure below:
 
 
 
-## Set up the MCMC routine
+## Set up the MCMC routine and launch it
 
+The MCMC routine takes as minimal input a starting point for the chains (use the command ```help(sabs_pkpd.pints_problem_def.MCMC_routine)``` in your Python console for more information about the inputs). 
+
+Note that the starting point must have a very particular structure to be understood by the function to launch the MCMC routine. It has to be a list of arrays. The number of arrays defines the number of chains used for the MCMC routine. The length of the arrays must match with the amount of parameters, eventually + 1 for noise, depending on the log-likelihood function chosen. The default log-likelihood used is ```pints.GaussionLogLikelihood```, which samples the noise, hence you need to provide a starting value for noise. If for example you are using the ```pints.GaussianKnownSigmaLogLikelihood```, the noise sigma is fixed so you just have to use arrays of length the amount of parameters.
+
+```python
 # Set a starting point for the MCMC routine
 starting_point = [np.array([4, 2, 0.005]), np.array([5, 3, 0.005]), np.array([6, 4, 0.004])]
 
 # Launch the MCMC routine
 chains = sabs_pkpd.pints_problem_def.MCMC_routine(starting_point, max_iter=5000)
+```
 
+## Plot the results of your freshly run MCMC routine
+
+If you want to plot the distributions of parameters one against another, you might want to use pints.plot.pairwise (have a quick look at https://github.com/pints-team/pints/tree/master/examples/plotting). On top of pints possibilities of plotting the results, we propose you to plot the MCMC chains convergence, as well as the distributions of the values taken by your parameters throughout the MCMC routine.
+
+```python
 # Plot the evolution of the chains during the MCMC sampling
 fig, axes = sabs_pkpd.pints_problem_def.plot_MCMC_convergence(mcmc_chains=chains, expected_values = true_values+[0.006], bound_max = [12, 8, 0.01], bound_min = [2, 1.5, 0.002])
+```
+
+This returns plots like the one below for our example problem:
+
+![synth_data]()
+
 
 # Plot the distributions of the values taken by the chains
 fig2, axes2 = sabs_pkpd.pints_problem_def.plot_distribution_parameters(chains, [2, 1.5, 0.002], [12, 8, 0.01], chain_index = 1)
@@ -134,7 +151,6 @@ plt.plot(sabs_pkpd.constants.data_exp.times[0],
          label='Chain 0 median')
 plt.legend()
 plt.show()
-
 ```
 
 
