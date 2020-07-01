@@ -100,18 +100,11 @@ def load_model_from_cellml(cellml_filename, mmt_filename):
 
     importer = myokit.formats.importer('cellml')
     model = importer.model(cellml_filename)
+    model, prot = convert_protocol(model)
     myokit.save_model(mmt_filename, model)
 
-    return 0
-
-    # Code for a simulation
-    # d = s.run(1000)
-    # first_state = next(model.states())
-    # var = first_state.qname()
-    # plt.plot(d.time(), d[var])
-    # plt.title(var)
-    # plt.show()
-
+    sim = load_simulation_from_mmt(mmt_filename)
+    return sim
 
 def load_simulation_from_mmt(filename):
     """Load a model into Myokit from MMT file format. Saves the default state to sabs_pkpd.constants.default_state.

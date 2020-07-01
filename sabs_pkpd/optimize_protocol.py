@@ -393,34 +393,35 @@ def damped_harmonic_oscillator(c, k, m, beta, protocol, t, x0):
     return result
 
 
-def main():
-    params = [1.70015678e+00,
-              1.92681600e+00,
-              -1.12329275e-01,
-              9.86565896e-01,
-              4.02746746e-01,
-              1.96004128e+02,
-              7.16528663e+01,
-              -2.13426171e+01,
-              1.32499357e+01,
-              -4.06159185e+01]
+### TODO: remove this function, it is now in Examples
+# def main():
+#     params = [1.70015678e+00,
+#               1.92681600e+00,
+#               -1.12329275e-01,
+#               9.86565896e-01,
+#               4.02746746e-01,
+#               1.96004128e+02,
+#               7.16528663e+01,
+#               -2.13426171e+01,
+#               1.32499357e+01,
+#               -4.06159185e+01]
+#
+#     opt = ProtocolOptimizer(
+#         damped_harmonic_oscillator,
+#         five_event_protocol,
+#         np.linspace(0, 10, 400),
+#         0.0,
+#         [5.0, 10.0, 1.0, 10.0],
+#         params,
+#         4000,
+#         true_model_params=[5.0, 10.0, 1.0, 10.0])
+#
+#     opt.run_original_protocol()
+#     opt.optimize_protocol()
+#     opt.infer_model_parameters()
+#     opt.plot()
+#     opt.update_model_parameters()
 
-    opt = ProtocolOptimizer(
-        damped_harmonic_oscillator,
-        five_event_protocol,
-        np.linspace(0, 10, 400),
-        0.0,
-        [5.0, 10.0, 1.0, 10.0],
-        params,
-        4000,
-        true_model_params=[5.0, 10.0, 1.0, 10.0])
 
-    opt.run_original_protocol()
-    opt.optimize_protocol()
-    opt.infer_model_parameters()
-    opt.plot()
-    opt.update_model_parameters()
-
-
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
