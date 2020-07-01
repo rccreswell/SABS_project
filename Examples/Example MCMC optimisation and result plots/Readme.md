@@ -1,32 +1,3 @@
-# About data.csv files
-
-The data file should be loaded as a .csv file, with <strong>coma as separator</strong>.
-
-The file should be organised following the template:
-
-| Time | Values | Experiment number | Experimental condition |
-| ---- | ------ | ----------------- | ---------------------- | 
-|0.00  | -85.47 |123456|310|
-|... |...|...|...|...|
-|1000  | -85.29 |123456|310
-
-Note : the rows do not need to be sorted. While loading the data table, the table will be sorted with increasing experimental conditions (in a first time), and with increasing times (in a second time), thus resulting in a data structure similar to the one above.
-
-For running the MCMC routine, you can also use synthetic data, that you can generate by using sabs_pkpd.run_model.quick_simulate().
-
-
-# Architecture of the data loaded from a CSV
-
-The data is loaded as a data_exp structure. <strong>data_exp</strong> is a structure with entries:
-  - <strong>times</strong> is a list of all loaded experiments, with all time points for each ;
-  - <strong>values</strong> is a list with the same shape, containing the data measured at those time points ;
-  - <strong>exp_nums</strong> is a list of the labels of the experiments, as floats.
-  - <strong>exp_conds</strong> is a list of the values taken by the experimental condition for each experiment. It is of length the number of experiments.
-  - <strong>.fitting_instructions</strong> after call of the function <strong>Add_fitting_instructions</strong>. This subclass has entries:
-    - <strong>fitted_params_annot</strong> is a list of strings for the parameters fitted for the model. It is presented as ['compartment.parameter_fitted1', 'compartment.parameter_fitted2', ...]. It should match the annotations of the .mmt model used for simulations/fitting.
-    - <strong>exp_cond_param_annot</strong> is a string. It should match the annotation of the .mmt model for the varying experimental condition used to generate the data.
-    - <strong>sim_output_param_annot</strong> is a string. It should match the annotation of the .mmt model output.
-
 # Use of the simulation and inference tools included in this package.
 
 Check the example.py file for the example code. If you want to run it, please change the directories to the directories of your choice. In the present example, data will be synthetic data generated using the present package.
