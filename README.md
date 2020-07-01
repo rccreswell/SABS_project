@@ -7,3 +7,13 @@
 [![codecov](https://codecov.io/gh/rcw5890/SABS_project/branch/master/graph/badge.svg?token=IYc8QeF81y)](https://codecov.io/gh/rcw5890/SABS_project)
 
 # SABS_project
+
+Hi fellow scientist !
+
+It's a pleasure to greet you to our repo. 
+
+We propose hereby a Python package that enables an easy fitting of model parameters, making the connection between the Myokit package (http://myokit.org/) useful for its simple way of writing ODE models, and PINTS (https://github.com/pints-team/pints) useful for its amazing library of fitting possibilities and MCMC samplers.
+
+To ensure you have a smooth experience using our Python package, we wrote some examples just for you. You might want to check that out, in the Examples folder. 
+
+We hope that you will enjoy using the present tool, and that it brightens up your day of programming :)
