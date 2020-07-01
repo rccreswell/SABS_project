@@ -12,7 +12,7 @@ Hi fellow scientist !
 
 It's a pleasure to greet you to our repo. 
 
-We propose hereby a Python package that enables an easy fitting of model parameters, making the connection between the Myokit package (http://myokit.org/) useful for its simple way of writing ODE models, and PINTS (https://github.com/pints-team/pints) useful for its amazing library of fitting possibilities and MCMC samplers.
+We propose hereby a Python package that enables an easy fitting of model parameters, making the connection between the Myokit package (http://myokit.org/) useful for its simple way of writing ODE models, and PINTS (https://github.com/pints-team/pints) useful for its amazing library of fitting possibilities and MCMC samplers. This project was initiated during Software Engineering classes at University of Oxford, in the SABS Doctoral Training Center (https://www.sabsr3.ox.ac.uk/). 
 
 To ensure you have a smooth experience using our Python package, we wrote some examples just for you. You might want to check that out, in the Examples folder. 
 
