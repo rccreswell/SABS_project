@@ -1,19 +1,21 @@
-import math
-import os
 import numpy as np
 import sabs_pkpd
 from sabs_pkpd.optimize_protocol import ProtocolOptimizer
 import unittest
 
+
 def simple_solver(alpha, protocol, times, x0):
     return np.ones(len(times)) * alpha
+
 
 def simple_protocol(amplitude, duration):
     return lambda times: np.array(((times > 1.0) & (times < 1.0 + duration)))\
                                     .astype(float) * amplitude
 
+
 def fake_protocol(amplitude, duration):
     return lambda times: np.zeros(len(times))
+
 
 class Test(unittest.TestCase):
     def test_init_optimizer(self):
@@ -124,7 +126,6 @@ class Test(unittest.TestCase):
 
         assert len(opt.protocol_params) == 2
 
-
     def test_infer_model_params(self):
         """Test inferring the model parameters.
         """
@@ -177,9 +178,9 @@ class Test(unittest.TestCase):
         assert len(fig.axes) > 0
 
     def test_oscillator(self):
-         sim = sabs_pkpd.optimize_protocol.damped_harmonic_oscillator
-         protocol = simple_protocol(0.5, 0.5)
-         t = np.linspace(0, 10, 100)
-         x0 = 0.5
-         ts = sim(1.0, 0.5, 0.5, 0.25, protocol, t, x0)
-         assert len(ts) == len(t)
+        sim = sabs_pkpd.optimize_protocol.damped_harmonic_oscillator
+        protocol = simple_protocol(0.5, 0.5)
+        t = np.linspace(0, 10, 100)
+        x0 = 0.5
+        ts = sim(1.0, 0.5, 0.5, 0.25, protocol, t, x0)
+        assert len(ts) == len(t)
