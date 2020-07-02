@@ -67,6 +67,22 @@ class Test(unittest.TestCase):
 
         res = sabs_pkpd.clamp_experiment.get_steady_state([sabs_pkpd.constants.s], time_ss, data_exp=sabs_pkpd.constants.data_exp)
 
+        # Test providing save location
+        model_filename1 = './mmt_models/tentusscher_2006.mmt'
+        model_filename2 = './mmt_models/ohara_rudy_cipa_v1_2017.mmt'
+        save_location = './mmt_models/test_save_get_steady_state'
+        list_of_models_names = ['TT06', 'Ohara 2017']
+        time_ss = 6000
+        sabs_pkpd.constants.s = [sabs_pkpd.load_model.load_simulation_from_mmt(model_filename1)]
+        sabs_pkpd.constants.s.append(sabs_pkpd.load_model.load_simulation_from_mmt(model_filename2))
+        res = sabs_pkpd.clamp_experiment.get_steady_state(sabs_pkpd.constants.s, time_ss, save_location=save_location, list_of_models_names=list_of_models_names)
+
+        # Test wrong number of model names
+        list_of_models_names = ['TT06', 'Ohara 2017', 'wrong model']
+        with self.assertRaises(ValueError) as context:
+            res = sabs_pkpd.clamp_experiment.get_steady_state(sabs_pkpd.constants.s, time_ss, save_location=save_location, list_of_models_names=list_of_models_names)
+
+
     def test_save_steady_state_to_mmt(self):
         # model_filename1 = 'C:/Users/yanral/Documents/Software Development/mmt_models/tentusscher_2006.mmt'
         # model_filename2 = 'C:/Users/yanral/Documents/Software Development/mmt_models/ohara_rudy_cipa_v1_2017.mmt'
@@ -118,7 +134,3 @@ class Test(unittest.TestCase):
         diff = np.linalg.norm(output-expected_output)
 
         assert diff < 0.001
-
-
-if __name__ == '__main__':
-    unittest.main()

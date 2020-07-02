@@ -138,10 +138,3 @@ class Test(unittest.TestCase):
         param_annot = 'comp1.x'
         myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
         assert sabs_pkpd.pints_problem_def.find_index_of_state(param_annot, myokit_simulation) == 1
-
-
-if __name__ == '__main__':
-    t=Test()
-    t.test_plot_MCMC_convergence()
-    exit()
-    unittest.main()

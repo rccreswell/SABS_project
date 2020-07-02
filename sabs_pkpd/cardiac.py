@@ -58,7 +58,7 @@ def compute_APD(AP, time_points=None, upstroke_time: float = None, repol_percent
 
     # Print warnings if set to True and if unusual AP characteristics
     if (min_AP >= -50 or min_AP <= -120 or max_AP < -40 or max_AP > 50) and print_warnings:
-        print('This AP may be abnormal, baseline is at ' + min_AP + ' mV. Calculating the APD anyway...')
+        print('This AP may be abnormal, baseline is at ' + str(min_AP) + ' mV. Calculating the APD anyway...')
 
     # Define time_points if not provided. It is assumed that the model is paced at 1 Hz
     if time_points is None:
@@ -186,4 +186,3 @@ def compute_calcium_transient_duration(Cai, time_points=None, upstroke_time: flo
         CaiD = 0
 
     return CaiD
-

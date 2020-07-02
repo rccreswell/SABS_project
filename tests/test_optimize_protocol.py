@@ -183,6 +183,3 @@ class Test(unittest.TestCase):
          x0 = 0.5
          ts = sim(1.0, 0.5, 0.5, 0.25, protocol, t, x0)
          assert len(ts) == len(t)
-
-if __name__ == '__main__':
-    unittest.main()
