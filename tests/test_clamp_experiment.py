@@ -134,7 +134,3 @@ class Test(unittest.TestCase):
         diff = np.linalg.norm(output-expected_output)
 
         assert diff < 0.001
-
-
-if __name__ == '__main__':
-    unittest.main()

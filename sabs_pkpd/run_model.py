@@ -243,7 +243,7 @@ def plot_model_vs_data(plotting_parameters_annot, plotting_parameters_values, da
     number_of_plots = len(data_exp.exp_conds)
 
     if number_of_plots == 1:
-        number_of_rows = 1    
+        number_of_rows = 1
         fig1 = plt.figure()
     else:
         number_of_rows = number_of_plots//2 + number_of_plots % (number_of_plots//2)
