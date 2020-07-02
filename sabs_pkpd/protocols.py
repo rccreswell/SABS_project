@@ -5,14 +5,11 @@ This file collects functions which are used for modelling certain forms of
 input protocol.
 """
 
-import pandas
 import numpy as np
 import scipy.interpolate
-import matplotlib.pyplot as plt
 import myokit
 import sabs_pkpd
-from operator import itemgetter
-from collections.abc import Iterable
+
 
 def one_step_protocol(amplitude, duration):
     """A protocol with one square step of arbitrary duration and magnitude.
@@ -32,7 +29,7 @@ def one_step_protocol(amplitude, duration):
         The protocol signal as a function of time
     """
     return lambda times: np.array(((times > 1.0) & (times < 1.0 + duration)))\
-                                    .astype(float) * amplitude
+        .astype(float) * amplitude
 
 
 def sine_wave_protocol(amplitude, frequency):
@@ -110,12 +107,12 @@ def TimeSeriesFromSteps(start_times_list,
 
     for i in range(1, len(start_times_list)):
         index_start = np.max(np.where(times <= start_times_list[i]))
-        index_end = np.max(np.where(times <= start_times_list[i] + \
-                                              duration_list[i]))
+        index_end = np.max(np.where(times <= start_times_list[i] +
+                                    duration_list[i]))
 
         if times[index_start] == start_times_list[i]:
-            times = np.insert(times, index_end + 1, start_times_list[i] + \
-                                                    duration_list[i])
+            times = np.insert(times, index_end + 1, start_times_list[i] +
+                              duration_list[i])
             values = np.insert(values, index_end + 1, values[index_end])
             values[index_start:index_end + 1] += amplitude_list[i]
 
@@ -126,8 +123,8 @@ def TimeSeriesFromSteps(start_times_list,
 
         else:
             times = np.insert(times, index_start + 1, start_times_list[i])
-            times = np.insert(times, index_end + 2, start_times_list[i] + \
-                                                    duration_list[i])
+            times = np.insert(times, index_end + 2, start_times_list[i] +
+                              duration_list[i])
             values = np.insert(values, index_start + 1, values[index_start])
             values = np.insert(values, index_end + 2, values[index_end + 1])
             values[index_start + 1:index_end + 2] += amplitude_list[i]
@@ -160,10 +157,10 @@ def MyokitProtocolFromTimeSeries(durations, amplitudes):
         starting_time += duration
 
     sim_time = sabs_pkpd.constants.protocol_optimisation_instructions.\
-                         simulation_time
+        simulation_time
 
     if starting_time < sim_time and \
-                sabs_pkpd.constants.protocol_optimisation_instructions != []:
+            sabs_pkpd.constants.protocol_optimisation_instructions != []:
         prot.schedule(amplitudes[-1],
                       starting_time,
                       sim_time - starting_time + 100)
