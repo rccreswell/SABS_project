@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 
 # In[]
 
-sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt('C:/Users/yanral/Documents/Software Development/tests/test resources/pints_problem_def_test.mmt')
+sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(
+    'C:/Users/yanral/Documents/Software Development'
+    '/tests/test resources/pints_problem_def_test.mmt')
 time_max = 10
 read_out1 = 'comp1.x'
 read_out2 = 'comp1.y'
@@ -22,8 +24,22 @@ fixed_params_annot = ['constants.unknown_cst', 'constants.unknown_cst2']
 fixed_params_values = [0.1, 0.1]
 time_samples = [0, 0.01, 0.05, 0.1, 0.3, 0.5, 1, 5]
 
-x = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s, time_max, read_out1, exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples=time_samples)
-y = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s, time_max, read_out2, exp_cond_param_annot, exp_cond_param_values, fixed_params_annot, fixed_params_values, time_samples=time_samples)
+x = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
+                                       time_max,
+                                       read_out1,
+                                       exp_cond_param_annot,
+                                       exp_cond_param_values,
+                                       fixed_params_annot,
+                                       fixed_params_values,
+                                       time_samples=time_samples)
+y = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
+                                       time_max,
+                                       read_out2,
+                                       exp_cond_param_annot,
+                                       exp_cond_param_values,
+                                       fixed_params_annot,
+                                       fixed_params_values,
+                                       time_samples=time_samples)
 
 
 # In[]
