@@ -223,7 +223,7 @@ def compute_calcium_transient_duration(Cai,
         if time_points[CaiD_index[0][i]] > time_points[upstroke_index[0]] + 20\
                 and not found_CaiD:
             CaiD = time_points[CaiD_index[0][i]] \
-                   - time_points[upstroke_index[0]]
+                - time_points[upstroke_index[0]]
             found_CaiD = True
             break
 
