@@ -10,7 +10,7 @@ def simple_solver(alpha, protocol, times, x0):
 
 def simple_protocol(amplitude, duration):
     return lambda times: np.array(((times > 1.0) & (times < 1.0 + duration)))\
-                                    .astype(float) * amplitude
+        .astype(float) * amplitude
 
 
 def fake_protocol(amplitude, duration):
