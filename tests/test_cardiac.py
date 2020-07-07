@@ -3,6 +3,7 @@ import sabs_pkpd
 import pytest
 import unittest
 
+
 class Test(unittest.TestCase):
     def test_inputs(self):
         AP = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
@@ -19,14 +20,17 @@ class Test(unittest.TestCase):
             sabs_pkpd.cardiac.compute_APD(AP, time_points)
 
         with pytest.raises(ValueError):
-            sabs_pkpd.cardiac.compute_calcium_transient_duration(AP, time_points)
+            sabs_pkpd.cardiac.compute_calcium_transient_duration(AP,
+                                                                 time_points)
 
         return None
 
 
     def test_compute_APD(self):
-        mmt = './tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt'
-        sabs_pkpd.constants.s = sabs_pkpd.load_model.load_simulation_from_mmt(mmt)
+        mmt = \
+            './tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt'
+        sabs_pkpd.constants.s = sabs_pkpd.load_model.\
+                                    load_simulation_from_mmt(mmt)
 
         AP = sabs_pkpd.run_model.quick_simulate(sabs_pkpd.constants.s,
                                                 1000,
