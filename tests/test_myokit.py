@@ -8,4 +8,5 @@ def test_myokit_import():
     """
     m, p, x = myokit.load('example')
     s = myokit.Simulation(m, p)
+    assert isinstance(s, myokit.Simulation)
     assert True
