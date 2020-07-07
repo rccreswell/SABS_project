@@ -65,7 +65,7 @@ def load_data_file(filename, headers: bool = True):
 
     data = sorted(data, key=itemgetter(3, 0))
     data = np.concatenate([i for i in data])
-    data = data.reshape(len(data)//4, 4)
+    data = data.reshape(len(data) // 4, 4)
     exp_nums_list = list(set(data[:, 2]))
     exp_conds_list = list(set(data[:, 3]))
     times = []
