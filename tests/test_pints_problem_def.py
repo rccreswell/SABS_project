@@ -22,7 +22,7 @@ class Test(unittest.TestCase):
         boundaries_high = [1, 1]
 
         sabs_pkpd.constants.data_exp = sabs_pkpd.load_data.load_data_file(
-                                './tests/test resources/load_data_test.csv')
+            './tests/test resources/load_data_test.csv')
         sabs_pkpd.constants.data_exp.Add_fitting_instructions(
             ['constants.unknown_cst', 'constants.unknown_cst2'],
             'constants.T',
@@ -142,36 +142,49 @@ class Test(unittest.TestCase):
         chains = sabs_pkpd.pints_problem_def.MCMC_routine(
             starting_point,
             max_iter=10,
-            mmt_model_filename='./tests/test resources/tentusscher_2006_pints_and_Chons_hERG.mmt')
+            mmt_model_filename='./tests/test resources'
+                               '/tentusscher_2006_pints_and_Chons_hERG.mmt')
 
         # test adapt start
-        chains = sabs_pkpd.pints_problem_def.MCMC_routine(starting_point, max_iter=10, adapt_start=5)
+        chains = sabs_pkpd.pints_problem_def.MCMC_routine(
+            starting_point, max_iter=10, adapt_start=5)
 
         # Test adapt start exceptions
         with self.assertRaises(ValueError) as context:
-            chains = sabs_pkpd.pints_problem_def.MCMC_routine(starting_point, max_iter=10, adapt_start=100)
-        assert 'number of iterations should be higher' in str(context.exception)
+            chains = sabs_pkpd.pints_problem_def.MCMC_routine(
+                starting_point, max_iter=10, adapt_start=100)
+        assert 'number of iterations should be higher' in \
+            str(context.exception)
 
         # Test chain and pdf filenames
-        chains = sabs_pkpd.pints_problem_def.MCMC_routine(starting_point, max_iter=10, chain_filename='chain.file', pdf_filename='pdf.file')
-
+        chains = sabs_pkpd.pints_problem_def.MCMC_routine(
+            starting_point,
+            max_iter=10,
+            chain_filename='chain.file',
+            pdf_filename='pdf.file')
 
         return None
 
     def test_plot_MCMC_convergence(self):
         # Test a chain with just 1 parameter
-        test_mcmc_chain = np.array([[[0.],[0.],[0.]],[[0.],[0.],[0.]]])
-        f, a = sabs_pkpd.pints_problem_def.plot_MCMC_convergence(test_mcmc_chain, [0.0], [1.0], [-1.0])
+        test_mcmc_chain = np.array([[[0.], [0.], [0.]], [[0.], [0.], [0.]]])
+        f, a = sabs_pkpd.pints_problem_def.plot_MCMC_convergence(
+            test_mcmc_chain, [0.0], [1.0], [-1.0])
 
     def test_parameter_is_state(self):
         param_annot = 'comp1.x'
-        myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
-        assert sabs_pkpd.pints_problem_def.parameter_is_state(param_annot, myokit_simulation) == True
+        myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt(
+            './tests/test resources/pints_problem_def_test.mmt')
+        assert sabs_pkpd.pints_problem_def.parameter_is_state(
+            param_annot, myokit_simulation) is True
 
         param_annot = 'constants.T'
-        assert sabs_pkpd.pints_problem_def.parameter_is_state(param_annot, myokit_simulation) == False
+        assert sabs_pkpd.pints_problem_def.parameter_is_state(
+            param_annot, myokit_simulation) is False
 
     def test_find_index_of_state(self):
         param_annot = 'comp1.x'
-        myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt('./tests/test resources/pints_problem_def_test.mmt')
-        assert sabs_pkpd.pints_problem_def.find_index_of_state(param_annot, myokit_simulation) == 1
+        myokit_simulation = sabs_pkpd.load_model.load_simulation_from_mmt(
+            './tests/test resources/pints_problem_def_test.mmt')
+        assert sabs_pkpd.pints_problem_def.find_index_of_state(
+            param_annot, myokit_simulation) == 1

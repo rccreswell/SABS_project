@@ -118,8 +118,8 @@ def get_steady_state(s,
         if list_of_models_names is None:
             if hasattr(sabs_pkpd.constants,
                        'protocol_optimisation_instructions'):
-                list_of_models_names = \
-                  sabs_pkpd.constants.protocol_optimisation_instructions.models
+                list_of_models_names = sabs_pkpd.constants.\
+                    protocol_optimisation_instructions.models
             else:
                 list_of_models_names = []
                 for i in range(len(steady_state)):
@@ -239,7 +239,7 @@ def clamp_experiment_model(model_filename,
     # name
     i = clamped_variable_annot.index('.')
     component_name = clamped_variable_annot[0:i]
-    variable_name = clamped_variable_annot[i+1:]
+    variable_name = clamped_variable_annot[i + 1:]
 
     # Change the model to clamp the selected value
     original_protocol_component = m.get(component_name,

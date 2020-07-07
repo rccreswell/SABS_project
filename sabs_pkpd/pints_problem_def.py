@@ -14,10 +14,10 @@ class MyModel(pints.ForwardModel):
     def simulate(self, parameters, times):
         sabs_pkpd.constants.n = len(parameters)
         out = sabs_pkpd.run_model.simulate_data(
-                                    parameters,
-                                    sabs_pkpd.constants.s,
-                                    sabs_pkpd.constants.data_exp,
-                                    pre_run=sabs_pkpd.constants.pre_run)
+            parameters,
+            sabs_pkpd.constants.s,
+            sabs_pkpd.constants.data_exp,
+            pre_run=sabs_pkpd.constants.pre_run)
         out = np.concatenate(out)
         return out
 
@@ -56,8 +56,8 @@ def parameter_is_state(param_annot, myokit_simulation):
             variable_found = True
 
     if not variable_found:
-        raise ValueError(
-           'The variable ' + param_annot + ' could not be found in the model.')
+        raise ValueError('The variable ' + param_annot +
+                         ' could not be found in the model.')
 
     return is_state
 
@@ -135,9 +135,9 @@ def infer_params(initial_point,
         sabs_pkpd.constants.data_exp.fitting_instructions.fitted_params_annot)
 
     problem = pints.SingleOutputProblem(
-                    model=MyModel(),
-                    times=np.linspace(0, 1, len(fit_values)),
-                    values=fit_values)
+        model=MyModel(),
+        times=np.linspace(0, 1, len(fit_values)),
+        values=fit_values)
     boundaries = pints.RectangularBoundaries(boundaries_low, boundaries_high)
     error_measure = pints.SumOfSquaresError(problem)
     optimiser = pints.OptimisationController(error_measure,
@@ -243,9 +243,9 @@ def MCMC_routine(starting_point,
     fit_values = np.concatenate(sabs_pkpd.constants.data_exp.values)
 
     problem = pints.SingleOutputProblem(
-                                    model,
-                                    times=np.linspace(0, 1, len(fit_values)),
-                                    values=fit_values)
+        model,
+        times=np.linspace(0, 1, len(fit_values)),
+        values=fit_values)
 
     # Create a log-likelihood function (adds an extra parameter!)
     log_likelihood = eval('pints.' + log_likelihood + '(problem)')
@@ -324,7 +324,7 @@ def plot_distribution_parameters(mcmc_chains: list,
     :return: fig, axes
     The matplotlib.pyplot.fig and -.axes corresponding to the desired figure.
     """
-    if chain_index > len(mcmc_chains)-1:
+    if chain_index > len(mcmc_chains) - 1:
         raise ValueError('This MCMC output does not have enough chains to '
                          'reach for chain no. ' + str(chain_index) + '. Only '
                          + str(len(mcmc_chains)) +
@@ -334,17 +334,17 @@ def plot_distribution_parameters(mcmc_chains: list,
         n_columns = len(mcmc_chains[0, 0])
     else:
         n_columns = 4
-    n_rows = 1 + len(mcmc_chains[0, 0])//4
+    n_rows = 1 + len(mcmc_chains[0, 0]) // 4
 
     # Generate the subplots
     fig, axes = plt.subplots(n_rows, n_columns, figsize=fig_size)
 
     # Loop over the subplots
-    for i in range(len(mcmc_chains[0][0])-1):
+    for i in range(len(mcmc_chains[0][0]) - 1):
         if n_rows == 1:
             ax = axes[i]
         else:
-            ax = axes[i//4, i % 4]
+            ax = axes[i // 4, i % 4]
         hist_1d(mcmc_chains[chain_index][explor_iter:, i], ax=ax)
         ax.set_title(sabs_pkpd.constants.data_exp.
                      fitting_instructions.fitted_params_annot[i])

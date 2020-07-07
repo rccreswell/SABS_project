@@ -79,11 +79,11 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run=0):
         s.pre(pre_run)
 
         # Run the simulation with starting parameters
-        a = s.run(data_exp.times[k][-1]*1.00001, log_times=data_exp.times[k])
+        a = s.run(data_exp.times[k][-1] * 1.00001, log_times=data_exp.times[k])
 
         # Convert output in concentration
         output.append(
-                list(a[data_exp.fitting_instructions.sim_output_param_annot]))
+            list(a[data_exp.fitting_instructions.sim_output_param_annot]))
 
     return output
 
@@ -195,7 +195,7 @@ def quick_simulate(s,
                     if sabs_pkpd.pints_problem_def.\
                             parameter_is_state(annot, s):
                         index = sabs_pkpd.pints_problem_def.\
-                                    find_index_of_state(annot, s)
+                            find_index_of_state(annot, s)
                         state_to_set[index] = fixed_params_values[i]
                     else:
                         s.set_constant(annot, fixed_params_values[i])
@@ -209,7 +209,7 @@ def quick_simulate(s,
             s.pre(pre_run)
 
             # Run the simulation with starting parameters
-            a = s.run(time_max*1.000001, log_times=time_samples)
+            a = s.run(time_max * 1.000001, log_times=time_samples)
             # Convert output in concentration
             output.append(list(a[read_out]))
     else:
@@ -228,7 +228,7 @@ def quick_simulate(s,
             for i, annot in enumerate(fixed_params_annot):
                 if sabs_pkpd.pints_problem_def.parameter_is_state(annot, s):
                     index = sabs_pkpd.pints_problem_def.\
-                                find_index_of_state(annot, s)
+                        find_index_of_state(annot, s)
                     state_to_set[index] = fixed_params_values[i]
                 else:
                     s.set_constant(annot, fixed_params_values[i])
@@ -297,13 +297,13 @@ def plot_model_vs_data(plotting_parameters_annot,
         number_of_rows = 1
         fig1 = plt.figure()
     else:
-        number_of_rows = number_of_plots//2 \
-            + number_of_plots % (number_of_plots//2)
+        number_of_rows = number_of_plots // 2 \
+            + number_of_plots % (number_of_plots // 2)
         fig1, axes = plt.subplots(number_of_rows, 2, figsize=figsize)
 
     for i in range(0, number_of_plots):
         if number_of_plots > 1:
-            plt.subplot(number_of_rows, 2, i+1)
+            plt.subplot(number_of_rows, 2, i + 1)
 
         # Retrieve simulation parameters from the provided data in data_exp
         time_max = data_exp.times[i][-1]
