@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
                               0.749, 0.748, 3.312e-05, 0.9709, 0.999, 0.99996,
                               0.999998, 2.363e-08])
         res = np.array(res[0][0])
-        rel_diff = abs((expected1-res)/res)
+        rel_diff = abs((expected1 - res) / res)
         print(np.nanmax(rel_diff) < 0.05)
 
         sabs_pkpd.constants.s = [sabs_pkpd.constants.s]
@@ -71,7 +71,7 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             res = sabs_pkpd.clamp_experiment.get_steady_state(
-                    sabs_pkpd.constants.s, time_ss, data_exp='not_data_exp')
+                sabs_pkpd.constants.s, time_ss, data_exp='not_data_exp')
         assert 'data_exp should contain' in str(context.exception)
 
         # Test providing data exp
@@ -187,6 +187,6 @@ class Test(unittest.TestCase):
         expected_output = np.array([0.00901, 0.02621, 0.00976, 0.02642,
                                     0.00952, 0.02661, 0.00935, 0.02676,
                                     0.00922])
-        diff = np.linalg.norm(output-expected_output)
+        diff = np.linalg.norm(output - expected_output)
 
         assert diff < 0.001
