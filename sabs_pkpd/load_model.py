@@ -71,11 +71,12 @@ def convert_protocol(model):
 
     # Write the protocol in Myokit format
     new_protocol = myokit.Protocol()
-    new_protocol.schedule(1.0,
-                          pacing_parameters['stimulus_protocol_IstimStart'],
-                          pacing_parameters['stimulus_protocol_IstimPulseDuration'],
-                          period=pacing_parameters['stimulus_protocol_IstimPeriod'],
-                          multiplier=0)
+    new_protocol.schedule(
+        1.0,
+        pacing_parameters['stimulus_protocol_IstimStart'],
+        pacing_parameters['stimulus_protocol_IstimPulseDuration'],
+        period=pacing_parameters['stimulus_protocol_IstimPeriod'],
+        multiplier=0)
 
     return model, new_protocol
 
@@ -106,8 +107,11 @@ def load_model_from_cellml(cellml_filename, mmt_filename):
     sim = load_simulation_from_mmt(mmt_filename)
     return sim
 
+
 def load_simulation_from_mmt(filename):
-    """Load a model into Myokit from MMT file format. Saves the default state to sabs_pkpd.constants.default_state.
+    """Load a model into Myokit from MMT file format.
+
+    Saves the default state to sabs_pkpd.constants.default_state.
 
     Parameters
     ----------
