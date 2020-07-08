@@ -71,8 +71,8 @@ def test_MyokitProtocolFromFourier():
     low_freq = 0
     high_freq = 100
     w = np.linspace(low_freq, high_freq, 11)
-    real_part = np.cos(2*np.pi*w/25)
-    imag_part = np.sin(2*np.pi*w/12.5)
+    real_part = np.cos(2 * np.pi * w / 25)
+    imag_part = np.sin(2 * np.pi * w / 12.5)
     prot = sabs_pkpd.protocols.MyokitProtocolFromFourier(real_part,
                                                          imag_part,
                                                          low_freq,
@@ -81,7 +81,7 @@ def test_MyokitProtocolFromFourier():
 
     expected_values = [0.09090909090909106, 0.14138365080049745,
                        0.5523186154284712, 0.01675948404164788,
-                       0.36157679274667687,0.22300143413482795,
+                       0.36157679274667687, 0.22300143413482795,
                        0.08807202790591157, 0.5247644916149904,
                        0.30631082576308805, 0.3263374809772719,
                        0.049851011157463695, 0.049851011157463695]
