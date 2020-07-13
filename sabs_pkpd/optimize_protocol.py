@@ -166,7 +166,7 @@ class ProtocolOptimizer:
                 J[i, j] = np.sum(d1 * d2)
 
         true_sigma = 0.1
-        J = 1/true_sigma**2 * J
+        J = 1 / true_sigma ** 2 * J
 
         # Calculate the objective function from the CRLBs
         try:
@@ -196,9 +196,9 @@ class ProtocolOptimizer:
         # Start one particle at the baseline protocol. Start all the others
         # at randomly generated points about it
         init_pos = [self.protocol_params]
-        for _ in range(num_particles-1):
+        for _ in range(num_particles - 1):
             init_pos.append(np.random.normal(self.protocol_params,
-                                             np.abs(self.protocol_params)*5))
+                                             np.abs(self.protocol_params) * 5))
         init_pos = np.array(init_pos)
 
         optimizer = ps.single.GlobalBestPSO(n_particles=num_particles,
@@ -214,13 +214,13 @@ class ProtocolOptimizer:
         """Infer posteriors of the model parameters given the current protocol.
         """
         values, chains = infer_model_parameters(
-                            self.simulator,
-                            self.x0,
-                            self.protocol_form(*self.protocol_params),
-                            self.true_model_params,
-                            self.times,
-                            self.num_mcmc_iterations
-                         )
+            self.simulator,
+            self.x0,
+            self.protocol_form(*self.protocol_params),
+            self.true_model_params,
+            self.times,
+            self.num_mcmc_iterations
+        )
 
         self.data = values
         self.posterior = chains
@@ -249,9 +249,9 @@ class ProtocolOptimizer:
 
         # Initial protocol
         axes[0, 0].plot(
-                self.times,
-                self.protocol_form(*self.original_protocol_params)(self.times)
-                )
+            self.times,
+            self.protocol_form(*self.original_protocol_params)(self.times)
+        )
         axes[0, 0].set_title('initial protocol')
 
         axes[0, 1].plot(self.times, self.original_data)
@@ -259,12 +259,11 @@ class ProtocolOptimizer:
 
         for i, model_param in enumerate(self.model_params):
             true_value = self.true_model_params[i]
-            axes[0, i+2].hist(self.original_posterior[0, :, i][burnin:],
-                              alpha=0.8)
-            axes[0, i+2].axvline(true_value,
-                                 zorder=-10,
-                                 color='mediumseagreen')
-            axes[0, i+2].set_title('parameter {}'.format(i+1))
+            axes[0, i + 2].hist(
+                self.original_posterior[0, :, i][burnin:], alpha=0.8)
+            axes[0, i + 2].axvline(
+                true_value, zorder=-10, color='mediumseagreen')
+            axes[0, i + 2].set_title('parameter {}'.format(i + 1))
 
         # Optimized protocol
         axes[1, 0].plot(self.times,
@@ -276,11 +275,10 @@ class ProtocolOptimizer:
 
         for i, model_param in enumerate(self.model_params):
             true_value = self.true_model_params[i]
-            axes[1, i+2].hist(self.posterior[0, :, i][burnin:], alpha=0.8)
-            axes[1, i+2].axvline(true_value,
-                                 zorder=-10,
-                                 color='mediumseagreen')
-            axes[1, i+2].set_title('parameter {}'.format(i+1))
+            axes[1, i + 2].hist(self.posterior[0, :, i][burnin:], alpha=0.8)
+            axes[1, i + 2].axvline(
+                true_value, zorder=-10, color='mediumseagreen')
+            axes[1, i + 2].set_title('parameter {}'.format(i + 1))
 
         fig.set_tight_layout(True)
         if show:
@@ -335,15 +333,15 @@ def infer_model_parameters(simulator,
     problem = pints.SingleOutputProblem(m, times, values)
     likelihood = pints.GaussianKnownSigmaLogLikelihood(problem, 0.1)
 
-    prior = pints.UniformLogPrior([0.0]*len(true_model_params),
-                                  [100.0]*len(true_model_params))
+    prior = pints.UniformLogPrior([0.0] * len(true_model_params),
+                                  [100.0] * len(true_model_params))
 
     log_posterior = pints.LogPosterior(likelihood, prior)
 
     # Get the MCMC starting point near the true values
     true_model_params = np.array(true_model_params)
     x0 = true_model_params + np.random.normal(
-                    0, np.abs(true_model_params)*0.1, len(true_model_params))
+        0, np.abs(true_model_params) * 0.1, len(true_model_params))
     x0 = [x0]
 
     # Run MCMC chain
@@ -383,44 +381,45 @@ def damped_harmonic_oscillator(c, k, m, beta, protocol, t, x0):
         return d
 
     result = scipy.integrate.solve_ivp(
-            f,
-            (min(t), max(t)),
-            [x0, 0],
-            t_eval=t,
-            max_step=0.1,
-            vectorized=True).y[0]
+        f,
+        (min(t), max(t)),
+        [x0, 0],
+        t_eval=t,
+        max_step=0.1,
+        vectorized=True).y[0]
 
     return result
 
 
-def main():
-    params = [1.70015678e+00,
-              1.92681600e+00,
-              -1.12329275e-01,
-              9.86565896e-01,
-              4.02746746e-01,
-              1.96004128e+02,
-              7.16528663e+01,
-              -2.13426171e+01,
-              1.32499357e+01,
-              -4.06159185e+01]
+# TODO: remove this function, it is now in Examples
+# def main():
+#     params = [1.70015678e+00,
+#               1.92681600e+00,
+#               -1.12329275e-01,
+#               9.86565896e-01,
+#               4.02746746e-01,
+#               1.96004128e+02,
+#               7.16528663e+01,
+#               -2.13426171e+01,
+#               1.32499357e+01,
+#               -4.06159185e+01]
+#
+#     opt = ProtocolOptimizer(
+#         damped_harmonic_oscillator,
+#         five_event_protocol,
+#         np.linspace(0, 10, 400),
+#         0.0,
+#         [5.0, 10.0, 1.0, 10.0],
+#         params,
+#         4000,
+#         true_model_params=[5.0, 10.0, 1.0, 10.0])
+#
+#     opt.run_original_protocol()
+#     opt.optimize_protocol()
+#     opt.infer_model_parameters()
+#     opt.plot()
+#     opt.update_model_parameters()
 
-    opt = ProtocolOptimizer(
-        damped_harmonic_oscillator,
-        five_event_protocol,
-        np.linspace(0, 10, 400),
-        0.0,
-        [5.0, 10.0, 1.0, 10.0],
-        params,
-        4000,
-        true_model_params=[5.0, 10.0, 1.0, 10.0])
 
-    opt.run_original_protocol()
-    opt.optimize_protocol()
-    opt.infer_model_parameters()
-    opt.plot()
-    opt.update_model_parameters()
-
-
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

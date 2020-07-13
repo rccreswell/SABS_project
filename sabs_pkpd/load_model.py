@@ -40,9 +40,9 @@ def convert_protocol(model):
     pacing_parameters = {}
     for equation in equations:
 
-        if equation.lhs.pystr() in ['IstimStart',
-                                    'IstimPeriod',
-                                    'IstimPulseDuration']:
+        if equation.lhs.pystr() in ['stimulus_protocol_IstimStart',
+                                    'stimulus_protocol_IstimPeriod',
+                                    'stimulus_protocol_IstimPulseDuration']:
             pacing_parameters[equation.lhs.pystr()] = equation.rhs
         if equation.lhs.pystr() == 'IstimAmplitude':
             amplitude = equation.rhs
@@ -71,11 +71,12 @@ def convert_protocol(model):
 
     # Write the protocol in Myokit format
     new_protocol = myokit.Protocol()
-    new_protocol.schedule(1.0,
-                          pacing_parameters['IstimStart'],
-                          pacing_parameters['IstimPulseDuration'],
-                          period=pacing_parameters['IstimPeriod'],
-                          multiplier=0)
+    new_protocol.schedule(
+        1.0,
+        pacing_parameters['stimulus_protocol_IstimStart'],
+        pacing_parameters['stimulus_protocol_IstimPulseDuration'],
+        period=pacing_parameters['stimulus_protocol_IstimPeriod'],
+        multiplier=0)
 
     return model, new_protocol
 
@@ -100,21 +101,17 @@ def load_model_from_cellml(cellml_filename, mmt_filename):
 
     importer = myokit.formats.importer('cellml')
     model = importer.model(cellml_filename)
+    model, prot = convert_protocol(model)
     myokit.save_model(mmt_filename, model)
 
-    return 0
-
-    # Code for a simulation
-    # d = s.run(1000)
-    # first_state = next(model.states())
-    # var = first_state.qname()
-    # plt.plot(d.time(), d[var])
-    # plt.title(var)
-    # plt.show()
+    sim = load_simulation_from_mmt(mmt_filename)
+    return sim
 
 
 def load_simulation_from_mmt(filename):
-    """Load a model into Myokit from MMT file format. Saves the default state to sabs_pkpd.constants.default_state.
+    """Load a model into Myokit from MMT file format.
+
+    Saves the default state to sabs_pkpd.constants.default_state.
 
     Parameters
     ----------
