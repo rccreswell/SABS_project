@@ -27,3 +27,8 @@ simulation = sabs_pkpd.load_model.load_model_from_cellml(cellml, mmt)
 
 That's it ! You have loaded the model and are ready to run simulations with it. It is loaded to the variable ```simulation``` which is a Myokit object.
 
+## Run a quick simulation with your freshly loaded model
+
+Now that you have your MMT model loaded in ```simulation```, you can run it. The simplest ever 
+
+
