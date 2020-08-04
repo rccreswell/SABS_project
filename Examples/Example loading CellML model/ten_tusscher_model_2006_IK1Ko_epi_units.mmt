@@ -1,0 +1,433 @@
+[[model]]
+author: Myokit CellML 1 API
+documentation: """
+    Alternans and spiral breakup in a human ventricular tissue model
+    
+    Noble
+    Penny
+    
+    Oxford University Cardiac Electrophysiology Group
+    
+    Model Status
+    
+    This is the EPICARDIAL CELL VARIANT of the model. This model was created by
+    Penny Noble of Oxford University and is known to read in COR and PCEnv. A
+    stimulus protocol has been added that allows the model to simulate multiple
+    action potentials at 1Hz.
+    
+    Model Structure
+    
+    ABSTRACT: Ventricular fibrillation (VF) is one of the main causes of death
+    in the Western world. According to one hypothesis, the chaotic excitation
+    dynamics during VF are the result of dynamical instabilities in action
+    potential duration (APD) the occurrence of which requires that the slope of
+    the APD restitution curve exceeds 1. Other factors such as electrotonic
+    coupling and cardiac memory also determine whether these instabilities can
+    develop. In this paper we study the conditions for alternans and spiral
+    breakup in human cardiac tissue. Therefore, we develop a new version of our
+    human ventricular cell model, which is based on recent experimental
+    measurements of human APD restitution and includes a more extensive
+    description of intracellular calcium dynamics. We apply this model to study
+    the conditions for electrical instability in single cells, for reentrant
+    waves in a ring of cells, and for reentry in two-dimensional sheets of
+    ventricular tissue. We show that an important determinant for the onset of
+    instability is the recovery dynamics of the fast sodium current. Slower
+    sodium current recovery leads to longer periods of spiral wave rotation and
+    more gradual conduction velocity restitution, both of which suppress
+    restitution-mediated instability. As a result, maximum restitution slopes
+    considerably exceeding 1 (up to 1.5) may be necessary for electrical
+    instability to occur. Although slopes necessary for the onset of
+    instabilities found in our study exceed 1, they are within the range of
+    experimentally measured slopes. Therefore, we conclude that steep APD
+    restitution-mediated instability is a potential mechanism for VF in the
+    human heart.
+    
+    The original paper reference is cited below:
+    
+    Alternans and spiral breakup in a human ventricular tissue model, K.H.W.J.
+    ten Tusscher, A.V. Panfilov, Sep 2006,
+    American Journal of Physiology, Heart and Circulatory Physiology , 291 3,
+    H1088-1100. PubMed ID: 16565318
+    
+    cell diagram
+    
+    A schematic diagram describing the ion movement across the cell surface
+    membrane and the sarcoplasmic reticulum, which are described by the Ten
+    Tusscher et al. 2006 mathematical model of the human ventricular myocyte.
+    """
+name: tentusscher_panfilov_2006_epi_cell
+# Initial values
+membrane.V                                          = -85.23
+rapid_time_dependent_potassium_current_Xr1_gate.Xr1 = 0.00621
+rapid_time_dependent_potassium_current_Xr2_gate.Xr2 = 0.4712
+slow_time_dependent_potassium_current_Xs_gate.Xs    = 0.0095
+fast_sodium_current_m_gate.m                        = 0.00172
+fast_sodium_current_h_gate.h                        = 0.7444
+fast_sodium_current_j_gate.j                        = 0.7045
+L_type_Ca_current_d_gate.d                          = 3.373e-5
+L_type_Ca_current_f_gate.f                          = 0.7888
+L_type_Ca_current_f2_gate.f2                        = 0.9755
+L_type_Ca_current_fCass_gate.fCass                  = 0.9953
+transient_outward_current_s_gate.s                  = 0.999998
+transient_outward_current_r_gate.r                  = 2.42e-8
+calcium_dynamics.Ca_i                               = 0.000126
+calcium_dynamics.Ca_SR                              = 3.64
+calcium_dynamics.Ca_ss                              = 0.00036
+calcium_dynamics.R_prime                            = 0.9073
+sodium_dynamics.Na_i                                = 8.604
+potassium_dynamics.K_i                              = 136.89
+
+[L_type_Ca_current]
+g_CaL = 3.98e-5 [L/F/ms (0.001)]
+    in [L/F/ms (0.001)]
+i_CaL = g_CaL * L_type_Ca_current_d_gate.d * L_type_Ca_current_f_gate.f * L_type_Ca_current_f2_gate.f2 * L_type_Ca_current_fCass_gate.fCass * 4 * (membrane.V - 15 [mV]) * membrane.F ^ 2 / (membrane.R * membrane.T) * (0.25 * calcium_dynamics.Ca_ss * exp(2 * (membrane.V - 15 [mV]) * membrane.F / (membrane.R * membrane.T)) - calcium_dynamics.Ca_o) / (exp(2 * (membrane.V - 15 [mV]) * membrane.F / (membrane.R * membrane.T)) - 1)
+    in [A/F]
+
+[L_type_Ca_current_d_gate]
+alpha_d = 1.4 / (1 + exp((-35 [mV] - membrane.V) / 13 [mV])) + 0.25
+    in [1]
+beta_d = 1.4 / (1 + exp((membrane.V + 5 [mV]) / 5 [mV]))
+    in [1]
+dot(d) = (d_inf - d) / tau_d
+    in [1]
+d_inf = 1 / (1 + exp((-8 [mV] - membrane.V) / 7.5 [mV]))
+    in [1]
+gamma_d = 1 [ms] / (1 + exp((50 [mV] - membrane.V) / 20 [mV]))
+    in [ms]
+tau_d = 1 [ms] * alpha_d * beta_d + gamma_d
+    in [ms]
+
+[L_type_Ca_current_f2_gate]
+dot(f2) = (f2_inf - f2) / tau_f2
+    in [1]
+f2_inf = 0.67 / (1 + exp((membrane.V + 35 [mV]) / 7 [mV])) + 0.33
+    in [1]
+tau_f2 = 562 [ms] * exp(-(membrane.V + 27 [mV]) ^ 2 / 240 [mV^2]) + 31 [ms] / (1 + exp((25 [mV] - membrane.V) / 10 [mV])) + 80 [ms] / (1 + exp((membrane.V + 30 [mV]) / 10 [mV]))
+    in [ms]
+
+[L_type_Ca_current_fCass_gate]
+dot(fCass) = (fCass_inf - fCass) / tau_fCass
+    in [1]
+fCass_inf = 0.6 / (1 + (calcium_dynamics.Ca_ss / 0.05 [mM]) ^ 2) + 0.4
+    in [1]
+tau_fCass = 80 [ms] / (1 + (calcium_dynamics.Ca_ss / 0.05 [mM]) ^ 2) + 2 [ms]
+    in [ms]
+
+[L_type_Ca_current_f_gate]
+dot(f) = (f_inf - f) / tau_f
+    in [1]
+f_inf = 1 / (1 + exp((membrane.V + 20 [mV]) / 7 [mV]))
+    in [1]
+tau_f = 1102.5 [ms] * exp(-(membrane.V + 27 [mV]) ^ 2 / 225 [mV^2]) + 200 [ms] / (1 + exp((13 [mV] - membrane.V) / 10 [mV])) + 180 [ms] / (1 + exp((membrane.V + 30 [mV]) / 10 [mV])) + 20 [ms]
+    in [ms]
+
+[calcium_background_current]
+g_bca = 0.000592 [mS/uF]
+    in [mS/uF]
+i_b_Ca = g_bca * (membrane.V - reversal_potentials.E_Ca)
+    in [A/F]
+
+[calcium_dynamics]
+Buf_c = 0.2 [mM]
+    in [mM]
+Buf_sr = 10 [mM]
+    in [mM]
+Buf_ss = 0.4 [mM]
+    in [mM]
+dot(Ca_SR) = Ca_sr_bufsr * (i_up - (i_rel + i_leak))
+    in [mM]
+dot(Ca_i) = Ca_i_bufc * ((i_leak - i_up) * V_sr / membrane.V_c + i_xfer - 1 [1 (1e+09)] * (calcium_background_current.i_b_Ca + calcium_pump_current.i_p_Ca - 2 * sodium_calcium_exchanger_current.i_NaCa) * membrane.Cm / (2 * 1 [1 (1e+15)] * membrane.V_c * membrane.F))
+    in [mM]
+Ca_i_bufc = 1 / (1 + Buf_c * K_buf_c / (Ca_i + K_buf_c) ^ 2)
+    in [1]
+Ca_o = 2 [mM]
+    in [mM]
+Ca_sr_bufsr = 1 / (1 + Buf_sr * K_buf_sr / (Ca_SR + K_buf_sr) ^ 2)
+    in [1]
+dot(Ca_ss) = Ca_ss_bufss * (-1 [1 (1e+09)] * L_type_Ca_current.i_CaL * membrane.Cm / (2 * 1 [1 (1e+15)] * V_ss * membrane.F) + i_rel * V_sr / V_ss - i_xfer * membrane.V_c / V_ss)
+    in [mM]
+Ca_ss_bufss = 1 / (1 + Buf_ss * K_buf_ss / (Ca_ss + K_buf_ss) ^ 2)
+    in [1]
+EC = 1.5 [mM]
+    in [mM]
+K_buf_c = 0.001 [mM]
+    in [mM]
+K_buf_sr = 0.3 [mM]
+    in [mM]
+K_buf_ss = 0.00025 [mM]
+    in [mM]
+K_up = 0.00025 [mM]
+    in [mM]
+O = k1 * Ca_ss ^ 2 * R_prime / (k3 + k1 * Ca_ss ^ 2)
+    in [1]
+dot(R_prime) = -k2 * Ca_ss * R_prime + k4 * (1 - R_prime)
+    in [1]
+V_leak = 0.00036 [mS/uF]
+    in [mS/uF]
+V_rel = 0.102 [mS/uF]
+    in [mS/uF]
+V_sr = 0.001094 [um^3]
+    in [um^3]
+V_ss = 5.468e-5 [um^3]
+    in [um^3]
+V_xfer = 0.0038 [mS/uF]
+    in [mS/uF]
+Vmax_up = 0.006375 [mM/ms]
+    in [mM/ms]
+i_leak = V_leak * (Ca_SR - Ca_i)
+    in [mM/ms]
+i_rel = V_rel * O * (Ca_SR - Ca_ss)
+    in [mM/ms]
+i_up = Vmax_up / (1 + K_up ^ 2 / Ca_i ^ 2)
+    in [mM/ms]
+i_xfer = V_xfer * (Ca_ss - Ca_i)
+    in [mM/ms]
+k1 = k1_prime / kcasr
+    in [1/mM^2/ms]
+k1_prime = 0.15 [1/mM^2/ms]
+    in [1/mM^2/ms]
+k2 = k2_prime * kcasr
+    in [1/mM/ms]
+k2_prime = 0.045 [1/mM/ms]
+    in [1/mM/ms]
+k3 = 0.06 [mS/uF]
+    in [mS/uF]
+k4 = 0.005 [mS/uF]
+    in [mS/uF]
+kcasr = max_sr - (max_sr - min_sr) / (1 + (EC / Ca_SR) ^ 2)
+    in [1]
+max_sr = 2.5
+    in [1]
+min_sr = 1
+    in [1]
+
+[calcium_pump_current]
+K_pCa = 0.0005 [mM]
+    in [mM]
+g_pCa = 0.1238 [A/F]
+    in [A/F]
+i_p_Ca = g_pCa * calcium_dynamics.Ca_i / (calcium_dynamics.Ca_i + K_pCa)
+    in [A/F]
+
+[environment]
+time = 0 [ms] bind time
+    in [ms]
+
+[fast_sodium_current]
+g_Na = 14.838 [mS/uF]
+    in [mS/uF]
+i_Na = g_Na * fast_sodium_current_m_gate.m ^ 3 * fast_sodium_current_h_gate.h * fast_sodium_current_j_gate.j * (membrane.V - reversal_potentials.E_Na)
+    in [A/F]
+
+[fast_sodium_current_h_gate]
+alpha_h = piecewise(membrane.V < -40 [mV], 0.057 [mS/uF] * exp(-(membrane.V + 80 [mV]) / 6.8 [mV]), 0 [mS/uF])
+    in [mS/uF]
+beta_h = piecewise(membrane.V < -40 [mV], 2.7 [mS/uF] * exp(0.079 [1/mV] * membrane.V) + 310000 [mS/uF] * exp(0.3485 [1/mV] * membrane.V), 0.77 [mS/uF] / (0.13 * (1 + exp((membrane.V + 10.66 [mV]) / -11.1 [mV]))))
+    in [mS/uF]
+dot(h) = (h_inf - h) / tau_h
+    in [1]
+h_inf = 1 / (1 + exp((membrane.V + 71.55 [mV]) / 7.43 [mV])) ^ 2
+    in [1]
+tau_h = 1 / (alpha_h + beta_h)
+    in [ms]
+
+[fast_sodium_current_j_gate]
+alpha_j = piecewise(membrane.V < -40 [mV], (-25428 [mS/uF] * exp(0.2444 [1/mV] * membrane.V) - 6.948e-6 [mS/uF] * exp(-0.04391 [1/mV] * membrane.V)) * (membrane.V + 37.78 [mV]) / 1 [mV] / (1 + exp(0.311 [1/mV] * (membrane.V + 79.23 [mV]))), 0 [mS/uF])
+    in [mS/uF]
+beta_j = piecewise(membrane.V < -40 [mV], 0.02424 [mS/uF] * exp(-0.01052 [1/mV] * membrane.V) / (1 + exp(-0.1378 [1/mV] * (membrane.V + 40.14 [mV]))), 0.6 [mS/uF] * exp(0.057 [1/mV] * membrane.V) / (1 + exp(-0.1 [1/mV] * (membrane.V + 32 [mV]))))
+    in [mS/uF]
+dot(j) = (j_inf - j) / tau_j
+    in [1]
+j_inf = 1 / (1 + exp((membrane.V + 71.55 [mV]) / 7.43 [mV])) ^ 2
+    in [1]
+tau_j = 1 / (alpha_j + beta_j)
+    in [ms]
+
+[fast_sodium_current_m_gate]
+alpha_m = 1 / (1 + exp((-60 [mV] - membrane.V) / 5 [mV]))
+    in [1]
+beta_m = 0.1 / (1 + exp((membrane.V + 35 [mV]) / 5 [mV])) + 0.1 / (1 + exp((membrane.V - 50 [mV]) / 200 [mV]))
+    in [1]
+dot(m) = (m_inf - m) / tau_m
+    in [1]
+m_inf = 1 / (1 + exp((-56.86 [mV] - membrane.V) / 9.03 [mV])) ^ 2
+    in [1]
+tau_m = 1 [ms] * alpha_m * beta_m
+    in [ms]
+
+[inward_rectifier_potassium_current]
+alpha_K1 = 0.1 / (1 + exp(0.06 [1/mV] * (membrane.V - reversal_potentials.E_K - 200 [mV])))
+    in [1]
+beta_K1 = (3 * exp(0.0002 [1/mV] * (membrane.V - reversal_potentials.E_K + 100 [mV])) + exp(0.1 [1/mV] * (membrane.V - reversal_potentials.E_K - 10 [mV]))) / (1 + exp(-0.5 [1/mV] * (membrane.V - reversal_potentials.E_K)))
+    in [1]
+g_K1 = 5.405 [mS/uF]
+    in [mS/uF]
+i_K1 = g_K1 * xK1_inf * sqrt(potassium_dynamics.K_o / 5.4 [mM]) * (membrane.V - reversal_potentials.E_K)
+    in [A/F]
+xK1_inf = alpha_K1 / (alpha_K1 + beta_K1)
+    in [1]
+
+[membrane]
+Cm = 0.185 [uF]
+    in [uF]
+F =  9.64853414999999950e4 [C/mmol]
+    in [C/mmol]
+R = 8314.472 [J/mol/K]
+    in [J/mol/K]
+T = 310 [K]
+    in [K]
+dot(V) = -1 / 1 * (inward_rectifier_potassium_current.i_K1 + transient_outward_current.i_to + rapid_time_dependent_potassium_current.i_Kr + slow_time_dependent_potassium_current.i_Ks + L_type_Ca_current.i_CaL + sodium_potassium_pump_current.i_NaK + fast_sodium_current.i_Na + sodium_background_current.i_b_Na + sodium_calcium_exchanger_current.i_NaCa + calcium_background_current.i_b_Ca + potassium_pump_current.i_p_K + calcium_pump_current.i_p_Ca + i_Stim)
+    in [mV]
+V_c = 0.016404 [um^3]
+    in [um^3]
+level = 0 bind pace
+	in [1]
+i_Stim = level * stim_amplitude
+    in [A/F]
+stim_amplitude = 52 [A/F]
+    in [A/F]
+stim_duration = 1 [ms]
+    in [ms]
+stim_period = 1000 [ms]
+    in [ms]
+stim_start = 10 [ms]
+    in [ms]
+
+[potassium_dynamics]
+dot(K_i) = -1 [1 (1e+09)] * (inward_rectifier_potassium_current.i_K1 + transient_outward_current.i_to + rapid_time_dependent_potassium_current.i_Kr + slow_time_dependent_potassium_current.i_Ks + potassium_pump_current.i_p_K + membrane.i_Stim - 2 * sodium_potassium_pump_current.i_NaK) / (1 [1 (1e+15)] * membrane.V_c * membrane.F) * membrane.Cm
+    in [mM]
+K_o = 5.4 [mM]
+    in [mM]
+
+[potassium_pump_current]
+g_pK = 0.0146 [mS/uF]
+    in [mS/uF]
+i_p_K = g_pK * (membrane.V - reversal_potentials.E_K) / (1 + exp((25 [mV] - membrane.V) / 5.98 [mV]))
+    in [A/F]
+
+[rapid_time_dependent_potassium_current]
+g_Kr = 0.153 [mS/uF]
+    in [mS/uF]
+i_Kr = g_Kr * sqrt(potassium_dynamics.K_o / 5.4 [mM]) * rapid_time_dependent_potassium_current_Xr1_gate.Xr1 * rapid_time_dependent_potassium_current_Xr2_gate.Xr2 * (membrane.V - reversal_potentials.E_K)
+    in [A/F]
+
+[rapid_time_dependent_potassium_current_Xr1_gate]
+dot(Xr1) = (xr1_inf - Xr1) / tau_xr1
+    in [1]
+alpha_xr1 = 450 / (1 + exp((-45 [mV] - membrane.V) / 10 [mV]))
+    in [1]
+beta_xr1 = 6 / (1 + exp((membrane.V + 30 [mV]) / 11.5 [mV]))
+    in [1]
+tau_xr1 = 1 [ms] * alpha_xr1 * beta_xr1
+    in [ms]
+xr1_inf = 1 / (1 + exp((-26 [mV] - membrane.V) / 7 [mV]))
+    in [1]
+
+[rapid_time_dependent_potassium_current_Xr2_gate]
+dot(Xr2) = (xr2_inf - Xr2) / tau_xr2
+    in [1]
+alpha_xr2 = 3 / (1 + exp((-60 [mV] - membrane.V) / 20 [mV]))
+    in [1]
+beta_xr2 = 1.12 / (1 + exp((membrane.V - 60 [mV]) / 20 [mV]))
+    in [1]
+tau_xr2 = 1 [ms] * alpha_xr2 * beta_xr2
+    in [ms]
+xr2_inf = 1 / (1 + exp((membrane.V + 88 [mV]) / 24 [mV]))
+    in [1]
+
+[reversal_potentials]
+E_Ca = 0.5 * membrane.R * membrane.T / membrane.F * log(calcium_dynamics.Ca_o / calcium_dynamics.Ca_i)
+    in [mV]
+E_K = membrane.R * membrane.T / membrane.F * log(potassium_dynamics.K_o / potassium_dynamics.K_i)
+    in [mV]
+E_Ks = membrane.R * membrane.T / membrane.F * log((potassium_dynamics.K_o + P_kna * sodium_dynamics.Na_o) / (potassium_dynamics.K_i + P_kna * sodium_dynamics.Na_i))
+    in [mV]
+E_Na = membrane.R * membrane.T / membrane.F * log(sodium_dynamics.Na_o / sodium_dynamics.Na_i)
+    in [mV]
+P_kna = 0.03
+    in [1]
+
+[slow_time_dependent_potassium_current]
+g_Ks = 0.392 [mS/uF]
+    in [mS/uF]
+i_Ks = g_Ks * slow_time_dependent_potassium_current_Xs_gate.Xs ^ 2 * (membrane.V - reversal_potentials.E_Ks)
+    in [A/F]
+
+[slow_time_dependent_potassium_current_Xs_gate]
+dot(Xs) = (xs_inf - Xs) / tau_xs
+    in [1]
+alpha_xs = 1400 / sqrt(1 + exp((5 [mV] - membrane.V) / 6 [mV]))
+    in [1]
+beta_xs = 1 / (1 + exp((membrane.V - 35 [mV]) / 15 [mV]))
+    in [1]
+tau_xs = 1 [ms] * alpha_xs * beta_xs + 80 [ms]
+    in [ms]
+xs_inf = 1 / (1 + exp((-5 [mV] - membrane.V) / 14 [mV]))
+    in [1]
+
+[sodium_background_current]
+g_bna = 0.00029 [mS/uF]
+    in [mS/uF]
+i_b_Na = g_bna * (membrane.V - reversal_potentials.E_Na)
+    in [A/F]
+
+[sodium_calcium_exchanger_current]
+K_NaCa = 1000 [A/F]
+    in [A/F]
+K_sat = 0.1
+    in [1]
+Km_Ca = 1.38 [mM]
+    in [mM]
+Km_Nai = 87.5 [mM]
+    in [mM]
+alpha = 2.5
+    in [1]
+gamma = 0.35
+    in [1]
+i_NaCa = K_NaCa * (exp(gamma * membrane.V * membrane.F / (membrane.R * membrane.T)) * sodium_dynamics.Na_i ^ 3 * calcium_dynamics.Ca_o - exp((gamma - 1) * membrane.V * membrane.F / (membrane.R * membrane.T)) * sodium_dynamics.Na_o ^ 3 * calcium_dynamics.Ca_i * alpha) / ((Km_Nai ^ 3 + sodium_dynamics.Na_o ^ 3) * (Km_Ca + calcium_dynamics.Ca_o) * (1 + K_sat * exp((gamma - 1) * membrane.V * membrane.F / (membrane.R * membrane.T))))
+    in [A/F]
+
+[sodium_dynamics]
+dot(Na_i) = -1 [1 (1e+09)] * (fast_sodium_current.i_Na + sodium_background_current.i_b_Na + 3 * sodium_potassium_pump_current.i_NaK + 3 * sodium_calcium_exchanger_current.i_NaCa) / (1 [1 (1e+15)] * membrane.V_c * membrane.F) * membrane.Cm
+    in [mM]
+Na_o = 140 [mM]
+    in [mM]
+
+[sodium_potassium_pump_current]
+K_mNa = 40 [mM]
+    in [mM]
+K_mk = 1 [mM]
+    in [mM]
+P_NaK = 2.724 [A/F]
+    in [A/F]
+i_NaK = P_NaK * potassium_dynamics.K_o / (potassium_dynamics.K_o + K_mk) * sodium_dynamics.Na_i / (sodium_dynamics.Na_i + K_mNa) / (1 + 0.1245 * exp(-0.1 * membrane.V * membrane.F / (membrane.R * membrane.T)) + 0.0353 * exp(-membrane.V * membrane.F / (membrane.R * membrane.T)))
+    in [A/F]
+
+[transient_outward_current]
+g_to = 0.294 [mS/uF]
+    in [mS/uF]
+i_to = g_to * transient_outward_current_r_gate.r * transient_outward_current_s_gate.s * (membrane.V - reversal_potentials.E_K)
+    in [A/F]
+
+[transient_outward_current_r_gate]
+dot(r) = (r_inf - r) / tau_r
+    in [1]
+r_inf = 1 / (1 + exp((20 [mV] - membrane.V) / 6 [mV]))
+    in [1]
+tau_r = 9.5 [ms] * exp(-(membrane.V + 40 [mV]) ^ 2 / 1800 [mV^2]) + 0.8 [ms]
+    in [ms]
+
+[transient_outward_current_s_gate]
+dot(s) = (s_inf - s) / tau_s
+    in [1]
+s_inf = 1 / (1 + exp((membrane.V + 20 [mV]) / 5 [mV]))
+    in [1]
+tau_s = 85 [ms] * exp(-(membrane.V + 45 [mV]) ^ 2 / 320 [mV^2]) + 5 [ms] / (1 + exp((membrane.V - 20 [mV]) / 5 [mV])) + 3 [ms]
+    in [ms]
+
+
+
+[[protocol]]
+# Level  Start    Length   Period   Multiplier
+1        50       0.5      1000     0
+
