@@ -31,3 +31,5 @@ That's it ! You have loaded the model and are ready to run simulations with it. 
 
 Some models (for example cardiac cell models) include external stimulus. The stimulus protocol must be written in the ```[[protocol]]``` section of the MMT model.
 
+https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20loading%20CellML%20model/protocol_example.PNG?token=ANSJY55QQOC3DRIVS4QLQKC7GLEFG
+
