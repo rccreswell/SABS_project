@@ -16,7 +16,7 @@ import sabs_pkpd
 import matplotlib.pyplot as plt
 ```
 
-Then browse to the CellML file for the model you just downloaded. You can also enter a path to where to save the MMT conversion of the model, which we recommend for two reasons. The first reason is that this avoids you to redo the conversion of your model from CellML to MMT (which is anyway needed to run simulations) everytime you want to change anything in your model. The second reason is that changing anything in your model will be more convenient in the MMT format. So by saving the MMT model, you can easily update your model and reload it using the function for loading MMT models presented in another example.
+Then browse to the CellML file for the model you just downloaded. You also need to enter a path to where to save the MMT conversion of the model, which will be useful for two reasons. The first reason is that this avoids you to redo the conversion of your model from CellML to MMT (which is anyway needed to run simulations) everytime you want to change anything in your model. The second reason is that changing anything in your model will be more convenient in the MMT format. So by saving the MMT model, you can easily update your model and reload it using the function for loading MMT models presented in another example.
 
 ```python
 cellml = 'Examples/Example loading CellML model/grandi_pasqualini_bers_2010.cellml'
