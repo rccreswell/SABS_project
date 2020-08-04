@@ -101,8 +101,15 @@ def load_model_from_cellml(cellml_filename, mmt_filename):
 
     importer = myokit.formats.importer('cellml')
     model = importer.model(cellml_filename)
-    model, prot = convert_protocol(model)
-    myokit.save_model(mmt_filename, model)
+
+    # Try to parse the stimulus protocol from the CellML model
+    try:
+        model, prot = convert_protocol(model)
+        myokit.save_model(mmt_filename, model)
+
+    # If the names of variables do not match, just load the model as is
+    except:
+        myokit.save_model(mmt_filename, model)
 
     sim = load_simulation_from_mmt(mmt_filename)
     return sim
