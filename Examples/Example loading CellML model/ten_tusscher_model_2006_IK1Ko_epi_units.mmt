@@ -284,7 +284,7 @@ level = 0 bind pace
 	in [1]
 i_Stim = level * stim_amplitude
     in [A/F]
-stim_amplitude = 52 [A/F]
+stim_amplitude = -52 [A/F]
     in [A/F]
 stim_duration = 1 [ms]
     in [ms]
@@ -426,8 +426,6 @@ tau_s = 85 [ms] * exp(-(membrane.V + 45 [mV]) ^ 2 / 320 [mV^2]) + 5 [ms] / (1 + 
     in [ms]
 
 
-
 [[protocol]]
 # Level  Start    Length   Period   Multiplier
 1        50       0.5      1000     0
-
