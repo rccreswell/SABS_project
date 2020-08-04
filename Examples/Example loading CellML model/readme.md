@@ -7,7 +7,7 @@ If you are brave enough, you can start writing the CellML model from scratch on 
 
 ## Loading the CellML model with the package
 
-Here, we will use the example of Grandi, Pasqualini, Bers 2010 model for cardiac cells (https://models.physiomeproject.org/workspace/grandi_pasqualini_bers_2010/file/8a2c891da5f2f1b90d9c465b7bc63f652999d096/grandi_pasqualini_bers_2010.cellml).
+Here, we will use the example of Ten Tusscher Panfilov 2006 model for cardiac cells (https://models.physiomeproject.org/workspace/tentusscher_panfilov_2006/file/5dc42395eef6044fe766786f7bff197dea355eb3/ten_tusscher_model_2006_IK1Ko_epi_units.cellml).
 
 Start by importing the needed librairies:
 
@@ -27,8 +27,13 @@ simulation = sabs_pkpd.load_model.load_model_from_cellml(cellml, mmt)
 
 That's it ! You have loaded the model and are ready to run simulations with it. It is loaded to the variable ```simulation``` which is a Myokit object.
 
-## Run a quick simulation with your freshly loaded model
+## Be careful with stimulus protocol
 
-Now that you have your MMT model loaded in ```simulation```, you can run it. The simplest ever 
+Some models (for example cardiac cell models) include external stimulus. The stimulus protocol must be written in the ```[[protocol]]``` section of the MMT model. The image below gives an example of how to write the protocol section of the model. Here, the stimulus is applied for a time duration of 0.5ms, every 1000ms, starting from time t=50 ms.
 
+![protocol_example](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20loading%20CellML%20model/protocol_example.PNG?token=ANSJY55QQOC3DRIVS4QLQKC7GLEFG)
+
+In the example of cardiac cell models, the external stimulus is a current, for instance ```I_stim``` in this example. A variable ```level``` is added to retrieve the stimulus instructions from the ```[[protocol]]``` section.
+
+![binding_example](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20loading%20CellML%20model/protocol_example_bis.PNG?token=ANSJY552ZKAQKO52R6JHR427GLE6E)
 
