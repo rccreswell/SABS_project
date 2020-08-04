@@ -33,3 +33,7 @@ Some models (for example cardiac cell models) include external stimulus. The sti
 
 ![protocol_example](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20loading%20CellML%20model/protocol_example.PNG?token=ANSJY55QQOC3DRIVS4QLQKC7GLEFG)
 
+In the example of cardiac cell models, the external stimulus is a current, for instance ```I_stim``` in this example. A variable ```level``` is added to retrieve the stimulus instructions from the ```[[protocol]]``` section.
+
+![binding_example](https://raw.githubusercontent.com/rcw5890/SABS_project/master/Examples/Example%20loading%20CellML%20model/protocol_example_bis.PNG?token=ANSJY552ZKAQKO52R6JHR427GLE6E)
+
