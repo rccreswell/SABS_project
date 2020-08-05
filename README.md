@@ -6,7 +6,7 @@
 
 [![codecov](https://codecov.io/gh/rcw5890/SABS_project/branch/master/graph/badge.svg?token=IYc8QeF81y)](https://codecov.io/gh/rcw5890/SABS_project)
 
-# SABS_project
+# Application of Software Engineering principles to interface Myokit and PINTS packages
 
 Hi fellow scientist !
 
@@ -17,3 +17,16 @@ We propose hereby a Python package that enables an easy fitting of model paramet
 To ensure you have a smooth experience using our Python package, we wrote some examples just for you. You might want to check that out, in the Examples folder. 
 
 We hope that you will enjoy using the present tool, and that it brightens up your day of programming :)
+
+If you are using our software for any of your paper, we would be thankful for citing in using the BibTeX reference below. Please note that both authors contributed equally to this work.
+
+@article{barralcreswell2020sabs,
+  title={Application of Software Engineering principles to interface Myokit and PINTS packages},
+  author={Barral Yann-Stanislas and Richard Creswell},
+  journal={GitHub},
+  volume={},
+  number={},
+  pages={},
+  year={2020},
+  publisher={GitHub}
+}
