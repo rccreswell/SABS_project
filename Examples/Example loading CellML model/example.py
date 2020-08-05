@@ -3,18 +3,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Enter the filenames for the CellML to load and the MMT to save
-cellml = 'Examples/Example loading CellML model/ten_tusscher' +
+cellml = 'Examples/Example loading CellML model/ten_tusscher' \
          '_model_2006_IK1Ko_epi_units.cellml'
-mmt = 'Examples/Example loading CellML model/ten_tusscher' +
+mmt = 'Examples/Example loading CellML model/ten_tusscher' \
       '_model_2006_IK1Ko_epi_units.mmt'
 
 # Load the CellML file and save the converted MMT model
 simulation = sabs_pkpd.load_model.load_model_from_cellml(cellml, mmt)
 
-""""
+"""
 MAKE SURE THAT THE STIMULUS IS SET CORRECTLY 
 BEFORE PROCEEDING TO THE FOLLOWING PART
-""""
+"""
 # Reload the model in case stimulation protocol changes were needed
 simulation = sabs_pkpd.load_model.load_simulation_from_mmt(mmt)
 
