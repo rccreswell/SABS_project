@@ -20,21 +20,14 @@ We hope that you will enjoy using the present tool, and that it brightens up you
 
 If you are using our software for any of your paper, we would be thankful for citing in using the BibTeX reference below. Please note that both authors contributed equally to this work.
 
+```
 @article{barralcreswell2020sabs,
-
-  title={Application of Software Engineering principles to interface Myokit and PINTS packages},
-  
-  author={Barral Yann-Stanislas and Richard Creswell},
-  
-  journal={GitHub},
-  
-  volume={},
-  
-  number={},
-  
-  pages={},
-  
-  year={2020},
-  
+  title={Application of Software Engineering principles to interface Myokit and PINTS packages},  
+  author={Barral Yann-Stanislas and Richard Creswell},  
+  journal={GitHub},  
+  volume={},  
+  number={},  
+  pages={},  
+  year={2020},  
   publisher={GitHub}
-}
+}```
