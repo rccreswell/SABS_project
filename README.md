@@ -23,7 +23,7 @@ If you are using our software for any of your paper, we would be thankful for ci
 ```
 @article{barralcreswell2020sabs,
   title={Application of Software Engineering principles to interface Myokit and PINTS packages},  
-  author={Barral Yann-Stanislas and Richard Creswell, Aditi Agrawal},  
+  author={Barral and Creswell, Agrawal},  
   journal={GitHub},  
   volume={},  
   number={},  
