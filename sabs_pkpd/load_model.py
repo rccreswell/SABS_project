@@ -108,7 +108,7 @@ def load_model_from_cellml(cellml_filename, mmt_filename):
         myokit.save_model(mmt_filename, model)
 
     # If the names of variables do not match, just load the model as is
-    except:
+    except KeyError:
         myokit.save_model(mmt_filename, model)
 
     sim = load_simulation_from_mmt(mmt_filename)
