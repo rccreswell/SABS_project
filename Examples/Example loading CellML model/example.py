@@ -12,7 +12,7 @@ mmt = 'Examples/Example loading CellML model/ten_tusscher' \
 simulation = sabs_pkpd.load_model.load_model_from_cellml(cellml, mmt)
 
 """
-MAKE SURE THAT THE STIMULUS IS SET CORRECTLY 
+MAKE SURE THAT THE STIMULUS IS SET CORRECTLY
 BEFORE PROCEEDING TO THE FOLLOWING PART
 """
 # Reload the model in case stimulation protocol changes were needed
@@ -24,8 +24,7 @@ plt.plot(result['membrane.V'])
 
 # Run using the package
 times = np.linspace(0, 1000, 1001)
-result = sabs_pkpd.run_model.quick_simulate(simulation, 1000, 
+result = sabs_pkpd.run_model.quick_simulate(simulation, 1000,
                                             'membrane.V',
                                             time_samples=times)
 plt.plot(result[0])
-
