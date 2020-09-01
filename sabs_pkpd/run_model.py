@@ -46,27 +46,27 @@ def simulate_data(fitted_params_values, s, data_exp, pre_run=0):
         if sabs_pkpd.constants.default_state is not None:
             state_to_set = sabs_pkpd.constants.default_state
         else:
-            state_to_set = sabs_pkpd.constants.s.state()
+            state_to_set = s.state()
 
         for i in range(0,
                        len(data_exp.fitting_instructions.fitted_params_annot)):
             if sabs_pkpd.pints_problem_def.parameter_is_state(
                     data_exp.fitting_instructions.fitted_params_annot[i],
-                    sabs_pkpd.constants.s):
+                    s):
                 index = sabs_pkpd.pints_problem_def.find_index_of_state(
                     data_exp.fitting_instructions.fitted_params_annot[i],
-                    sabs_pkpd.constants.s)
+                    s)
                 state_to_set[index] = fitted_params_values[i]
 
         # Set the value of the initial state to what it should be
-        sabs_pkpd.constants.s.set_state(state_to_set)
+        s.set_state(state_to_set)
 
         # Set constant parameters values.
         for i in range(0,
                        len(data_exp.fitting_instructions.fitted_params_annot)):
             if not sabs_pkpd.pints_problem_def.parameter_is_state(
                     data_exp.fitting_instructions.fitted_params_annot[i],
-                    sabs_pkpd.constants.s):
+                    s):
                 s.set_constant(
                     data_exp.fitting_instructions.fitted_params_annot[i],
                     fitted_params_values[i])
